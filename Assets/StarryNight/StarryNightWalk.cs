@@ -19,17 +19,26 @@ namespace Puzzle.StarryNight
         Quaternion openingRotation;
         float elapsed, yaw, pitch, verticalSpeed;
 
+        public bool InputSuppressed { get; set; }
+        internal bool EscapeHandledExternally { get; set; }
+
         void Start()
         {
+            if (approachGuide == null)
+            {
+                EnterWalking(player.transform);
+                return;
+            }
             overlook = transform.position;
             openingRotation = transform.rotation;
             player.enabled = false;
             Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
         }
 
         void Update()
         {
-            if (dialoguePlayer != null && dialoguePlayer.BlocksGameplayInput) return;
+            if (InputSuppressed || (dialoguePlayer != null && dialoguePlayer.BlocksGameplayInput)) return;
             var keys = Keyboard.current;
             var mouse = Mouse.current;
             bool clicked = mouse != null && mouse.leftButton.wasPressedThisFrame;
@@ -42,7 +51,7 @@ namespace Puzzle.StarryNight
                 }
                 return;
             }
-            if (keys != null && keys.escapeKey.wasPressedThisFrame)
+            if (!EscapeHandledExternally && keys?.escapeKey.wasPressedThisFrame == true)
                 Cursor.lockState = CursorLockMode.None;
             if (view == View.Approaching)
             {
@@ -77,6 +86,22 @@ namespace Puzzle.StarryNight
 
         static int Pressed(bool value) => value ? 1 : 0;
 
+        public void EnterWalking(Transform spawn = null)
+        {
+            if (spawn != null && spawn != player.transform)
+            {
+                player.enabled = false;
+                player.transform.SetPositionAndRotation(spawn.position, spawn.rotation);
+            }
+            yaw = player.transform.eulerAngles.y;
+            pitch = -5f;
+            verticalSpeed = 0;
+            player.enabled = true;
+            view = View.Walking;
+            transform.SetPositionAndRotation(player.transform.position + Vector3.up * eyeHeight, Quaternion.Euler(pitch, yaw, 0));
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+
         void FlyToEntrance()
         {
             elapsed += Time.deltaTime;
@@ -87,15 +112,14 @@ namespace Puzzle.StarryNight
             var arrivalRotation = Quaternion.Euler(-5f, player.transform.eulerAngles.y, 0);
             transform.SetPositionAndRotation(Vector3.Lerp(a, b, t), Quaternion.Slerp(openingRotation, arrivalRotation, t));
             if (elapsed < approachSeconds) return;
-            yaw = player.transform.eulerAngles.y;
-            pitch = -5f;
-            player.enabled = true;
-            view = View.Walking;
+            bool captured = Cursor.lockState == CursorLockMode.Locked;
+            EnterWalking();
+            if (!captured) Cursor.lockState = CursorLockMode.None;
         }
 
         void OnGUI()
         {
-            if (view != View.Overlook) return;
+            if (view != View.Overlook || InputSuppressed) return;
             var rect = new Rect((Screen.width-164)*.5f, Screen.height-62, 164, 34);
             GUI.Box(rect, "点击进入村落");
         }

@@ -123,13 +123,22 @@ namespace Puzzle.Dialogue
                 prompt.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
-        public bool TryPlay(DialogueConversation asset, DialogueAppearance appearance = null, Action completed = null)
+        public bool TryPlay(DialogueConversation asset, DialogueAppearance appearance = null, Action completed = null,
+            string startNodeId = null)
         {
             if (!isActiveAndEnabled || overlay == null || IsPlaying || asset == null) return false;
             if (!asset.TryBuildIndex(out var index, out var entry, out string error))
             {
                 Debug.LogError($"Dialogue '{asset.name}': {error}", asset);
                 return false;
+            }
+
+            if (!string.IsNullOrEmpty(startNodeId))
+            {
+                if (index.TryGetValue(startNodeId, out var checkpointNode))
+                    entry = checkpointNode;
+                else
+                    Debug.LogWarning($"Dialogue '{asset.name}' has no node '{startNodeId}'. Starting from the beginning.", asset);
             }
 
             conversation = asset;

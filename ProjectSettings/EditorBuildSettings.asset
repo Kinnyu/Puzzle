@@ -6,6 +6,12 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
+    path: Assets/Scenes/Start.unity
+    guid: 3b2874a70c91b874c80cb3d8a987dae8
+  - enabled: 1
+    path: Assets/Scenes/StoryGallery.unity
+    guid: 2d3e98440cd2f424c9a1798fa446d85b
+  - enabled: 1
     path: Assets/Scenes/StarryNight.unity
     guid: fbc4aa29f56e5a75aa8ee5fd0e0f00ca
   - enabled: 1

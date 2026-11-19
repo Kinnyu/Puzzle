@@ -1,0 +1,231 @@
+.story-screen {
+    flex-grow: 1;
+    color: #f6eddb;
+    font-size: 16px;
+}
+
+.story-start-art {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    -unity-background-scale-mode: scale-and-crop;
+}
+
+.story-start {
+    flex-grow: 1;
+    justify-content: center;
+    padding-left: 9%;
+    background-color: rgba(7, 12, 23, 0.20);
+}
+
+.story-title-card {
+    width: 420px;
+    max-width: 85%;
+    padding: 42px;
+    background-color: rgba(12, 18, 30, 0.95);
+    border-left-width: 3px;
+    border-left-color: #cda567;
+    align-items: flex-start;
+}
+
+.story-title {
+    font-size: 58px;
+    -unity-font-style: bold;
+    margin-bottom: 24px;
+}
+
+.story-reticle {
+    width: 6px;
+    height: 6px;
+    border-radius: 3px;
+    border-width: 1px;
+    border-color: #fff0c9;
+    background-color: rgba(17, 24, 36, 0.8);
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    translate: -3px -3px;
+}
+
+.story-reticle-active {
+    background-color: #ffe8ac;
+    border-color: #ffe8ac;
+}
+
+.story-prompt {
+    position: absolute;
+    align-self: center;
+    top: 55%;
+    background-color: rgba(12, 18, 30, 0.90);
+    padding: 9px 17px;
+    color: #fff0cf;
+}
+
+.story-controls, .story-toast {
+    position: absolute;
+    left: 26px;
+    bottom: 24px;
+    padding: 8px 14px;
+    background-color: rgba(12, 18, 30, 0.84);
+    color: #f2e4cb;
+    font-size: 14px;
+}
+
+.story-toast {
+    left: auto;
+    right: 26px;
+    border-right-width: 2px;
+    border-right-color: #cda567;
+}
+
+.story-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    padding: 20px;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(6, 10, 18, 0.68);
+}
+
+.story-card {
+    width: 600px;
+    max-width: 100%;
+    max-height: 95%;
+    padding: 28px;
+    background-color: #111927;
+    border-top-width: 2px;
+    border-top-color: #cda567;
+}
+
+.story-card-title {
+    font-size: 30px;
+    -unity-font-style: bold;
+    margin-bottom: 12px;
+    white-space: normal;
+}
+
+.story-detail {
+    color: #e6cf9e;
+    margin-top: 9px;
+    margin-bottom: 6px;
+    min-height: 24px;
+    white-space: normal;
+}
+
+.story-chapters {
+    min-height: 60px;
+    max-height: 278px;
+    margin-top: 2px;
+}
+
+.story-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    margin-top: 6px;
+}
+
+.story-button {
+    min-height: 42px;
+    padding: 6px 15px;
+    margin: 4px;
+    border-width: 1px;
+    border-color: #526179;
+    border-radius: 2px;
+    background-color: #212d40;
+    color: #f6eddb;
+    white-space: normal;
+}
+
+.story-button:hover {
+    border-color: #e1bc7d;
+    background-color: #35445b;
+}
+
+.story-button:focus {
+    border-color: #e1bc7d;
+}
+
+.story-selected, .story-primary {
+    border-color: #e6c48a;
+    background-color: #e6c48a;
+    color: #171b24;
+}
+
+.story-primary:hover {
+    color: #171b24;
+    background-color: #f5d9a6;
+}
+
+.story-button:disabled {
+    opacity: 0.55;
+}
+
+.story-chapter {
+    -unity-text-align: middle-left;
+    margin-left: 0;
+    margin-right: 8px;
+}
+
+.drawing-tools {
+    position: absolute;
+    bottom: 22px;
+    align-self: center;
+    max-width: 95%;
+    padding: 8px 12px;
+    background-color: rgba(12, 18, 30, 0.96);
+    border-top-width: 2px;
+    border-top-color: #cda567;
+}
+
+.drawing-palette, .drawing-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.drawing-swatch {
+    width: 29px;
+    min-height: 29px;
+    padding: 0;
+    border-width: 2px;
+    border-color: #303747;
+}
+
+.drawing-swatch-selected {
+    border-color: #f9e2ad;
+}
+
+.drawing-eraser {
+    color: #171b24;
+    -unity-font-style: bold;
+}
+
+.drawing-brush {
+    width: 154px;
+    margin: 4px 8px;
+}
+
+.drawing-brush .unity-base-field__label {
+    min-width: 0;
+    margin-right: 8px;
+    color: #f6eddb;
+}
+
+.drawing-power {
+    position: absolute;
+    align-self: center;
+    top: 61%;
+    width: 180px;
+    height: 20px;
+}
+
+.drawing-power .unity-progress-bar__progress {
+    background-color: #cda567;
+}

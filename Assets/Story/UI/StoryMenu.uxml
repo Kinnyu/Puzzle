@@ -1,0 +1,4 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements">
+    <Style src="StoryMenu.uss" />
+    <ui:VisualElement name="story-screen" class="story-screen" picking-mode="Ignore" />
+</ui:UXML>

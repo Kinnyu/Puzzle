@@ -36,16 +36,18 @@ namespace Puzzle.Dialogue
         // Assign this method to a button, puzzle event, or cutscene signal.
         public void Play() => TryPlay();
 
+        public void PlayFromNode(string nodeId) => TryPlay(nodeId);
+
         internal void PlayOnEntry()
         {
             playedOnEntry = true;
             TryPlay();
         }
 
-        internal bool TryPlay()
+        internal bool TryPlay(string nodeId = null)
         {
             if (!isActiveAndEnabled || (once && completed) || player == null) return false;
-            if (!player.TryPlay(conversation, appearance, HandleCompleted)) return false;
+            if (!player.TryPlay(conversation, appearance, HandleCompleted, nodeId)) return false;
             playedOnEntry = true;
             return true;
         }

@@ -5302,6 +5302,118 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 89611902}
   m_Mesh: {fileID: -2951874241262920753, guid: f7521f88de43b4e4baaee5f5548be1f6, type: 2}
+--- !u!1 &93065344
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 93065347}
+  - component: {fileID: 93065346}
+  - component: {fileID: 93065345}
+  m_Layer: 0
+  m_Name: Story Progress
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &93065345
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 93065344}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a97781d97c1768a4aa5afd0427e2c1ac, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Puzzle.Story.StorySceneProgress
+  story: {fileID: 11400000, guid: 3beaf739c90b1814fb859207cebea458, type: 2}
+  chapterId: chapter-1
+  checkpoints:
+  - id: church-help
+    spawn: {fileID: 948652741}
+    dialogue: {fileID: 11400000, guid: f2ddc9af84e7643418be38d8e1584bb2, type: 2}
+    dialogueNodeId: help
+    onRestored:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1557310017}
+          m_TargetAssemblyTypeName: Puzzle.Dialogue.DialogueTrigger, Assembly-CSharp
+          m_MethodName: PlayFromNode
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: help
+            m_BoolArgument: 0
+          m_CallState: 2
+  - id: church-value
+    spawn: {fileID: 948652741}
+    dialogue: {fileID: 11400000, guid: f2ddc9af84e7643418be38d8e1584bb2, type: 2}
+    dialogueNodeId: value
+    onRestored:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1557310017}
+          m_TargetAssemblyTypeName: Puzzle.Dialogue.DialogueTrigger, Assembly-CSharp
+          m_MethodName: PlayFromNode
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: 
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: value
+            m_BoolArgument: 0
+          m_CallState: 2
+  walk: {fileID: 330585548}
+  dialoguePlayer: {fileID: 1285379369}
+  font: {fileID: 12800000, guid: cafdc8ada718a6243a4caed82d90c1a7, type: 3}
+--- !u!114 &93065346
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 93065344}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.UIElements.UIDocument
+  m_PanelSettings: {fileID: 11400000, guid: 899c1305a0239c4419592befa4296864, type: 2}
+  m_ParentUI: {fileID: 0}
+  sourceAsset: {fileID: 9197481963319205126, guid: 6910da620455d2045aff719bef468c2d, type: 3}
+  m_SortingOrder: 10
+  m_Position: 0
+  m_WorldSpaceSizeMode: 1
+  m_WorldSpaceWidth: 1920
+  m_WorldSpaceHeight: 1080
+  m_PivotReferenceSize: 0
+  m_Pivot: 0
+  m_WorldSpaceCollider: {fileID: 0}
+--- !u!4 &93065347
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 93065344}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &99420089
 GameObject:
   m_ObjectHideFlags: 0
@@ -65228,7 +65340,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b04951f03ce43194ea7068beaac07e04, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Puzzle.Dialogue.DialoguePlayer
   traditionalChineseFont: {fileID: 12800000, guid: cafdc8ada718a6243a4caed82d90c1a7, type: 3}
   japaneseFont: {fileID: 12800000, guid: 52a61bda1e9ad7844a9c511b939bb9a6, type: 3}
@@ -65244,7 +65356,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 19102, guid: 0000000000000000e000000000000000, type: 0}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: UnityEngine.dll::UnityEngine.UIElements.UIDocument
   m_PanelSettings: {fileID: 11400000, guid: 899c1305a0239c4419592befa4296864, type: 2}
   m_ParentUI: {fileID: 0}
@@ -77880,7 +77992,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 420cdc3c73014c2fab191cb373c1ff21, type: 3}
-  m_Name:
+  m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Puzzle.Dialogue.DialogueTrigger
   player: {fileID: 1285379369}
   conversation: {fileID: 11400000, guid: f2ddc9af84e7643418be38d8e1584bb2, type: 2}
@@ -77891,7 +78003,19 @@ MonoBehaviour:
   appearance: {fileID: 0}
   onCompleted:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 93065345}
+        m_TargetAssemblyTypeName: Puzzle.Story.StorySceneProgress, Assembly-CSharp
+        m_MethodName: CompleteChapter
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &1559741208
 GameObject:
   m_ObjectHideFlags: 0
@@ -109069,3 +109193,4 @@ SceneRoots:
   - {fileID: 1014500647}
   - {fileID: 1131787133}
   - {fileID: 1285379371}
+  - {fileID: 93065347}
