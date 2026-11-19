@@ -1,3 +1,4 @@
+using Puzzle.Dialogue;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -10,6 +11,7 @@ namespace Puzzle.StarryNight
         [SerializeField] Transform approachGuide;
         [SerializeField, Min(.1f)] float approachSeconds = 6.5f;
         [SerializeField, Min(.1f)] float eyeHeight = 1.62f;
+        [SerializeField] DialoguePlayer dialoguePlayer;
 
         enum View { Overlook, Approaching, Walking }
         View view;
@@ -27,6 +29,7 @@ namespace Puzzle.StarryNight
 
         void Update()
         {
+            if (dialoguePlayer != null && dialoguePlayer.BlocksGameplayInput) return;
             var keys = Keyboard.current;
             var mouse = Mouse.current;
             bool clicked = mouse != null && mouse.leftButton.wasPressedThisFrame;
