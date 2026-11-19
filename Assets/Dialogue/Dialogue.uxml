@@ -3,16 +3,18 @@
     <ui:VisualElement class="dialogue-root" picking-mode="Ignore">
         <ui:Label name="dialogue-prompt" class="dialogue-prompt" picking-mode="Ignore" />
         <ui:VisualElement name="dialogue-overlay" class="dialogue-overlay">
+            <ui:VisualElement name="dialogue-shade" class="dialogue-shade" picking-mode="Ignore" />
+            <ui:Image name="dialogue-portrait" class="dialogue-portrait" picking-mode="Ignore" />
             <ui:VisualElement name="dialogue-card" class="dialogue-card">
-                <ui:VisualElement class="dialogue-toolbar">
-                    <ui:Button name="dialogue-language" class="dialogue-control" />
-                    <ui:Button name="dialogue-close" class="dialogue-control" />
-                </ui:VisualElement>
-                <ui:ScrollView name="dialogue-scroll" horizontal-scroller-visibility="Hidden">
+                <ui:ScrollView name="dialogue-scroll" class="dialogue-scroll" horizontal-scroller-visibility="Hidden">
                     <ui:Label name="dialogue-speaker" class="dialogue-speaker" />
                     <ui:Label name="dialogue-line" class="dialogue-line" />
                     <ui:VisualElement name="dialogue-actions" />
                 </ui:ScrollView>
+            </ui:VisualElement>
+            <ui:VisualElement class="dialogue-toolbar" picking-mode="Ignore">
+                <ui:Button name="dialogue-language" class="dialogue-control" />
+                <ui:Button name="dialogue-close" class="dialogue-control" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>

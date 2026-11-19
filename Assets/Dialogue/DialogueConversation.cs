@@ -42,6 +42,8 @@ namespace Puzzle.Dialogue
             public string id;
             public DialogueText speaker;
             public DialogueText line;
+            public Texture2D portrait;
+            public bool portraitOnRight;
             [Tooltip("For a line without choices. Leave empty to finish the conversation.")]
             public string nextNodeId;
             public Choice[] choices;

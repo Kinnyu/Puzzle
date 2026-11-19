@@ -23,41 +23,74 @@
     flex-grow: 1;
     align-items: center;
     justify-content: flex-end;
-    padding: 0 20px 32px;
-    background-color: rgba(9, 14, 25, 0.27);
     color: #f6edd7;
 }
 
+.dialogue-shade {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    min-height: 40%;
+    max-height: 100%;
+    background-image: url("project://database/Assets/Dialogue/Subtitle%20Fade.png");
+    background-size: 100% 100%;
+}
+
+.dialogue-portrait {
+    display: none;
+    position: absolute;
+    bottom: 1.5%;
+    left: 4%;
+    width: 16%;
+    height: 30%;
+    max-width: 224px;
+    max-height: 224px;
+}
+
+.dialogue-portrait-visible {
+    display: flex;
+}
+
+.dialogue-portrait-right {
+    left: auto;
+    right: 4%;
+}
+
 .dialogue-card {
-    width: 100%;
+    width: 60%;
     max-width: 800px;
     max-height: 85%;
-    padding: 16px 24px 22px;
-    background-color: #151e30;
-    border-width: 1px;
-    border-color: #5a6180;
-    border-top-color: #c9a76d;
-    border-radius: 10px;
+    margin-bottom: 3%;
+}
+
+.dialogue-scroll {
+    flex-shrink: 1;
+    min-height: 0;
 }
 
 .dialogue-toolbar {
+    position: absolute;
+    top: 18px;
+    right: 20px;
     flex-direction: row;
-    justify-content: flex-end;
-    flex-shrink: 0;
-    margin-bottom: 8px;
 }
 
 .dialogue-speaker {
     font-size: 19px;
     color: #eac98d;
     white-space: normal;
-    margin-bottom: 8px;
+    margin-bottom: 5px;
+    -unity-text-align: middle-center;
+    text-shadow: 0 2px 4px rgba(4, 8, 19, 0.95);
 }
 
 .dialogue-line {
     font-size: 22px;
     white-space: normal;
-    margin-bottom: 18px;
+    margin-bottom: 10px;
+    -unity-text-align: middle-center;
+    text-shadow: 0 2px 4px rgba(4, 8, 19, 0.95);
 }
 
 .dialogue-control, .dialogue-action {
@@ -76,6 +109,16 @@
     font-size: 18px;
     white-space: normal;
     -unity-text-align: middle-left;
+}
+
+.dialogue-advance {
+    align-self: center;
+    background-color: transparent;
+    border-color: rgba(234, 201, 141, 0.35);
+    color: #eac98d;
+    font-size: 16px;
+    padding: 3px 12px;
+    -unity-text-align: middle-center;
 }
 
 .dialogue-control:focus, .dialogue-action:focus {

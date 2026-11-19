@@ -19,7 +19,9 @@ namespace Puzzle.Dialogue
 
         readonly List<DialogueTrigger> triggers = new();
         VisualElement overlay;
+        VisualElement shade;
         VisualElement card;
+        Image portrait;
         VisualElement actions;
         Label prompt;
         Label speaker;
@@ -46,7 +48,9 @@ namespace Puzzle.Dialogue
         {
             var root = GetComponent<UIDocument>().rootVisualElement;
             overlay = root?.Q("dialogue-overlay");
+            shade = root?.Q("dialogue-shade");
             card = root?.Q("dialogue-card");
+            portrait = root?.Q<Image>("dialogue-portrait");
             actions = root?.Q("dialogue-actions");
             prompt = root?.Q<Label>("dialogue-prompt");
             speaker = root?.Q<Label>("dialogue-speaker");
@@ -64,6 +68,8 @@ namespace Puzzle.Dialogue
 
             speaker.enableRichText = false;
             line.enableRichText = false;
+            if (portrait != null) portrait.scaleMode = ScaleMode.ScaleToFit;
+            if (shade != null) card.RegisterCallback<GeometryChangedEvent>(ResizeShade);
             overlay.style.display = DisplayStyle.None;
             languageButton.clicked += ToggleLanguage;
             closeButton.clicked += Cancel;
@@ -78,6 +84,7 @@ namespace Puzzle.Dialogue
             if (overlay == null) return;
             languageButton.clicked -= ToggleLanguage;
             closeButton.clicked -= Cancel;
+            if (shade != null) card.UnregisterCallback<GeometryChangedEvent>(ResizeShade);
             overlay = null;
         }
 
@@ -207,6 +214,12 @@ namespace Puzzle.Dialogue
             SetText(speaker, currentNode.speaker);
             speaker.style.display = string.IsNullOrWhiteSpace(speaker.text) ? DisplayStyle.None : DisplayStyle.Flex;
             SetText(line, currentNode.line);
+            if (portrait != null)
+            {
+                portrait.image = currentNode.portrait;
+                portrait.EnableInClassList("dialogue-portrait-visible", currentNode.portrait != null);
+                portrait.EnableInClassList("dialogue-portrait-right", currentNode.portraitOnRight);
+            }
             actions.Clear();
 
             if (currentNode.choices is { Length: > 0 })
@@ -219,12 +232,18 @@ namespace Puzzle.Dialogue
                 string nextId = currentNode.nextNodeId;
                 string label = string.IsNullOrEmpty(nextId) ? Local("結束", "会話を終える") : Local("繼續", "続ける");
                 var button = AddAction(nextId);
+                button.AddToClassList("dialogue-advance");
                 button.text = label;
                 ApplyFont(button, language);
             }
 
             scroll.scrollOffset = Vector2.zero;
             actions.ElementAt(0).Focus();
+        }
+
+        void ResizeShade(GeometryChangedEvent change)
+        {
+            shade.style.height = change.newRect.height + 104f;
         }
 
         Button AddAction(string nextId)
@@ -273,6 +292,7 @@ namespace Puzzle.Dialogue
             nodes = null;
             onCompleted = null;
             actions.Clear();
+            if (portrait != null) portrait.image = null;
             overlay.style.display = DisplayStyle.None;
             ApplyAppearance(null);
             closedFrame = Time.frameCount;
