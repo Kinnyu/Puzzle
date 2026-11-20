@@ -1,0 +1,644 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16a28623c3134fcaabde08787e9d8c51, type: 3}
+  m_Name: Chapter 2 - Ordinary Lives
+  m_EditorClassIdentifier:
+  entryNodeId: request
+  nodes:
+  - id: request
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "我一直想幫助那些生活困苦的人，但最近卻遇到了不少挫折……"
+      japanese: "苦しい暮らしを送る人たちを助けたいと思ってきたけれど、最近は挫折ばかりでね……。"
+    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
+    nextNodeId: request-2
+    choices: []
+  - id: request-2
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "我發現，光有想幫助別人的心，似乎還不夠。"
+      japanese: "力になりたいという気持ちだけでは足りないみたいだ。"
+    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
+    nextNodeId: request-3
+    choices: []
+  - id: request-3
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "你願意替我去看看那些辛苦生活的人們嗎？"
+      japanese: "僕の代わりに、懸命に生きる人たちの様子を見に行ってくれないか？"
+    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
+    nextNodeId:
+    choices:
+    - text:
+        traditionalChinese: "當然！我很樂意幫忙。"
+        japanese: "もちろん。喜んで手伝うよ。"
+      nextNodeId: request-yes
+    - text:
+        traditionalChinese: "我可以試試看，但不知道能幫上什麼忙。"
+        japanese: "やってみるけど、何ができるかは分からない。"
+      nextNodeId: request-try
+  - id: request-yes
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "謝謝你！我相信你的善意一定能帶給他們溫暖。"
+      japanese: "ありがとう。君の優しさなら、きっと力になれる。"
+    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
+    nextNodeId:
+    choices: []
+  - id: request-try
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "沒關係，有時候一點小小的幫助，就能帶來很大的改變。"
+      japanese: "大丈夫。ほんの小さな手助けが、大きな変化を生むこともある。"
+    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
+    nextNodeId:
+    choices: []
+  - id: miner
+    speaker:
+      traditionalChinese: "礦工"
+      japanese: "鉱夫"
+    line:
+      traditionalChinese: "唉……今天又在礦坑裡工作了一整天。"
+      japanese: "はあ……今日も一日中、坑道で働きづめだ。"
+    portrait: {fileID: 2800000, guid: 88d41b9c621ec2844939e163eb704c85, type: 3}
+    nextNodeId: miner-2
+    choices: []
+  - id: miner-2
+    speaker:
+      traditionalChinese: "礦工"
+      japanese: "鉱夫"
+    line:
+      traditionalChinese: "肚子餓得不得了，卻連一頓像樣的飯都吃不上。"
+      japanese: "腹が減ってたまらないのに、まともな飯すら食えない。"
+    portrait: {fileID: 2800000, guid: 88d41b9c621ec2844939e163eb704c85, type: 3}
+    nextNodeId: miner-3
+    choices: []
+  - id: miner-3
+    speaker:
+      traditionalChinese: "礦工"
+      japanese: "鉱夫"
+    line:
+      traditionalChinese: "如果能有點食物就好了……"
+      japanese: "何か食べるものがあればなあ……。"
+    portrait: {fileID: 2800000, guid: 88d41b9c621ec2844939e163eb704c85, type: 3}
+    nextNodeId:
+    choices: []
+  - id: farm
+    speaker:
+      traditionalChinese: "農夫"
+      japanese: "農夫"
+    line:
+      traditionalChinese: "哎呀！今天的農活可真多啊！"
+      japanese: "やれやれ、今日も畑仕事が山ほどあるよ。"
+    portrait: {fileID: 2800000, guid: 2d3b0e9bd5c1daf44848a7a59b231a42, type: 3}
+    nextNodeId: farm-2
+    choices: []
+  - id: farm-2
+    speaker:
+      traditionalChinese: "農夫"
+      japanese: "農夫"
+    line:
+      traditionalChinese: "年輕人，你願意幫我整理一下農田嗎？"
+      japanese: "若いの、畑を耕すのを手伝ってくれないかい？"
+    portrait: {fileID: 2800000, guid: 2d3b0e9bd5c1daf44848a7a59b231a42, type: 3}
+    nextNodeId:
+    choices:
+    - text:
+        traditionalChinese: "沒問題，我來幫你！"
+        japanese: "もちろん、手伝うよ。"
+      nextNodeId: farm-accept
+    - text:
+        traditionalChinese: "好吧，看起來你真的很需要幫忙。"
+        japanese: "いいよ。手が足りなさそうだね。"
+      nextNodeId: farm-accept
+  - id: farm-accept
+    speaker:
+      traditionalChinese: "農夫"
+      japanese: "農夫"
+    line:
+      traditionalChinese: "太好了！那就麻煩你了！"
+      japanese: "助かるよ、頼んだよ！"
+    portrait: {fileID: 2800000, guid: 2d3b0e9bd5c1daf44848a7a59b231a42, type: 3}
+    nextNodeId:
+    choices: []
+  - id: reward
+    speaker:
+      traditionalChinese: "農夫"
+      japanese: "農夫"
+    line:
+      traditionalChinese: "真是太感謝你了！有你的幫忙，今天的工作輕鬆多了。"
+      japanese: "本当にありがとう。おかげで今日の仕事がずいぶん楽になったよ。"
+    portrait: {fileID: 2800000, guid: 2d3b0e9bd5c1daf44848a7a59b231a42, type: 3}
+    nextNodeId: reward-2
+    choices: []
+  - id: reward-2
+    speaker:
+      traditionalChinese: "農夫"
+      japanese: "農夫"
+    line:
+      traditionalChinese: "這些是我們剛收成的馬鈴薯，雖然不是什麼貴重的東西，但都是我們辛苦種出來的。"
+      japanese: "これは採れたばかりのジャガイモ。高価なものではないけど、丹精を込めて育てたんだ。"
+    portrait: {fileID: 2800000, guid: 2d3b0e9bd5c1daf44848a7a59b231a42, type: 3}
+    nextNodeId: reward-3
+    choices: []
+  - id: reward-3
+    speaker:
+      traditionalChinese: "農夫"
+      japanese: "農夫"
+    line:
+      traditionalChinese: "就送給你當作謝禮吧！"
+      japanese: "お礼に受け取っておくれ！"
+    portrait: {fileID: 2800000, guid: 2d3b0e9bd5c1daf44848a7a59b231a42, type: 3}
+    nextNodeId:
+    choices: []
+  - id: delivery
+    speaker:
+      traditionalChinese: "礦工"
+      japanese: "鉱夫"
+    line:
+      traditionalChinese: "是你啊……找到食物了嗎？"
+      japanese: "君か……食べ物は見つかったかい？"
+    portrait: {fileID: 2800000, guid: 88d41b9c621ec2844939e163eb704c85, type: 3}
+    nextNodeId: potato
+    choices: []
+  - id: potato
+    speaker:
+      traditionalChinese: "玩家"
+      japanese: "あなた"
+    line:
+      traditionalChinese: "我帶了一些馬鈴薯給你，希望能幫上忙。"
+      japanese: "ジャガイモを持ってきたよ。少しでも役に立てば。"
+    nextNodeId: thanks
+    choices: []
+  - id: thanks
+    speaker:
+      traditionalChinese: "礦工"
+      japanese: "鉱夫"
+    line:
+      traditionalChinese: "真的嗎？太感謝你了！"
+      japanese: "本当かい？ ありがとう！"
+    portrait: {fileID: 2800000, guid: 88d41b9c621ec2844939e163eb704c85, type: 3}
+    nextNodeId: thanks-2
+    choices: []
+  - id: thanks-2
+    speaker:
+      traditionalChinese: "礦工"
+      japanese: "鉱夫"
+    line:
+      traditionalChinese: "我們每天辛苦工作，只希望能讓家人過上安穩的生活。"
+      japanese: "家族に穏やかな暮らしをさせたくて、毎日必死に働いているんだ。"
+    portrait: {fileID: 2800000, guid: 88d41b9c621ec2844939e163eb704c85, type: 3}
+    nextNodeId: thanks-3
+    choices: []
+  - id: thanks-3
+    speaker:
+      traditionalChinese: "礦工"
+      japanese: "鉱夫"
+    line:
+      traditionalChinese: "這些馬鈴薯對你來說或許很普通，但對現在的我來說，卻是非常珍貴的一餐。"
+      japanese: "君には普通のジャガイモかもしれないけど、今の僕にはかけがえのない一食だ。"
+    portrait: {fileID: 2800000, guid: 88d41b9c621ec2844939e163eb704c85, type: 3}
+    nextNodeId: thanks-4
+    choices: []
+  - id: thanks-4
+    speaker:
+      traditionalChinese: "礦工"
+      japanese: "鉱夫"
+    line:
+      traditionalChinese: "謝謝你願意幫助我。"
+      japanese: "手を差し伸べてくれて、本当にありがとう。"
+    portrait: {fileID: 2800000, guid: 88d41b9c621ec2844939e163eb704c85, type: 3}
+    nextNodeId:
+    choices: []
+  - id: theo
+    speaker:
+      traditionalChinese: "西奧"
+      japanese: "テオ"
+    line:
+      traditionalChinese: "你好！請問你認識文森特・梵谷嗎？"
+      japanese: "こんにちは。フィンセント・ファン・ゴッホを知っていますか？"
+    portrait: {fileID: 2800000, guid: 2e53c57501dbae04492237f3085a37e4, type: 3}
+    nextNodeId: theo-player
+    choices: []
+  - id: theo-player
+    speaker:
+      traditionalChinese: "玩家"
+      japanese: "あなた"
+    line:
+      traditionalChinese: "認識！我正準備回去找他。"
+      japanese: "知ってるよ。今から彼に会いに行くところだ。"
+    nextNodeId: theo-ask
+    choices: []
+  - id: theo-ask
+    speaker:
+      traditionalChinese: "西奧"
+      japanese: "テオ"
+    line:
+      traditionalChinese: "太好了！我是他的弟弟西奧。哥哥最近經歷了不少挫折，我一直很擔心他。"
+      japanese: "よかった。弟のテオです。兄は最近つらいこと続きで、ずっと心配していました。"
+    portrait: {fileID: 2800000, guid: 2e53c57501dbae04492237f3085a37e4, type: 3}
+    nextNodeId: theo-ask-2
+    choices: []
+  - id: theo-ask-2
+    speaker:
+      traditionalChinese: "西奧"
+      japanese: "テオ"
+    line:
+      traditionalChinese: "我寫了一封信給他，你能幫我轉交嗎？"
+      japanese: "兄に手紙を書きました。渡してもらえませんか？"
+    portrait: {fileID: 2800000, guid: 2e53c57501dbae04492237f3085a37e4, type: 3}
+    nextNodeId:
+    choices:
+    - text:
+        traditionalChinese: "當然可以！"
+        japanese: "もちろん。"
+      nextNodeId: theo-yes
+    - text:
+        traditionalChinese: "信裡寫了什麼呢？"
+        japanese: "何を書いたの？"
+      nextNodeId: theo-ask-letter
+  - id: theo-yes
+    speaker:
+      traditionalChinese: "西奧"
+      japanese: "テオ"
+    line:
+      traditionalChinese: "太感謝你了！希望這封信能讓哥哥重新振作起來。"
+      japanese: "ありがとう。この手紙で兄が少しでも元気を取り戻してくれたら。"
+    portrait: {fileID: 2800000, guid: 2e53c57501dbae04492237f3085a37e4, type: 3}
+    nextNodeId: theo-money
+    choices: []
+  - id: theo-ask-letter
+    speaker:
+      traditionalChinese: "西奧"
+      japanese: "テオ"
+    line:
+      traditionalChinese: "我只是想讓他知道，不管遇到什麼困難，他都不是孤單一個人。"
+      japanese: "どんな困難に遭っても、ひとりじゃないと伝えたかったんです。"
+    portrait: {fileID: 2800000, guid: 2e53c57501dbae04492237f3085a37e4, type: 3}
+    nextNodeId: theo-money
+    choices: []
+  - id: theo-money
+    speaker:
+      traditionalChinese: "西奧"
+      japanese: "テオ"
+    line:
+      traditionalChinese: "另外，我也準備了一些生活費，希望能減輕他的負擔。"
+      japanese: "生活費も少し用意しました。兄の負担が軽くなればと思って。"
+    portrait: {fileID: 2800000, guid: 2e53c57501dbae04492237f3085a37e4, type: 3}
+    nextNodeId:
+    choices: []
+  - id: return-with-letter
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "你回來了！怎麼樣？有遇到需要幫助的人嗎？"
+      japanese: "おかえり。どうだった？ 助けを必要としている人に会えたかい？"
+    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
+    nextNodeId: report-with-letter
+    choices: []
+  - id: report-with-letter
+    speaker:
+      traditionalChinese: "玩家"
+      japanese: "あなた"
+    line:
+      traditionalChinese: "我遇到了一位飢餓的礦工，後來幫農夫耕地，獲得了一些馬鈴薯，再把它們送給了礦工。"
+      japanese: "空腹の鉱夫に会ったよ。農夫を手伝ってジャガイモをもらい、その鉱夫に届けたんだ。"
+    nextNodeId: reflect-with-letter
+    choices: []
+  - id: reflect-with-letter
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "原來如此……那些人每天辛苦工作，只為了維持最基本的生活。"
+      japanese: "そうか……日々必死に働いて、やっと暮らしをつないでいるんだね。"
+    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
+    nextNodeId: reflect-with-letter-2
+    choices: []
+  - id: reflect-with-letter-2
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "他們用自己的雙手努力活著，這樣平凡的生活，其實也充滿了值得被看見的價值。"
+      japanese: "自分の手で懸命に生きている。そんなありふれた暮らしにも、見つめる価値がある。"
+    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
+    nextNodeId: reflect-with-letter-3
+    choices: []
+  - id: reflect-with-letter-3
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "我想……或許我能用畫筆，把他們真實的生活記錄下來。"
+      japanese: "僕は……絵筆で彼らのありのままの暮らしを描き残せるかもしれない。"
+    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
+    nextNodeId: reflect-with-letter-4
+    choices: []
+  - id: reflect-with-letter-4
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "讓更多人看見，這些平凡生命中的辛勞與尊嚴。"
+      japanese: "その苦労と尊厳を、もっと多くの人に見てもらいたい。"
+    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
+    nextNodeId: hand-over
+    choices: []
+  - id: return-without-letter
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "你回來了！怎麼樣？有遇到需要幫助的人嗎？"
+      japanese: "おかえり。どうだった？ 助けを必要としている人に会えたかい？"
+    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
+    nextNodeId: report-without-letter
+    choices: []
+  - id: report-without-letter
+    speaker:
+      traditionalChinese: "玩家"
+      japanese: "あなた"
+    line:
+      traditionalChinese: "我遇到了一位飢餓的礦工，後來幫農夫耕地，獲得了一些馬鈴薯，再把它們送給了礦工。"
+      japanese: "空腹の鉱夫に会ったよ。農夫を手伝ってジャガイモをもらい、その鉱夫に届けたんだ。"
+    nextNodeId: reflect-without-letter
+    choices: []
+  - id: reflect-without-letter
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "原來如此……那些人每天辛苦工作，只為了維持最基本的生活。"
+      japanese: "そうか……日々必死に働いて、やっと暮らしをつないでいるんだね。"
+    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
+    nextNodeId: reflect-without-letter-2
+    choices: []
+  - id: reflect-without-letter-2
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "他們用自己的雙手努力活著，這樣平凡的生活，其實也充滿了值得被看見的價值。"
+      japanese: "自分の手で懸命に生きている。そんなありふれた暮らしにも、見つめる価値がある。"
+    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
+    nextNodeId: reflect-without-letter-3
+    choices: []
+  - id: reflect-without-letter-3
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "我想……或許我能用畫筆，把他們真實的生活記錄下來。"
+      japanese: "僕は……絵筆で彼らのありのままの暮らしを描き残せるかもしれない。"
+    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
+    nextNodeId: reflect-without-letter-4
+    choices: []
+  - id: reflect-without-letter-4
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "讓更多人看見，這些平凡生命中的辛勞與尊嚴。"
+      japanese: "その苦労と尊厳を、もっと多くの人に見てもらいたい。"
+    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
+    nextNodeId: fail-response
+    choices: []
+  - id: hand-over
+    speaker:
+      traditionalChinese: "玩家"
+      japanese: "あなた"
+    line:
+      traditionalChinese: "我想起了西奧託我帶來的信。"
+      japanese: "テオから預かった手紙を思い出した。"
+    nextNodeId:
+    choices:
+    - text:
+        traditionalChinese: "對了，我還有一樣東西要交給你。"
+        japanese: "そうだ、渡したいものがあるんだ。"
+      nextNodeId: letter-reaction
+  - id: letter-reaction
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "這是……西奧的信？原來他一直都這麼關心我……"
+      japanese: "これは……テオの手紙？ ずっと僕を気にかけてくれていたんだね……。"
+    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
+    nextNodeId: letter
+    choices: []
+  - id: letter
+    speaker:
+      traditionalChinese: "西奧的信"
+      japanese: "テオの手紙"
+    line:
+      traditionalChinese: "親愛的文森特：我知道你最近經歷了許多困難，但請不要因此放棄自己。"
+      japanese: "親愛なるフィンセント。最近つらいことが多かったね。どうか自分を諦めないでほしい。"
+    nextNodeId: letter-2
+    choices: []
+  - id: letter-2
+    speaker:
+      traditionalChinese: "西奧的信"
+      japanese: "テオの手紙"
+    line:
+      traditionalChinese: "無論未來遇到什麼挫折，你都可以依靠我。"
+      japanese: "これから何があっても、僕を頼っていいんだ。"
+    nextNodeId: letter-3
+    choices: []
+  - id: letter-3
+    speaker:
+      traditionalChinese: "西奧的信"
+      japanese: "テオの手紙"
+    line:
+      traditionalChinese: "我也準備了一些生活費，希望能讓你安心追尋自己真正想做的事。"
+      japanese: "生活費も少し用意した。安心して本当にやりたいことを探してほしい。"
+    nextNodeId: letter-4
+    choices: []
+  - id: letter-4
+    speaker:
+      traditionalChinese: "西奧的信"
+      japanese: "テオの手紙"
+    line:
+      traditionalChinese: "不管你選擇什麼道路，我都會支持你。——你的弟弟，西奧"
+      japanese: "どんな道を選んでも、僕は応援するよ。弟のテオより。"
+    nextNodeId: vincent-success
+    choices: []
+  - id: vincent-success
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "西奧……總是在我最需要幫助的時候支持我。"
+      japanese: "テオは……僕がいちばん助けを必要とするとき、支えてくれるんだ。"
+    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
+    nextNodeId: vincent-success-2
+    choices: []
+  - id: vincent-success-2
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "也許未來還會遇到很多困難，但我想繼續畫下去。"
+      japanese: "これからも困難はあるだろう。それでも僕は描き続けたい。"
+    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
+    nextNodeId: vincent-success-3
+    choices: []
+  - id: vincent-success-3
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "謝謝你替我帶來這封信，也謝謝你讓我重新看見那些平凡生命的價值。"
+      japanese: "手紙を届けてくれてありがとう。人々の暮らしの価値に気づかせてくれたことにも感謝している。"
+    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
+    nextNodeId: success
+    choices: []
+  - id: fail-response
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "謝謝你願意幫助那些辛苦生活的人們。"
+      japanese: "懸命に生きる人たちを助けてくれて、ありがとう。"
+    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
+    nextNodeId: fail-response-2
+    choices: []
+  - id: fail-response-2
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "你的行動讓我更加確定，我想透過繪畫，記錄這些不被注意的平凡生活。"
+      japanese: "君のおかげで、見過ごされてきた暮らしを絵に残したいという気持ちが強くなった。"
+    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
+    nextNodeId: fail-response-3
+    choices: []
+  - id: fail-response-3
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "即使這條路並不容易，我也想繼續嘗試。"
+      japanese: "簡単な道ではなくても、挑んでみたい。"
+    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
+    nextNodeId: failure
+    choices: []
+  - id: success
+    speaker:
+      traditionalChinese: "旁白"
+      japanese: "ナレーション"
+    line:
+      traditionalChinese: "經歷宗教工作的挫折後，梵谷逐漸找到了新的生命方向——繪畫。"
+      japanese: "宗教活動での挫折を経て、ゴッホは絵画という新しい道を見出していった。"
+    nextNodeId: success-2
+    choices: []
+  - id: success-2
+    speaker:
+      traditionalChinese: "旁白"
+      japanese: "ナレーション"
+    line:
+      traditionalChinese: "他開始將目光投向平凡的勞動者，試圖透過畫筆，呈現他們辛勤生活的真實樣貌。"
+      japanese: "彼は働く人たちに目を向け、日々の営みをありのまま描こうとした。"
+    nextNodeId: success-3
+    choices: []
+  - id: success-3
+    speaker:
+      traditionalChinese: "旁白"
+      japanese: "ナレーション"
+    line:
+      traditionalChinese: "1885年，梵谷完成了著名作品《吃馬鈴薯的人》，描繪農民在昏暗燈光下，共享簡單晚餐的情景。"
+      japanese: "1885年、ゴッホは《ジャガイモを食べる人たち》を完成させた。薄暗い明かりの下で質素な夕食を囲む農民たちを描いた作品だ。"
+    nextNodeId: success-4
+    choices: []
+  - id: success-4
+    speaker:
+      traditionalChinese: "旁白"
+      japanese: "ナレーション"
+    line:
+      traditionalChinese: "而在這段追尋藝術的道路上，弟弟西奧始終是他重要的支柱。"
+      japanese: "芸術の道を追う兄を、弟テオは支え続けた。"
+    nextNodeId: success-5
+    choices: []
+  - id: success-5
+    speaker:
+      traditionalChinese: "旁白"
+      japanese: "ナレーション"
+    line:
+      traditionalChinese: "西奧不僅提供經濟上的援助，也透過書信給予鼓勵與建議，陪伴梵谷走過一次又一次的困境。"
+      japanese: "テオは生活を援助し、手紙で励ましや助言を送り、幾度もの困難に寄り添った。"
+    nextNodeId: success-6
+    choices: []
+  - id: success-6
+    speaker:
+      traditionalChinese: "旁白"
+      japanese: "ナレーション"
+    line:
+      traditionalChinese: "在弟弟的支持下，梵谷繼續走上屬於自己的藝術之路。"
+      japanese: "弟に支えられ、ゴッホは自分の芸術の道を歩み続けた。"
+    nextNodeId:
+    choices: []
+  - id: failure
+    speaker:
+      traditionalChinese: "旁白"
+      japanese: "ナレーション"
+    line:
+      traditionalChinese: "經歷宗教工作的挫折後，梵谷逐漸找到了新的生命方向——繪畫。"
+      japanese: "宗教活動での挫折を経て、ゴッホは絵画という新しい道を見出していった。"
+    nextNodeId: failure-2
+    choices: []
+  - id: failure-2
+    speaker:
+      traditionalChinese: "旁白"
+      japanese: "ナレーション"
+    line:
+      traditionalChinese: "他開始將目光投向平凡的勞動者，試圖透過畫筆，呈現他們辛勤生活的真實樣貌。"
+      japanese: "彼は働く人たちに目を向け、日々の営みをありのまま描こうとした。"
+    nextNodeId: failure-3
+    choices: []
+  - id: failure-3
+    speaker:
+      traditionalChinese: "旁白"
+      japanese: "ナレーション"
+    line:
+      traditionalChinese: "1885年，梵谷完成了著名作品《吃馬鈴薯的人》，描繪農民在昏暗燈光下，共享簡單晚餐的情景。"
+      japanese: "1885年、ゴッホは《ジャガイモを食べる人たち》を完成させた。薄暗い明かりの下で質素な夕食を囲む農民たちを描いた作品だ。"
+    nextNodeId: failure-4
+    choices: []
+  - id: failure-4
+    speaker:
+      traditionalChinese: "旁白"
+      japanese: "ナレーション"
+    line:
+      traditionalChinese: "然而，成為畫家的道路並不容易。他的作品尚未獲得廣泛認可，經濟上的困難也始終伴隨著他。"
+      japanese: "だが画家になる道は険しく、作品は広く認められず、生活の苦しさも続いた。"
+    nextNodeId: failure-5
+    choices: []
+  - id: failure-5
+    speaker:
+      traditionalChinese: "旁白"
+      japanese: "ナレーション"
+    line:
+      traditionalChinese: "在這段假設的命運分岔中，失去重要支持的梵谷，最終在貧病交迫中離開了人世……"
+      japanese: "この仮の未来では、大切な支えを得られなかったゴッホは、貧困と病のうちに世を去った……。"
+    nextNodeId:
+    choices: []

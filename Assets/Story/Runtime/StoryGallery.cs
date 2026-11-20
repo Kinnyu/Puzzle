@@ -26,10 +26,12 @@ namespace Puzzle.Story
         Label detail;
         Button resume;
         Button restart;
+        Button deleteSave;
         Button confirm;
         StoryDefinition story;
         StoryDefinition.Chapter selected;
         string selectedCheckpoint;
+        bool confirmingDelete;
 
         void Start()
         {
@@ -50,7 +52,11 @@ namespace Puzzle.Story
             var keys = Keyboard.current;
             if (story != null)
             {
-                if (keys?.escapeKey.wasPressedThisFrame == true) Close();
+                if (keys?.escapeKey.wasPressedThisFrame == true)
+                {
+                    if (confirmingDelete) Open(story, selected);
+                    else Close();
+                }
                 return;
             }
 
@@ -93,10 +99,11 @@ namespace Puzzle.Story
             }
         }
 
-        void Open(StoryDefinition definition)
+        void Open(StoryDefinition definition, StoryDefinition.Chapter initialChapter = null)
         {
             story = definition;
             selected = null;
+            confirmingDelete = false;
             rows.Clear();
             card.Clear();
             walk.InputSuppressed = true;
@@ -110,7 +117,7 @@ namespace Puzzle.Story
             var chapters = new ScrollView();
             chapters.AddToClassList("story-chapters");
             card.Add(chapters);
-            Button first = null;
+            Button initial = null;
             for (int i = 0; i < story.Chapters.Count; i++)
             {
                 var chapter = story.Chapters[i];
@@ -124,7 +131,7 @@ namespace Puzzle.Story
                     () => Select(chapter), "story-chapter");
                 row.SetEnabled(available && playable);
                 rows.Add((chapter, row));
-                if (row.enabledSelf && first == null) first = row;
+                if (row.enabledSelf && (initial == null || chapter == initialChapter)) initial = row;
             }
 
             detail = StoryMenu.Label(card, "", "story-detail");
@@ -133,17 +140,19 @@ namespace Puzzle.Story
             restart = StoryMenu.Button(actions, "從章首", () => ChooseCheckpoint(null));
             resume = StoryMenu.Button(actions, "讀取記錄點", () =>
                 ChooseCheckpoint(StoryProgress.Read(story, selected).checkpointId));
+            deleteSave = StoryMenu.Button(actions, "刪除存檔", ShowDeleteConfirmation);
             confirm = StoryMenu.Button(actions, "確認進入", Confirm, "story-primary");
-            if (first != null)
+            if (initial != null)
             {
-                Select(rows.Find(row => row.button == first).chapter);
-                first.Focus();
+                Select(rows.Find(row => row.button == initial).chapter);
+                initial.Focus();
             }
             else
             {
                 detail.text = "目前沒有可遊玩的章節";
                 StoryMenu.Show(restart, false);
                 StoryMenu.Show(resume, false);
+                StoryMenu.Show(deleteSave, false);
                 confirm.SetEnabled(false);
             }
         }
@@ -158,7 +167,27 @@ namespace Puzzle.Story
             bool canResume = chapter.FindCheckpoint(saved) != null;
             StoryMenu.Show(restart, canResume);
             StoryMenu.Show(resume, canResume);
+            StoryMenu.Show(deleteSave, StoryProgress.HasSave(story, chapter));
             ChooseCheckpoint(canResume ? saved : null);
+        }
+
+        void ShowDeleteConfirmation()
+        {
+            if (!StoryProgress.HasSave(story, selected)) return;
+
+            var chapter = selected;
+            confirmingDelete = true;
+            card.Clear();
+            StoryMenu.Label(card, $"刪除〈{chapter.title}〉的存檔？", "story-card-title");
+            StoryMenu.Label(card, "記錄點與通關紀錄會永久移除，依賴此通關紀錄的章節也可能重新上鎖。", "story-detail");
+            var actions = StoryMenu.Panel(card, "story-row");
+            var cancel = StoryMenu.Button(actions, "取消", () => Open(story, chapter));
+            StoryMenu.Button(actions, "永久刪除", () =>
+            {
+                StoryProgress.DeleteSave(story, chapter);
+                Open(story, chapter);
+            }, "story-danger");
+            cancel.Focus();
         }
 
         void ChooseCheckpoint(string checkpoint)

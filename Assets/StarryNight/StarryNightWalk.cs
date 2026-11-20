@@ -12,6 +12,7 @@ namespace Puzzle.StarryNight
         [SerializeField, Min(.1f)] float approachSeconds = 6.5f;
         [SerializeField, Min(.1f)] float eyeHeight = 1.62f;
         [SerializeField] DialoguePlayer dialoguePlayer;
+        [SerializeField] ChapterOpeningText chapterOpening;
 
         enum View { Overlook, Approaching, Walking }
         View view;
@@ -21,6 +22,8 @@ namespace Puzzle.StarryNight
 
         public bool InputSuppressed { get; set; }
         internal bool EscapeHandledExternally { get; set; }
+        internal System.Func<Vector2, bool> PointerOverMenu { get; set; }
+        internal CharacterController Player => player;
 
         void Start()
         {
@@ -41,7 +44,8 @@ namespace Puzzle.StarryNight
             if (InputSuppressed || (dialoguePlayer != null && dialoguePlayer.BlocksGameplayInput)) return;
             var keys = Keyboard.current;
             var mouse = Mouse.current;
-            bool clicked = mouse != null && mouse.leftButton.wasPressedThisFrame;
+            bool clicked = mouse != null && mouse.leftButton.wasPressedThisFrame
+                && PointerOverMenu?.Invoke(mouse.position.ReadValue()) != true;
             if (view == View.Overlook)
             {
                 if (clicked)
@@ -90,9 +94,16 @@ namespace Puzzle.StarryNight
         {
             if (spawn != null && spawn != player.transform)
             {
-                player.enabled = false;
-                player.transform.SetPositionAndRotation(spawn.position, spawn.rotation);
+                EnterWalkingAt(spawn.position, spawn.rotation);
+                return;
             }
+            EnterWalkingAt(player.transform.position, player.transform.rotation);
+        }
+
+        internal void EnterWalkingAt(Vector3 position, Quaternion rotation)
+        {
+            player.enabled = false;
+            player.transform.SetPositionAndRotation(position, rotation);
             yaw = player.transform.eulerAngles.y;
             pitch = -5f;
             verticalSpeed = 0;
@@ -115,6 +126,8 @@ namespace Puzzle.StarryNight
             bool captured = Cursor.lockState == CursorLockMode.Locked;
             EnterWalking();
             if (!captured) Cursor.lockState = CursorLockMode.None;
+            if (dialoguePlayer != null)
+                dialoguePlayer.ShowOpening(chapterOpening);
         }
 
         void OnGUI()

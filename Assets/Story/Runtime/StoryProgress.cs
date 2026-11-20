@@ -24,6 +24,17 @@ namespace Puzzle.Story
         static string SaveKey(StoryDefinition story, StoryDefinition.Chapter chapter) =>
             $"Puzzle.Story.v1.{story.Id.Length}.{story.Id}.{chapter.id}";
 
+        internal static bool HasSave(StoryDefinition story, StoryDefinition.Chapter chapter) =>
+            story != null && chapter != null && !string.IsNullOrWhiteSpace(story.Id)
+            && !string.IsNullOrWhiteSpace(chapter.id) && PlayerPrefs.HasKey(SaveKey(story, chapter));
+
+        internal static void DeleteSave(StoryDefinition story, StoryDefinition.Chapter chapter)
+        {
+            if (!HasSave(story, chapter)) return;
+            PlayerPrefs.DeleteKey(SaveKey(story, chapter));
+            PlayerPrefs.Save();
+        }
+
         public static ChapterRecord Read(StoryDefinition story, StoryDefinition.Chapter chapter)
         {
             if (story == null || chapter == null || string.IsNullOrWhiteSpace(story.Id)
@@ -82,6 +93,9 @@ namespace Puzzle.Story
             checkpoint = pending.checkpoint;
             return true;
         }
+
+        internal static string EntryChapterId(StoryDefinition story, string defaultId) =>
+            pending.story == story && pending.chapter != null ? pending.chapter.id : defaultId;
 
         internal static void OpenMenu(string scenePath)
         {

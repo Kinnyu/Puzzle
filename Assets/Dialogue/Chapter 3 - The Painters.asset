@@ -1,0 +1,330 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16a28623c3134fcaabde08787e9d8c51, type: 3}
+  m_Name: Chapter 3 - The Painters
+  m_EditorClassIdentifier:
+  entryNodeId: home
+  nodes:
+  - id: home
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "你來啦！我在亞爾租下了這間黃色小屋。這裡的陽光、田野和街道，讓我有好多想畫的東西！"
+      japanese: "来てくれたんだね！ アルルでこの黄色い家を借りたんだ。陽の光も野原も街並みも、描きたいものばかりだよ。"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId: home-dream
+    choices: []
+  - id: home-dream
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "我希望這裡也能成為畫家們一起生活、交流創作的地方。"
+      japanese: "ここを、画家たちが一緒に暮らし、創作について語り合える場所にしたいんだ。"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId:
+    choices:
+    - text:
+        traditionalChinese: "聽起來很棒！你一定很期待吧！"
+        japanese: "素敵だね。楽しみでしょう？"
+      nextNodeId: home-hope
+    - text:
+        traditionalChinese: "和其他畫家一起生活，不容易吵架嗎？"
+        japanese: "他の画家と暮らしたら、けんかにならない？"
+      nextNodeId: home-doubt
+  - id: home-hope
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "當然！如果能和志同道合的朋友一起創作，那一定很幸福！"
+      japanese: "もちろん！ 気の合う友人と一緒に描けたら、きっと幸せだろうな。"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: home-doubt
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "或許會有不同意見吧，但我相信藝術能讓我們互相理解。"
+      japanese: "意見は違うかもしれない。でも、芸術を通じて分かり合えると思うんだ。"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: guest
+    speaker:
+      traditionalChinese: "高更"
+      japanese: "ゴーギャン"
+    line:
+      traditionalChinese: "你好，我是畫家高更。文森特邀請我來亞爾一起創作，你能帶我去他的住處嗎？"
+      japanese: "こんにちは。画家のゴーギャンです。フィンセントにアルルで一緒に描こうと誘われたのですが、彼の家まで案内してもらえますか？"
+    portrait: {fileID: 2800000, guid: 9f662b0d40b2f40448daff9254c1a452, type: 3}
+    portraitOnRight: 1
+    nextNodeId: guest-answer
+    choices: []
+  - id: guest-answer
+    speaker:
+      traditionalChinese: "你"
+      japanese: "あなた"
+    line:
+      traditionalChinese: "當然可以。黃色小屋就在西邊，跟我來吧。"
+      japanese: "もちろん。黄色い家は西にあります。ついてきてください。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: meeting
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "高更！你終於來了！我一直想和你一起畫畫，看看我們能從彼此身上學到什麼。"
+      japanese: "ゴーギャン！ ようやく来てくれたんだね。ずっと一緒に描いて、お互いから何を学べるか楽しみにしていたよ。"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId: meeting-answer
+    choices: []
+  - id: meeting-answer
+    speaker:
+      traditionalChinese: "高更"
+      japanese: "ゴーギャン"
+    line:
+      traditionalChinese: "好久不見，文森特。我也想看看你最近的作品。"
+      japanese: "久しぶりだね、フィンセント。君の最近の作品を私も見たいと思っていたよ。"
+    portrait: {fileID: 2800000, guid: 9f662b0d40b2f40448daff9254c1a452, type: 3}
+    portraitOnRight: 1
+    nextNodeId: meeting-plan
+    choices: []
+  - id: meeting-plan
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "教堂南邊的阿里斯康墓園，秋天特別美。我們一起去取景吧！"
+      japanese: "教会の南にあるアリスカンは、秋がとても美しい。一緒に写生しに行こう！"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: arrival
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "你看，這裡的路伸得好遠。陽光一變，整片葉子的顏色也跟著變了。"
+      japanese: "見て、この道はずっと遠くまで続いている。光が変わるたびに、葉の色も変わるんだ。"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId: arrival-g
+    choices: []
+  - id: arrival-g
+    speaker:
+      traditionalChinese: "高更"
+      japanese: "ゴーギャン"
+    line:
+      traditionalChinese: "同一片景色，我們看見的也許不一樣。你也去走走，想想有哪些東西值得放進畫裡。"
+      japanese: "同じ景色でも、私たちの目には違って映るかもしれない。君も歩いて、何を絵に入れたいか考えてみてくれ。"
+    portrait: {fileID: 2800000, guid: 9f662b0d40b2f40448daff9254c1a452, type: 3}
+    portraitOnRight: 1
+    nextNodeId:
+    choices: []
+  - id: survey
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "怎麼樣？有找到值得畫下來的景物嗎？"
+      japanese: "どうだい？ 描き留めたいと思う景色は見つかった？"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId:
+    choices:
+    - text:
+        traditionalChinese: "取景完成了！"
+        japanese: "観察は終わったよ！"
+      nextNodeId: submit
+    - text:
+        traditionalChinese: "我再去附近看看。"
+        japanese: "もう少し見てくるよ。"
+      nextNodeId: more
+  - id: survey-angle
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "怎麼樣？從這裡看去，你注意到了什麼？"
+      japanese: "どうだい？ ここから眺めて、何か気づいたことはある？"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId:
+    choices:
+    - text:
+        traditionalChinese: "取景完成了！"
+        japanese: "観察は終わったよ！"
+      nextNodeId: submit
+    - text:
+        traditionalChinese: "我再去附近看看。"
+        japanese: "もう少し見てくるよ。"
+      nextNodeId: more
+    - text:
+        traditionalChinese: "沿著道路望過去，畫面很有深度。"
+        japanese: "道の先を眺めると、奥行きが感じられるね。"
+      nextNodeId: perspective
+  - id: submit
+    speaker:
+      traditionalChinese: "高更"
+      japanese: "ゴーギャン"
+    line:
+      traditionalChinese: "讓我們看看，同一片風景能創作出什麼不同的作品。"
+      japanese: "同じ風景から、どんな違う絵が生まれるか見てみよう。"
+    portrait: {fileID: 2800000, guid: 9f662b0d40b2f40448daff9254c1a452, type: 3}
+    portraitOnRight: 1
+    nextNodeId:
+    choices: []
+  - id: more
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "好啊。慢慢看，或許會發現剛才錯過的細節。"
+      japanese: "いいよ。ゆっくり見れば、さっき見落としたものが見つかるかもしれない。"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: perspective
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "你也發現了！道路往遠方延伸，兩旁的樹讓畫面更有深度。把這個角度留在畫裡吧。"
+      japanese: "君も気づいたね！ 遠くまで続く道と両側の木々が奥行きを生んでいる。この構図を絵に残そう。"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: leaves
+    speaker:
+      traditionalChinese: "你"
+      japanese: "あなた"
+    line:
+      traditionalChinese: "金黃色的葉子落在地上，連整條路都染上了秋天的顏色。這些色彩值得畫下來。"
+      japanese: "金色の葉が地面に落ちて、道まで秋色に染まっている。この色は絵に残したい。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: stone
+    speaker:
+      traditionalChinese: "你"
+      japanese: "あなた"
+    line:
+      traditionalChinese: "古老的石棺沿著路邊排開。把它們畫進去，才能看出這片風景為何與別處不同。"
+      japanese: "古い石棺が道沿いに並んでいる。絵に入れれば、この場所ならではの風景が伝わる。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: incomplete
+    speaker:
+      traditionalChinese: "高更"
+      japanese: "ゴーギャン"
+    line:
+      traditionalChinese: "文森特，你的畫似乎還少了一些你想留住的東西。"
+      japanese: "フィンセント、この絵には、君が残したかった何かがまだ足りないみたいだ。"
+    portrait: {fileID: 2800000, guid: 9f662b0d40b2f40448daff9254c1a452, type: 3}
+    portraitOnRight: 1
+    nextNodeId: retry-survey
+    choices: []
+  - id: retry-survey
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "你說得對。我們再回去看看，把值得留下的景物找齊吧。"
+      japanese: "そのとおりだね。もう一度戻って、残しておきたい景色を探そう。"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: complete-study
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "這就是我想畫下來的景色！延伸的道路、金黃的秋葉，還有那些古老的石棺。"
+      japanese: "これが描きたかった景色だ！ 遠くへ続く道、金色の葉、そして古い石棺。"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId: complete-g
+    choices: []
+  - id: complete-g
+    speaker:
+      traditionalChinese: "高更"
+      japanese: "ゴーギャン"
+    line:
+      traditionalChinese: "我們站在同一個地方，畫出來卻很不一樣。回小屋看看彼此的作品吧。"
+      japanese: "同じ場所に立っていたのに、ずいぶん違う絵になったね。家に戻ってお互いの絵を見よう。"
+    portrait: {fileID: 2800000, guid: 9f662b0d40b2f40448daff9254c1a452, type: 3}
+    portraitOnRight: 1
+    nextNodeId:
+    choices: []
+  - id: failure
+    speaker:
+      traditionalChinese: "旁白"
+      japanese: "語り"
+    line:
+      traditionalChinese: "小屋安靜下來。兩個人都沒能把想說的話說完。夜裡，梵谷需要有人來陪他。"
+      japanese: "家は静まり返った。二人とも伝えたいことを言い切れなかった。その夜、フィンセントにはそばにいてくれる人が必要だった。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId: failure-retry
+    choices: []
+  - id: failure-retry
+    speaker:
+      traditionalChinese: "旁白"
+      japanese: "語り"
+    line:
+      traditionalChinese: "如果能再回到那三十秒，也許來得及請人過來。"
+      japanese: "あの三十秒に戻れたら、誰かを呼びに行けるかもしれない。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: ending
+    speaker:
+      traditionalChinese: "旁白"
+      japanese: "語り"
+    line:
+      traditionalChinese: "你請鄰居帶醫生趕來。他們留在小屋陪伴梵谷，直到他得到照護。"
+      japanese: "君が頼んだ近所の人が医師を連れてきた。二人はフィンセントが手当てを受けられるまでそばにいた。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId: ending-final
+    choices: []
+  - id: ending-final
+    speaker:
+      traditionalChinese: "旁白"
+      japanese: "語り"
+    line:
+      traditionalChinese: "兩位畫家的道路從此分開。那天留下的作品，仍然保存著他們並肩看過的那片秋色。"
+      japanese: "二人の画家は別々の道を歩んだ。あの日の絵には、二人で眺めた秋の色が今も残っている。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []

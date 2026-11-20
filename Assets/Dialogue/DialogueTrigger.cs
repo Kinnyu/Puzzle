@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -21,6 +22,24 @@ namespace Puzzle.Dialogue
 
         bool completed;
         bool playedOnEntry;
+        string entryNode;
+        Action afterDialogue;
+
+        internal void Initialize(DialoguePlayer dialogue, Collider interactingActor, DialogueConversation asset,
+            float interactionRange = 3f)
+        {
+            player = dialogue;
+            actor = interactingActor;
+            conversation = asset;
+            range = interactionRange;
+        }
+
+        internal void SetInteraction(string nodeId, Action onFinished)
+        {
+            entryNode = nodeId;
+            afterDialogue = onFinished;
+            enabled = !string.IsNullOrEmpty(nodeId);
+        }
 
         void OnEnable()
         {
@@ -47,7 +66,7 @@ namespace Puzzle.Dialogue
         internal bool TryPlay(string nodeId = null)
         {
             if (!isActiveAndEnabled || (once && completed) || player == null) return false;
-            if (!player.TryPlay(conversation, appearance, HandleCompleted, nodeId)) return false;
+            if (!player.TryPlay(conversation, appearance, HandleCompleted, nodeId ?? entryNode)) return false;
             playedOnEntry = true;
             return true;
         }
@@ -73,6 +92,7 @@ namespace Puzzle.Dialogue
         {
             completed = true;
             onCompleted?.Invoke();
+            afterDialogue?.Invoke();
         }
     }
 }

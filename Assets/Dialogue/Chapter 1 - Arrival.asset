@@ -1,0 +1,20 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b2cb4398459046ada61b563fd43f3dce, type: 3}
+  m_Name: Chapter 1 - Arrival
+  m_EditorClassIdentifier:
+  title:
+    traditionalChinese: "\u7b2c\u4e00\u5e55\u3000\u751f\u547d\u7684\u610f\u7fa9"
+    japanese: "\u7b2c\u4e00\u5e55\u3000\u751f\u304d\u308b\u610f\u5473"
+  objective:
+    traditionalChinese: "\u68b5\u8c37\u6b63\u5728\u6559\u5802\u88e1\u3002\u5230\u524d\u9762\u53bb\u548c\u4ed6\u8aaa\u8aaa\u8a71\u5427\u3002"
+    japanese: "\u30b4\u30c3\u30db\u306f\u6559\u4f1a\u306b\u3044\u307e\u3059\u3002\u524d\u306b\u9032\u3093\u3067\u3001\u5f7c\u306b\u8a71\u3057\u304b\u3051\u3066\u307f\u307e\u3057\u3087\u3046\u3002"

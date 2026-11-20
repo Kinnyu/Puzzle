@@ -5313,6 +5313,9 @@ GameObject:
   - component: {fileID: 93065347}
   - component: {fileID: 93065346}
   - component: {fileID: 93065345}
+  - component: {fileID: 93065348}
+  - component: {fileID: 93065349}
+  - component: {fileID: 93065350}
   m_Layer: 0
   m_Name: Story Progress
   m_TagString: Untagged
@@ -5336,7 +5339,7 @@ MonoBehaviour:
   chapterId: chapter-1
   checkpoints:
   - id: church-help
-    spawn: {fileID: 948652741}
+    spawn: {fileID: 1557310021}
     dialogue: {fileID: 11400000, guid: f2ddc9af84e7643418be38d8e1584bb2, type: 2}
     dialogueNodeId: help
     onRestored:
@@ -5355,7 +5358,7 @@ MonoBehaviour:
             m_BoolArgument: 0
           m_CallState: 2
   - id: church-value
-    spawn: {fileID: 948652741}
+    spawn: {fileID: 1557310021}
     dialogue: {fileID: 11400000, guid: f2ddc9af84e7643418be38d8e1584bb2, type: 2}
     dialogueNodeId: value
     onRestored:
@@ -5376,6 +5379,97 @@ MonoBehaviour:
   walk: {fileID: 330585548}
   dialoguePlayer: {fileID: 1285379369}
   font: {fileID: 12800000, guid: cafdc8ada718a6243a4caed82d90c1a7, type: 3}
+  chapterTwo: {fileID: 93065348}
+  chapterThree: {fileID: 93065349}
+  chapterFour: {fileID: 93065350}
+--- !u!114 &93065350
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 93065344}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ea5f5eb702d24c1bbfbf180cafb531c3, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Puzzle.Story.StarryNightChapterFour
+  walk: {fileID: 330585548}
+  dialogue: {fileID: 1285379369}
+  terrain: {fileID: 93065348}
+  previous: {fileID: 93065349}
+  clinicLot: {fileID: 1706467522}
+  galleryLot: {fileID: 1438037235}
+  script: {fileID: 11400000, guid: 096d3e42365648c194ad0b2013ea227f, type: 2}
+  opening: {fileID: 11400000, guid: e51bf4e0c6554dda81534986c616df65, type: 2}
+  vincentSprite: {fileID: 21300000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+  theoSprite: {fileID: 21300000, guid: 2e53c57501dbae04492237f3085a37e4, type: 3}
+  doctorSprite: {fileID: 21300000, guid: b6dc027099688494c8f68093dfdf2503, type: 3}
+  minerSprite: {fileID: 21300000, guid: 88d41b9c621ec2844939e163eb704c85, type: 3}
+  visitorSprites:
+  - {fileID: 21300000, guid: bc0c9ae700a24c04ab2884d7abf6b0a0, type: 3}
+  - {fileID: 21300000, guid: 9f662b0d40b2f40448daff9254c1a452, type: 3}
+  - {fileID: 21300000, guid: 7146471ec82ead143b881eadaf504619, type: 3}
+  - {fileID: 21300000, guid: b6dc027099688494c8f68093dfdf2503, type: 3}
+  - {fileID: 21300000, guid: 2d3b0e9bd5c1daf44848a7a59b231a42, type: 3}
+  starryNight: {fileID: 2800000, guid: 6d73ea4782e89d047a734bdc3bf7f3b9, type: 3}
+  potatoEaters: {fileID: 2800000, guid: a5638600ff1443e3913a3d8cfda5a771, type: 3}
+  church: {x: 5, y: 0, z: 2}
+  mine: {x: 34, y: 0, z: 0}
+--- !u!114 &93065349
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 93065344}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 92ff392199e842bc9c5cf2fc6829e39a, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Puzzle.Story.StarryNightChapterThree
+  walk: {fileID: 330585548}
+  dialogue: {fileID: 1285379369}
+  previousChapter: {fileID: 93065348}
+  cottage: {fileID: 120410876}
+  script: {fileID: 11400000, guid: 777a3cf9e63d465ba8ef8e01bfd98735, type: 2}
+  opening: {fileID: 11400000, guid: c904cbcb39d44991a90473d663ab1299, type: 2}
+  retry: {fileID: 11400000, guid: 09587a9a5fd648d197aa63a1dececec0, type: 2}
+  vincentSprite: {fileID: 21300000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+  gauguinSprite: {fileID: 21300000, guid: 9f662b0d40b2f40448daff9254c1a452, type: 3}
+  neighborSprite: {fileID: 21300000, guid: 2d3b0e9bd5c1daf44848a7a59b231a42, type: 3}
+  gauguinPainting: {fileID: 2800000, guid: d4814f7af4c243feb66015abba7b8db5, type: 3}
+  church: {x: 5, y: 0, z: 2}
+  cemetery: {x: 10, y: 0, z: -27}
+--- !u!114 &93065348
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 93065344}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2cedc63a159444708a0149898ef01adc, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Puzzle.Story.StarryNightChapterTwo
+  walk: {fileID: 330585548}
+  dialogue: {fileID: 1285379369}
+  chapterOneVincent: {fileID: 1557310015}
+  script: {fileID: 11400000, guid: e903b78abb274aaca00d4c9fabbb763c, type: 2}
+  opening: {fileID: 11400000, guid: 59c08de619054f9d9abeff836a3a49c4, type: 2}
+  retry: {fileID: 11400000, guid: 0c05059cc58544f3a939272c11993ca7, type: 2}
+  vincentSprite: {fileID: 21300000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
+  minerSprite: {fileID: 21300000, guid: 88d41b9c621ec2844939e163eb704c85, type: 3}
+  farmerSprite: {fileID: 21300000, guid: 2d3b0e9bd5c1daf44848a7a59b231a42, type: 3}
+  theoSprite: {fileID: 21300000, guid: 2e53c57501dbae04492237f3085a37e4, type: 3}
+  church: {x: 5, y: 0, z: 2}
+  mine: {x: 34, y: 0, z: 0}
+  farm: {x: 36, y: 0, z: 12}
+  road: {x: 21, y: 0, z: 0}
+  groundSurfaces:
+  - {fileID: 1907131636}
+  - {fileID: 651200552}
 --- !u!114 &93065346
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17218,6 +17312,7 @@ MonoBehaviour:
   approachSeconds: 6.5
   eyeHeight: 1.62
   dialoguePlayer: {fileID: 1285379369}
+  chapterOpening: {fileID: 11400000, guid: 2ab09deea33b4195a88eb01ad50870a2, type: 2}
 --- !u!1 &332349308
 GameObject:
   m_ObjectHideFlags: 0
@@ -60882,7 +60977,7 @@ Transform:
   m_GameObject: {fileID: 1186635896}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.8260536, z: -0, w: 0.56359154}
-  m_LocalPosition: {x: 35.01512, y: 0.14136055, z: 14.039156}
+  m_LocalPosition: {x: 35.01512, y: 0.12358901, z: 18.3}
   m_LocalScale: {x: 1.504084, y: 1.0847704, z: 1.3909461}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -65346,6 +65441,7 @@ MonoBehaviour:
   japaneseFont: {fileID: 12800000, guid: 52a61bda1e9ad7844a9c511b939bb9a6, type: 3}
   defaultAppearance: {fileID: 11400000, guid: 0f545f71c8fa484f9cc8fb3d8400ead2, type: 2}
   interactKey: 19
+  charactersPerSecond: 18
 --- !u!114 &1285379370
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -65383,6 +65479,8 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1557310016}
+  - {fileID: 1557310021}
+  - {fileID: 1557310025}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1292763677
@@ -77960,8 +78058,12 @@ GameObject:
   m_Component:
   - component: {fileID: 1557310016}
   - component: {fileID: 1557310017}
+  - component: {fileID: 1557310018}
+  - component: {fileID: 1557310019}
+  - component: {fileID: 1557310022}
+  - component: {fileID: 1557310023}
   m_Layer: 0
-  m_Name: Chapter 1 Dialogue Point
+  m_Name: Vincent - Chapter 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -77975,8 +78077,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1557310015}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -2.682235, y: -0.0060494915, z: -21}
+  m_LocalRotation: {x: 0, y: 0.061048545, z: 0, w: 0.99813485}
+  m_LocalPosition: {x: -2.072885, y: -0.174, z: -16.03725}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -77998,12 +78100,24 @@ MonoBehaviour:
   conversation: {fileID: 11400000, guid: f2ddc9af84e7643418be38d8e1584bb2, type: 2}
   activation: 1
   actor: {fileID: 948652742}
-  range: 3
-  once: 0
+  range: 2.5
+  once: 1
   appearance: {fileID: 0}
   onCompleted:
     m_PersistentCalls:
       m_Calls:
+      - m_Target: {fileID: 1557310023}
+        m_TargetAssemblyTypeName: Puzzle.Dialogue.DialogueActorAction, Assembly-CSharp
+        m_MethodName: Perform
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument:
+          m_BoolArgument: 0
+        m_CallState: 2
       - m_Target: {fileID: 93065345}
         m_TargetAssemblyTypeName: Puzzle.Story.StorySceneProgress, Assembly-CSharp
         m_MethodName: CompleteChapter
@@ -78016,6 +78130,144 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!212 &1557310018
+SpriteRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1557310015}
+  m_Enabled: 1
+  m_CastShadows: 0
+  m_ReceiveShadows: 0
+  m_RenderingLayerMask: 1
+  m_Materials:
+  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_Sprite: {fileID: 21300000, guid: e225afd4f0ea9e8479fc9999b2a1c38b, type: 3}
+  m_Color: {r: 0.86, g: 0.88, b: 0.97, a: 1}
+  m_FlipX: 0
+  m_FlipY: 0
+  m_DrawMode: 0
+  m_Size: {x: 0.9309091, y: 1.8618182}
+  m_WasSpriteAssigned: 1
+  m_MaskInteraction: 0
+  m_SpriteSortPoint: 0
+--- !u!136 &1557310019
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1557310015}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.24
+  m_Height: 1.8
+  m_Direction: 1
+  m_Center: {x: 0, y: 0.9, z: 0}
+--- !u!114 &1557310022
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1557310015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e233c24e679408a9861829e89ca7e58, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Puzzle.StarryNight.CharacterBillboard
+--- !u!114 &1557310023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1557310015}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 907b97ac49ba46f68efb53f822e6218b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: Assembly-CSharp::Puzzle.Dialogue.DialogueActorAction
+  waypoints:
+  - {fileID: 1557310025}
+  speed: 3
+  hideOnArrival: 1
+--- !u!1 &1557310024
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1557310025}
+  m_Layer: 0
+  m_Name: Vincent exit waypoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1557310025
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1557310024}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.62, y: -0.21, z: -12.55}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1285379371}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1557310020
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1557310021}
+  m_Layer: 0
+  m_Name: Vincent checkpoint spawn
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1557310021
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1557310020}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0.061048545, z: 0, w: 0.99813485}
+  m_LocalPosition: {x: -2.316625, y: -0.095, z: -18.02235}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1285379371}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1559741208
 GameObject:
   m_ObjectHideFlags: 0
@@ -90284,7 +90536,7 @@ Transform:
   m_GameObject: {fileID: 1790937312}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0.9999685, z: -0, w: 0.007933371}
-  m_LocalPosition: {x: 37.864685, y: 0.1343311, z: 14.179321}
+  m_LocalPosition: {x: 37.864685, y: 0.07899648, z: 18.55}
   m_LocalScale: {x: 1.291844, y: 1.0347346, z: 1.4916255}
   m_ConstrainProportionsScale: 0
   m_Children: []

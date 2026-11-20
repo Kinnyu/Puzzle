@@ -25,13 +25,31 @@ MonoBehaviour:
       title: "\u6559\u5802\u30FB\u5E73\u51E1\u7684\u529B\u91CF"
   - id: chapter-2
     title: "\u5E73\u51E1\u751F\u547D\u7684\u50F9\u503C"
-    scenePath: 
-    checkpoints: []
+    scenePath: Assets/Scenes/StarryNight.unity
+    checkpoints:
+    - id: miner-helped
+      title: "\u8FD4\u56DE\u6559\u5802\u7684\u8DEF\u4E0A"
   - id: chapter-3
     title: "\u7406\u60F3\u7684\u78B0\u649E"
-    scenePath: 
-    checkpoints: []
+    scenePath: Assets/Scenes/StarryNight.unity
+    checkpoints:
+    - id: alyscamps
+      title: "阿里斯康墓園"
+    - id: yellow-house-debate
+      title: "黃色小屋・藝術的辯論"
+    - id: yellow-house-retry
+      title: "黃色小屋・再試一次"
   - id: chapter-4
-    title: "\u7B2C\u56DB\u7AE0"
-    scenePath: 
-    checkpoints: []
+    title: "未竟的星光"
+    scenePath: Assets/Scenes/StarryNight.unity
+    checkpoints:
+    - id: starry-night-painted
+      title: "療養院・西奧的提議"
+    - id: exhibition-ready
+      title: "小畫館・邀請觀眾"
+    - id: exhibition-open
+      title: "小畫館・作品介紹"
+    - id: a-quiet-day
+      title: "畫展閉幕・陪伴梵谷的一天"
+    - id: gift-of-spring
+      title: "黃色小屋・春天的禮物"

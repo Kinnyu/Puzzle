@@ -1,0 +1,711 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 16a28623c3134fcaabde08787e9d8c51, type: 3}
+  m_Name: Chapter 4 - The Unfinished Starlight
+  m_EditorClassIdentifier:
+  entryNodeId: visit
+  nodes:
+  - id: visit
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "你來了……來到這裡接受照護後，我有時還是不太安穩。不過，只要拿起畫筆，我就還能留意窗外的光。"
+      japanese: "来てくれたんだね。ここで治療を受けても、まだ落ち着かない時がある。でも筆を取ると、窓の外の光に目が向くんだ。"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId: visit-2
+    choices: []
+  - id: visit-2
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "那些星星讓我忍不住想把整個夜晚畫下來。你願意替我看看，還能把什麼留在畫裡嗎？"
+      japanese: "あの星を見ていると、夜を丸ごと描きたくなる。ほかに何を絵に残せそうか見てくれる？"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: sky
+    speaker:
+      traditionalChinese: "你"
+      japanese: "あなた"
+    line:
+      traditionalChinese: "星光在深藍色的夜空裡格外明亮。也許可以讓整片夜空在畫布上流動。"
+      japanese: "深い青の中で星がひときわ明るい。夜空全体が絵の中で流れるように描けるかもしれない。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: cypress
+    speaker:
+      traditionalChinese: "你"
+      japanese: "あなた"
+    line:
+      traditionalChinese: "柏樹的輪廓一直伸向天空，像把地面和星光連在了一起。"
+      japanese: "糸杉の輪郭が空へ伸び、地上と星の光をつないでいるようだ。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: village
+    speaker:
+      traditionalChinese: "你"
+      japanese: "あなた"
+    line:
+      traditionalChinese: "如果在天空下面畫一座寧靜的村莊，想像中的屋頂也能成為這片風景的一部分。"
+      japanese: "空の下に静かな村を描こう。想像した屋根も、この風景の一部になる。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: starry-made
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "星光、柏樹，還有一座想像中的村莊……我知道該從哪裡畫起了。"
+      japanese: "星の光、糸杉、そして想像の村……どこから描き始めるか分かったよ。"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId: starry-made-2
+    choices: []
+  - id: starry-made-2
+    speaker:
+      traditionalChinese: "旁白"
+      japanese: "語り"
+    line:
+      traditionalChinese: "在療養院裡，梵谷仍持續畫畫。觀察到的風景和他的想像，一起變成了《星夜》。"
+      japanese: "療養院でもゴッホは描き続けた。目にした景色と彼の想像が合わさり、『星月夜』が生まれた。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: starry-missing
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "我們再多看一點吧。窗外、庭院和畫架旁，都可能還藏著一點靈感。"
+      japanese: "もう少し見てみよう。窓の外、中庭、イーゼルのそばにも、まだヒントがあるかもしれない。"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: proposal
+    speaker:
+      traditionalChinese: "西奧"
+      japanese: "テオ"
+    line:
+      traditionalChinese: "好久不見！文森特完成了新畫，我想讓更多人看到它。你願意和我一起籌辦一場畫展嗎？"
+      japanese: "久しぶり！ フィンセントの新作を多くの人に見てもらいたいんだ。一緒に展覧会を準備してくれる？"
+    portrait: {fileID: 2800000, guid: 2e53c57501dbae04492237f3085a37e4, type: 3}
+    portraitOnRight: 1
+    nextNodeId: proposal-2
+    choices: []
+  - id: proposal-2
+    speaker:
+      traditionalChinese: "西奧"
+      japanese: "テオ"
+    line:
+      traditionalChinese: "《星夜》留在療養院，《吃馬鈴薯的人》和《阿里斯康墓園》在黃色小屋。把三幅畫帶去教堂北邊的小畫館吧。"
+      japanese: "『星月夜』は療養院に、『ジャガイモを食べる人々』と『アリスカン』は黄色い家にある。三枚を教会の北の画廊へ運んでくれ。"
+    portrait: {fileID: 2800000, guid: 2e53c57501dbae04492237f3085a37e4, type: 3}
+    portraitOnRight: 1
+    nextNodeId:
+    choices: []
+  - id: invite-brief
+    speaker:
+      traditionalChinese: "西奧"
+      japanese: "テオ"
+    line:
+      traditionalChinese: "畫都掛好了！現在需要觀眾。麻煩你到教堂前，在九十秒內邀請五位路人。"
+      japanese: "絵はそろった！ 次はお客さんだ。教会の前で、九十秒以内に五人を誘ってくれる？"
+    portrait: {fileID: 2800000, guid: 2e53c57501dbae04492237f3085a37e4, type: 3}
+    portraitOnRight: 1
+    nextNodeId:
+    choices: []
+  - id: invite-1
+    speaker:
+      traditionalChinese: "村民"
+      japanese: "村の人"
+    line:
+      traditionalChinese: "畫展？是誰的作品啊？"
+      japanese: "展覧会？ 誰の作品なの？"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId: invite-1-2
+    choices: []
+  - id: invite-1-2
+    speaker:
+      traditionalChinese: "你"
+      japanese: "あなた"
+    line:
+      traditionalChinese: "是梵谷的作品。小畫館就在教堂北邊，歡迎來看看！"
+      japanese: "ゴッホの作品です。教会の北の画廊へ、ぜひ見に来てください！"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId: invite-1-3
+    choices: []
+  - id: invite-1-3
+    speaker:
+      traditionalChinese: "村民"
+      japanese: "村の人"
+    line:
+      traditionalChinese: "聽起來不錯，我等等去看看！"
+      japanese: "面白そう。あとで寄ってみるよ！"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: invite-2
+    speaker:
+      traditionalChinese: "村民"
+      japanese: "村の人"
+    line:
+      traditionalChinese: "我不太懂藝術，也能去嗎？"
+      japanese: "芸術に詳しくなくても行っていいの？"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId: invite-2-2
+    choices: []
+  - id: invite-2-2
+    speaker:
+      traditionalChinese: "你"
+      japanese: "あなた"
+    line:
+      traditionalChinese: "當然。停在喜歡的作品前看看，就已經在欣賞了。"
+      japanese: "もちろん。好きな絵の前で立ち止まって眺めるだけでいいんです。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId: invite-2-3
+    choices: []
+  - id: invite-2-3
+    speaker:
+      traditionalChinese: "村民"
+      japanese: "村の人"
+    line:
+      traditionalChinese: "那我也想去。"
+      japanese: "じゃあ行ってみたいな。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: invite-3
+    speaker:
+      traditionalChinese: "村民"
+      japanese: "村の人"
+    line:
+      traditionalChinese: "他的畫有什麼特別的地方？"
+      japanese: "どんなところが特別なの？"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId: invite-3-2
+    choices: []
+  - id: invite-3-2
+    speaker:
+      traditionalChinese: "你"
+      japanese: "あなた"
+    line:
+      traditionalChinese: "鮮明的色彩和筆觸，都是他看待世界的方式。"
+      japanese: "鮮やかな色と筆遣いに、彼の世界の見方が表れているんです。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId: invite-3-3
+    choices: []
+  - id: invite-3-3
+    speaker:
+      traditionalChinese: "村民"
+      japanese: "村の人"
+    line:
+      traditionalChinese: "我會去看看的。"
+      japanese: "見に行ってみるよ。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: invite-4
+    speaker:
+      traditionalChinese: "村民"
+      japanese: "村の人"
+    line:
+      traditionalChinese: "是在附近的小畫館嗎？散步回來我可以順路去。"
+      japanese: "近くの小さな画廊？ 散歩の帰りに寄れるね。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId: invite-4-2
+    choices: []
+  - id: invite-4-2
+    speaker:
+      traditionalChinese: "你"
+      japanese: "あなた"
+    line:
+      traditionalChinese: "就在教堂北邊，我們等你。"
+      japanese: "教会の北です。お待ちしています。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: invite-5
+    speaker:
+      traditionalChinese: "村民"
+      japanese: "村の人"
+    line:
+      traditionalChinese: "我聽說畫館換了新的作品。有他最近畫的星空嗎？"
+      japanese: "画廊に新しい絵が入ったって聞いたよ。最近描いた星空も見られる？"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId: invite-5-2
+    choices: []
+  - id: invite-5-2
+    speaker:
+      traditionalChinese: "你"
+      japanese: "あなた"
+    line:
+      traditionalChinese: "有，今晚就能看到《星夜》。"
+      japanese: "ええ、今夜は『星月夜』も見られます。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: invite-fail
+    speaker:
+      traditionalChinese: "旁白"
+      japanese: "語り"
+    line:
+      traditionalChinese: "畫館的燈亮著，來看畫的人卻比預想的少。再回到開幕前，請更多人走進畫館吧。"
+      japanese: "画廊には明かりがともったが、来場者は思ったより少なかった。開幕前に戻り、もう少し多くの人を誘ってみよう。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: fame-brief
+    speaker:
+      traditionalChinese: "西奧"
+      japanese: "テオ"
+    line:
+      traditionalChinese: "觀眾到了！請在兩分鐘內和三位觀眾談談畫作，讓名聲至少達到八十分。"
+      japanese: "お客さんが来た！ 二分以内に三人と作品について話して、評判を八十点以上にしよう。"
+    portrait: {fileID: 2800000, guid: 2e53c57501dbae04492237f3085a37e4, type: 3}
+    portraitOnRight: 1
+    nextNodeId:
+    choices: []
+  - id: potato-good
+    speaker:
+      traditionalChinese: "村民"
+      japanese: "村の人"
+    line:
+      traditionalChinese: "原來如此。現在再看，我好像能感覺到他們一天的辛苦。"
+      japanese: "なるほど。見直すと、この人たちの一日の苦労が伝わってくるよ。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: potato-poor
+    speaker:
+      traditionalChinese: "村民"
+      japanese: "村の人"
+    line:
+      traditionalChinese: "那我大概還是比較喜歡其他作品。"
+      japanese: "じゃあ、ほかの絵のほうが好きかもしれないな。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: cemetery-good
+    speaker:
+      traditionalChinese: "村民"
+      japanese: "村の人"
+    line:
+      traditionalChinese: "難怪！沿著畫裡的路看，真的有一種走進去的感覺。"
+      japanese: "なるほど！ 絵の中の道をたどると、本当に歩いて入っていけそうだ。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: cemetery-poor
+    speaker:
+      traditionalChinese: "村民"
+      japanese: "村の人"
+    line:
+      traditionalChinese: "我想再看看別的畫。"
+      japanese: "ほかの絵を見てみようかな。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: night-good
+    speaker:
+      traditionalChinese: "村民"
+      japanese: "村の人"
+    line:
+      traditionalChinese: "把看見的夜晚和感受到的夜晚一起畫進去，難怪它看起來這麼有生命力。"
+      japanese: "見た夜と感じた夜が一緒に描かれているから、こんなに生き生きしているんだね。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: night-poor
+    speaker:
+      traditionalChinese: "村民"
+      japanese: "村の人"
+    line:
+      traditionalChinese: "這樣啊……那我可能還沒有看懂。"
+      japanese: "そうなのか……まだよく分からないな。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: fame-fail
+    speaker:
+      traditionalChinese: "旁白"
+      japanese: "語り"
+    line:
+      traditionalChinese: "參觀的人看見了這些畫，卻還沒聽懂它們背後的故事。再試一次，把你對作品的理解說給他們聽。"
+      japanese: "観客は絵を見たが、その背景までは伝わらなかった。もう一度、作品について分かったことを自分の言葉で伝えよう。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: exhibition-end
+    speaker:
+      traditionalChinese: "西奧"
+      japanese: "テオ"
+    line:
+      traditionalChinese: "今天有人在《星夜》前站了很久。文森特，你的畫真的被人看見了。"
+      japanese: "今日、『星月夜』の前に長く立っている人がいたよ。フィンセント、君の絵はちゃんと見てもらえたんだ。"
+    portrait: {fileID: 2800000, guid: 2e53c57501dbae04492237f3085a37e4, type: 3}
+    portraitOnRight: 1
+    nextNodeId: exhibition-end-2
+    choices: []
+  - id: exhibition-end-2
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "我很開心。但我還是會擔心，自己以後能不能這樣畫下去。"
+      japanese: "うれしいよ。だけど、これからもこうして描けるのか、ときどき不安になる。"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId: exhibition-end-3
+    choices: []
+  - id: exhibition-end-3
+    speaker:
+      traditionalChinese: "西奧"
+      japanese: "テオ"
+    line:
+      traditionalChinese: "你不用一個人面對。我陪你去找醫師談談。"
+      japanese: "一人で抱えなくていいんだ。一緒に先生のところへ行こう。"
+    portrait: {fileID: 2800000, guid: 2e53c57501dbae04492237f3085a37e4, type: 3}
+    portraitOnRight: 1
+    nextNodeId:
+    choices: []
+  - id: doctor
+    speaker:
+      traditionalChinese: "醫師"
+      japanese: "医師"
+    line:
+      traditionalChinese: "持續接受照護，也給自己規律休息和有人作伴的時間。今天可以依文森特的狀況，慢慢安排。"
+      japanese: "治療を続けながら、休息と誰かと過ごす時間も大切にしてください。今日はフィンセントの調子に合わせて、ゆっくり過ごしましょう。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId: doctor-2
+    choices: []
+  - id: doctor-2
+    speaker:
+      traditionalChinese: "西奧"
+      japanese: "テオ"
+    line:
+      traditionalChinese: "那我們就陪他度過平靜的一天吧。先一起吃早餐。"
+      japanese: "では、穏やかな一日を一緒に過ごそう。まず朝食からだね。"
+    portrait: {fileID: 2800000, guid: 2e53c57501dbae04492237f3085a37e4, type: 3}
+    portraitOnRight: 1
+    nextNodeId:
+    choices: []
+  - id: breakfast
+    speaker:
+      traditionalChinese: "西奧"
+      japanese: "テオ"
+    line:
+      traditionalChinese: "文森特，今天我們就放慢腳步。早飯吃完，再一起出去走走吧。"
+      japanese: "フィンセント、今日はゆっくり過ごそう。朝食のあと、一緒に散歩に行かない？"
+    portrait: {fileID: 2800000, guid: 2e53c57501dbae04492237f3085a37e4, type: 3}
+    portraitOnRight: 1
+    nextNodeId: breakfast-2
+    choices: []
+  - id: breakfast-2
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "好啊。我想看看以前走過的那些地方。"
+      japanese: "いいね。前によく歩いた場所を、また見てみたい。"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: walk-church
+    speaker:
+      traditionalChinese: "神職人員"
+      japanese: "聖職者"
+    line:
+      traditionalChinese: "文森特，好久不見。聽說很多人來看你的畫，我真替你高興。幫助別人的方式有很多種，你願意關心他們，就已經很有意義。"
+      japanese: "フィンセント、久しぶりだね。絵を見に大勢来たそうで、私もうれしいよ。人を助ける方法はいくつもある。誰かを気にかけることだけでも意味があるんだ。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId: walk-church-2
+    choices: []
+  - id: walk-church-2
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "以前我以為，得做很了不起的事，才能幫到別人。現在想想，在別人需要時留在他身邊，就已經很重要了。"
+      japanese: "昔は、人を助けるには立派なことをしなきゃと思っていた。今は、必要な時にそばにいるだけでも大切だと分かるよ。"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: walk-farm
+    speaker:
+      traditionalChinese: "礦工"
+      japanese: "鉱夫"
+    line:
+      traditionalChinese: "文森特，我還記得你們送來的馬鈴薯。現在收成有多，我們也分給需要的人。"
+      japanese: "フィンセント、あの時届けてくれたジャガイモを覚えているよ。今では、余った分を必要な人に分けているんだ。"
+    portrait: {fileID: 2800000, guid: 88d41b9c621ec2844939e163eb704c85, type: 3}
+    portraitOnRight: 0
+    nextNodeId: walk-farm-2
+    choices: []
+  - id: walk-farm-2
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "原來那天做的小事，還有人記得。"
+      japanese: "あの日の小さなことを、覚えてくれていたんだね。"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: walk-graves
+    speaker:
+      traditionalChinese: "高更的信"
+      japanese: "ゴーギャンの手紙"
+    line:
+      traditionalChinese: "文森特，聽說有人特地來看你的畫。我們對繪畫的看法不同，可是在這裡一起寫生的秋天，對我依然很重要。請繼續走你自己的路。——高更"
+      japanese: "フィンセント、君の絵を見に来た人がいたと聞いたよ。絵に対する考えは違うが、ここで一緒に写生した秋は今も大切に思っている。どうか自分の道を歩き続けてくれ。ゴーギャン"
+    portrait: {fileID: 0}
+    portraitOnRight: 1
+    nextNodeId: walk-graves-2
+    choices: []
+  - id: walk-graves-2
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "我也記得。我們不一定要走同一條路，才能珍惜曾經一起走過的那一段。"
+      japanese: "僕も覚えている。同じ道を歩き続けなくても、一緒に歩いた時間を大切にできるね。"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: lunch
+    speaker:
+      traditionalChinese: "旁白"
+      japanese: "語り"
+    line:
+      traditionalChinese: "散步回來後，大家一起吃了午餐。梵谷在窗邊休息了一會兒，看見屋外的花開了。"
+      japanese: "散歩から戻り、みんなで昼食を取った。窓辺でひと休みしたゴッホは、家の外で花が咲いていることに気づいた。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId: lunch-2
+    choices: []
+  - id: lunch-2
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "我想在杏樹旁畫一幅畫。可以幫我找畫布、畫筆、顏料和畫架嗎？"
+      japanese: "杏の木のそばで絵を描きたい。カンヴァス、筆、絵の具、イーゼルを探してくれる？"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: spring
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "謝謝你。這樣就準備好了。我想把今天的心情留在這幅畫裡。"
+      japanese: "ありがとう。これで用意できた。今日の気持ちをこの絵に残したいんだ。"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId: spring-2
+    choices: []
+  - id: spring-2
+    speaker:
+      traditionalChinese: "旁白"
+      japanese: "語り"
+    line:
+      traditionalChinese: "那天下午，梵谷再度拿起畫筆。盛開的花朵成了他送給同伴的禮物。"
+      japanese: "その午後、ゴッホはまた筆を取った。咲き誇る花は、仲間への贈り物になった。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: thanks
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "送給你。今天你陪我走過的那些地方，讓我想起自己留下過一些東西。"
+      japanese: "君に贈るよ。今日一緒に歩いた場所で、僕が残してきたものを思い出した。"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId: thanks-2
+    choices: []
+  - id: thanks-2
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "我不知道未來會怎樣。但至少現在，我還想繼續畫下去。"
+      japanese: "未来のことは分からない。でも、少なくとも今は描き続けたいんだ。"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId: thanks-3
+    choices: []
+  - id: thanks-3
+    speaker:
+      traditionalChinese: "你"
+      japanese: "あなた"
+    line:
+      traditionalChinese: "那就慢慢來。今天也可以先好好休息。"
+      japanese: "じゃあ、ゆっくりいこう。今日はまず、ゆっくり休んでもいいんだよ。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: evening
+    speaker:
+      traditionalChinese: "旁白"
+      japanese: "語り"
+    line:
+      traditionalChinese: "傍晚，兩兄弟一起吃了晚餐。梵谷把新畫留在桌上，回房間休息。困難沒有消失，但他有定期的照護，也有人願意陪伴他。"
+      japanese: "夕方、兄弟は一緒に夕食を取った。ゴッホは新しい絵を机に残し、部屋で休んだ。困難は消えなかったが、治療は続き、そばにいてくれる人もいた。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: morning
+    speaker:
+      traditionalChinese: "西奧"
+      japanese: "テオ"
+    line:
+      traditionalChinese: "早安，文森特。今天想做什麼？"
+      japanese: "おはよう、フィンセント。今日は何をしたい？"
+    portrait: {fileID: 2800000, guid: 2e53c57501dbae04492237f3085a37e4, type: 3}
+    portraitOnRight: 1
+    nextNodeId: morning-2
+    choices: []
+  - id: morning-2
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "或許……再畫一幅畫吧。"
+      japanese: "そうだね……もう一枚、描こうかな。"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId: morning-3
+    choices: []
+  - id: morning-3
+    speaker:
+      traditionalChinese: "旁白"
+      japanese: "語り"
+    line:
+      traditionalChinese: "在這個故事的結局裡，梵谷親眼看見了有人欣賞他的作品，也有機會繼續創作、繼續生活。"
+      japanese: "この物語の結末では、ゴッホは自分の絵を見つめる人たちをその目で見た。そして、描き続け、生き続ける機会を得た。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId: morning-4
+    choices: []
+  - id: morning-4
+    speaker:
+      traditionalChinese: "旁白"
+      japanese: "語り"
+    line:
+      traditionalChinese: "這一次，星光不再只照亮他的作品，也照亮了他的未來。"
+      japanese: "今度は星の光が、彼の作品だけでなく、彼の未来も照らした。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: potato
+    speaker:
+      traditionalChinese: "村民"
+      japanese: "村の人"
+    line:
+      traditionalChinese: "這幅畫好暗。為什麼他要畫一群農民吃飯？"
+      japanese: "暗い絵だね。なぜ農民の食事を描いたんだろう？"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices:
+    - text:
+        traditionalChinese: "他想呈現農民辛勤生活的樣貌。"
+        japanese: "農民の懸命な暮らしを描きたかったんだ。"
+      nextNodeId: potato-good
+    - text:
+        traditionalChinese: "他那時還不太會畫畫。"
+        japanese: "まだ絵がうまくなかったんだ。"
+      nextNodeId: potato-poor
+  - id: cemetery
+    speaker:
+      traditionalChinese: "村民"
+      japanese: "村の人"
+    line:
+      traditionalChinese: "為什麼墓園的道路看起來一直延伸到遠方？"
+      japanese: "なぜ墓地の道は遠くまで続いているように見えるの？"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices:
+    - text:
+        traditionalChinese: "他用構圖表現道路的空間和深度。"
+        japanese: "構図で道の広がりと奥行きを表したんだ。"
+      nextNodeId: cemetery-good
+    - text:
+        traditionalChinese: "他隨意畫的，沒有特別安排。"
+        japanese: "何も考えずに描いたんだ。"
+      nextNodeId: cemetery-poor
+  - id: night
+    speaker:
+      traditionalChinese: "村民"
+      japanese: "村の人"
+    line:
+      traditionalChinese: "天空像在旋轉。梵谷真的看到了一模一樣的天空嗎？"
+      japanese: "空が渦を巻いているね。見たままの空なの？"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices:
+    - text:
+        traditionalChinese: "他把觀察和想像畫在一起，用筆觸表達感受。"
+        japanese: "観察と想像を重ね、筆遣いで気持ちを表したんだ。"
+      nextNodeId: night-good
+    - text:
+        traditionalChinese: "他只是隨便畫成這樣。"
+        japanese: "ただ適当に描いたんだ。"
+      nextNodeId: night-poor

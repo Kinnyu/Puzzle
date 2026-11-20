@@ -1,5 +1,7 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UIElements;
@@ -11,23 +13,48 @@ namespace Puzzle.Dialogue
     public sealed class DialoguePlayer : MonoBehaviour
     {
         const string LanguagePreference = "Puzzle.Dialogue.Language";
+        const float PageScrollSeconds = 0.24f;
+        const float MaxLineHeight = 152f;
+        const float MaxChoiceHeight = 112f;
+        const float LineBottomPadding = 8f;
 
         [SerializeField] Font traditionalChineseFont;
         [SerializeField] Font japaneseFont;
         [SerializeField] DialogueAppearance defaultAppearance;
         [SerializeField] Key interactKey = Key.E;
+        [SerializeField, Min(1f)] float charactersPerSecond = 18f;
 
         readonly List<DialogueTrigger> triggers = new();
+        readonly List<(string Heading, string Text, DialogueLanguage Language)> history = new();
         VisualElement overlay;
         VisualElement shade;
         VisualElement card;
         Image portrait;
-        VisualElement actions;
+        ScrollView actions;
         Label prompt;
+        Label openingTitle;
+        VisualElement titleScreen;
+        VisualElement objectiveScreen;
+        Label objectiveHeading;
+        Label objectiveText;
+        Coroutine openingSequence;
+        bool showingChapterTitle;
+        DialogueLanguage objectiveLanguage;
+        bool suspended;
+        bool scrolling;
+        bool preparingLine;
+        bool lineReady;
+        VisualElement page;
         Label speaker;
         Label line;
+        Coroutine lineSequence;
+        string fullLine;
+        DialogueLanguage lineLanguage;
+        int[] textElements;
+        int visibleCharacters;
         Button languageButton;
         Button closeButton;
+        Button advanceButton;
         ScrollView scroll;
         DialogueConversation conversation;
         Dictionary<string, DialogueConversation.Node> nodes;
@@ -38,11 +65,31 @@ namespace Puzzle.Dialogue
         CursorLockMode previousLock;
         bool previousCursorVisibility;
         int closedFrame = -1;
+        int renderedFrame = -1;
+        int interactionFrame = -1;
 
         public event Action<DialogueConversation> Completed;
         public event Action<DialogueConversation, string> LineChanged;
         public bool IsPlaying => conversation != null;
-        public bool BlocksGameplayInput => IsPlaying || closedFrame == Time.frameCount;
+        public bool BlocksGameplayInput => suspended || IsPlaying || showingChapterTitle || closedFrame == Time.frameCount;
+        internal IReadOnlyList<(string Heading, string Text, DialogueLanguage Language)> History => history;
+        internal string InteractionKeyLabel => interactKey == Key.None ? string.Empty
+            : Keyboard.current?[interactKey].displayName ?? interactKey.ToString();
+        bool HasChoices => currentNode.choices is { Length: > 0 };
+
+        internal void SetSuspended(bool value)
+        {
+            suspended = value;
+            overlay?.SetEnabled(!value);
+            if (value) SetPromptVisible(false);
+            else closedFrame = Time.frameCount;
+        }
+
+        internal void RecordHistory(string heading, string text, DialogueLanguage? textLanguage = null)
+        {
+            if (!string.IsNullOrWhiteSpace(text))
+                history.Add((heading, text, textLanguage ?? language));
+        }
 
         void OnEnable()
         {
@@ -51,39 +98,52 @@ namespace Puzzle.Dialogue
             shade = root?.Q("dialogue-shade");
             card = root?.Q("dialogue-card");
             portrait = root?.Q<Image>("dialogue-portrait");
-            actions = root?.Q("dialogue-actions");
+            actions = root?.Q<ScrollView>("dialogue-actions");
             prompt = root?.Q<Label>("dialogue-prompt");
-            speaker = root?.Q<Label>("dialogue-speaker");
-            line = root?.Q<Label>("dialogue-line");
+            titleScreen = root?.Q("chapter-title-screen");
+            openingTitle = root?.Q<Label>("chapter-title");
+            objectiveScreen = root?.Q("chapter-objective-screen");
+            objectiveHeading = root?.Q<Label>("chapter-objective-heading");
+            objectiveText = root?.Q<Label>("chapter-objective-text");
             languageButton = root?.Q<Button>("dialogue-language");
             closeButton = root?.Q<Button>("dialogue-close");
+            advanceButton = root?.Q<Button>("dialogue-advance");
             scroll = root?.Q<ScrollView>("dialogue-scroll");
-            if (overlay == null || card == null || actions == null || prompt == null || speaker == null
-                || line == null || languageButton == null || closeButton == null || scroll == null)
+            if (overlay == null || card == null || actions == null || prompt == null
+                || languageButton == null || closeButton == null || advanceButton == null || scroll == null)
             {
                 Debug.LogError("Dialogue visual tree is missing required named elements. Use Dialogue.uxml as a template.", this);
                 overlay = null;
                 return;
             }
 
-            speaker.enableRichText = false;
-            line.enableRichText = false;
+            if (openingTitle != null) openingTitle.enableRichText = false;
+            if (objectiveText != null) objectiveText.enableRichText = false;
+            advanceButton.enableRichText = false;
             if (portrait != null) portrait.scaleMode = ScaleMode.ScaleToFit;
             if (shade != null) card.RegisterCallback<GeometryChangedEvent>(ResizeShade);
             overlay.style.display = DisplayStyle.None;
+            overlay.SetEnabled(!suspended);
+            overlay.RegisterCallback<ClickEvent>(OnOverlayClick, TrickleDown.TrickleDown);
+            overlay.RegisterCallback<NavigationSubmitEvent>(OnOverlaySubmit);
             languageButton.clicked += ToggleLanguage;
             closeButton.clicked += Cancel;
+            advanceButton.clicked += AdvanceLinearNode;
             SetLanguage(PlayerPrefs.GetInt(LanguagePreference) == (int)DialogueLanguage.Japanese
                 ? DialogueLanguage.Japanese : DialogueLanguage.TraditionalChinese);
         }
 
         void OnDisable()
         {
+            StopOpening();
             Cancel();
             SetPromptVisible(false);
             if (overlay == null) return;
             languageButton.clicked -= ToggleLanguage;
             closeButton.clicked -= Cancel;
+            advanceButton.clicked -= AdvanceLinearNode;
+            overlay.UnregisterCallback<ClickEvent>(OnOverlayClick, TrickleDown.TrickleDown);
+            overlay.UnregisterCallback<NavigationSubmitEvent>(OnOverlaySubmit);
             if (shade != null) card.UnregisterCallback<GeometryChangedEvent>(ResizeShade);
             overlay = null;
         }
@@ -93,9 +153,14 @@ namespace Puzzle.Dialogue
 
         void LateUpdate()
         {
-            if (overlay == null) return;
+            if (overlay == null || suspended || showingChapterTitle || closedFrame == Time.frameCount) return;
             var keyboard = Keyboard.current;
-            if (IsPlaying && keyboard?.escapeKey.wasPressedThisFrame == true) Cancel();
+            if (IsPlaying)
+            {
+                if (interactKey != Key.None && keyboard?[interactKey].wasPressedThisFrame == true)
+                    AdvanceLinearNode();
+                return;
+            }
 
             DialogueTrigger nearby = null;
             DialogueTrigger automatic = null;
@@ -116,12 +181,20 @@ namespace Puzzle.Dialogue
                 }
             }
 
-            SetPromptVisible(!IsPlaying && nearby != null && interactKey != Key.None);
-            if (BlocksGameplayInput) return;
+            SetPromptVisible(nearby != null && interactKey != Key.None);
             if (automatic != null)
                 automatic.PlayOnEntry();
-            else if (nearby != null && interactKey != Key.None && keyboard?[interactKey].wasPressedThisFrame == true)
+            else if (nearby != null && TryConsumeGameplayInteraction())
                 nearby.Play();
+        }
+
+        internal bool TryConsumeGameplayInteraction()
+        {
+            if (overlay == null || BlocksGameplayInput || interactionFrame == Time.frameCount || interactKey == Key.None
+                || Keyboard.current?[interactKey].wasPressedThisFrame != true)
+                return false;
+            interactionFrame = Time.frameCount;
+            return true;
         }
 
         void SetPromptVisible(bool visible)
@@ -130,10 +203,87 @@ namespace Puzzle.Dialogue
                 prompt.style.display = visible ? DisplayStyle.Flex : DisplayStyle.None;
         }
 
+        internal void ShowOpening(ChapterOpeningText text, Action whenCovered = null)
+        {
+            if (!isActiveAndEnabled || IsPlaying || text == null || titleScreen == null ||
+                openingTitle == null || objectiveScreen == null || objectiveHeading == null || objectiveText == null)
+            {
+                whenCovered?.Invoke();
+                return;
+            }
+
+            StopOpening();
+            SetText(openingTitle, text.Title);
+            objectiveLanguage = SetText(objectiveText, text.Objective);
+            if (string.IsNullOrWhiteSpace(openingTitle.text))
+            {
+                whenCovered?.Invoke();
+                whenCovered = null;
+                if (string.IsNullOrWhiteSpace(objectiveText.text)) return;
+            }
+            titleScreen.EnableInClassList("chapter-title-transition", whenCovered != null);
+            objectiveHeading.text = Local("目前目標", "現在の目標");
+            ApplyFont(objectiveHeading, language);
+            openingSequence = StartCoroutine(ShowOpeningSequence(whenCovered));
+        }
+
+        IEnumerator ShowOpeningSequence(Action whenCovered)
+        {
+            if (!string.IsNullOrWhiteSpace(openingTitle.text))
+            {
+                showingChapterTitle = true;
+                SetPromptVisible(false);
+                yield return ShowTimedMessage(titleScreen, 0.4f, 1.6f, 1f, whenCovered);
+                showingChapterTitle = false;
+            }
+
+            if (!string.IsNullOrWhiteSpace(objectiveText.text))
+            {
+                RecordHistory(objectiveHeading.text, objectiveText.text, objectiveLanguage);
+                yield return ShowTimedMessage(objectiveScreen, 0.35f, 4f, 0.65f);
+            }
+
+            openingSequence = null;
+        }
+
+        IEnumerator ShowTimedMessage(VisualElement screen, float fadeIn, float hold, float fadeOut,
+            Action whenOpaque = null)
+        {
+            screen.style.opacity = 0f;
+            screen.AddToClassList("chapter-message-visible");
+            float duration = fadeIn + hold + fadeOut;
+            float elapsed = 0f;
+            while (elapsed < duration)
+            {
+                yield return null;
+                if (suspended) continue;
+                elapsed += Time.unscaledDeltaTime;
+                screen.style.opacity = Mathf.SmoothStep(0f, 1f,
+                    Mathf.Min(elapsed / fadeIn, (duration - elapsed) / fadeOut));
+                if (elapsed >= fadeIn && whenOpaque != null)
+                {
+                    whenOpaque();
+                    whenOpaque = null;
+                }
+            }
+            whenOpaque?.Invoke();
+            screen.RemoveFromClassList("chapter-message-visible");
+        }
+
+        void StopOpening()
+        {
+            if (openingSequence != null) StopCoroutine(openingSequence);
+            openingSequence = null;
+            showingChapterTitle = false;
+            titleScreen?.RemoveFromClassList("chapter-message-visible");
+            objectiveScreen?.RemoveFromClassList("chapter-message-visible");
+        }
+
         public bool TryPlay(DialogueConversation asset, DialogueAppearance appearance = null, Action completed = null,
             string startNodeId = null)
         {
-            if (!isActiveAndEnabled || overlay == null || IsPlaying || asset == null) return false;
+            if (!isActiveAndEnabled || overlay == null || suspended || IsPlaying || showingChapterTitle || asset == null)
+                return false;
             if (!asset.TryBuildIndex(out var index, out var entry, out string error))
             {
                 Debug.LogError($"Dialogue '{asset.name}': {error}", asset);
@@ -148,6 +298,7 @@ namespace Puzzle.Dialogue
                     Debug.LogWarning($"Dialogue '{asset.name}' has no node '{startNodeId}'. Starting from the beginning.", asset);
             }
 
+            StopOpening();
             conversation = asset;
             nodes = index;
             currentNode = entry;
@@ -158,6 +309,7 @@ namespace Puzzle.Dialogue
             Cursor.visible = true;
             SetPromptVisible(false);
             ApplyAppearance(appearance != null ? appearance : defaultAppearance);
+            scroll.scrollOffset = Vector2.zero;
             overlay.style.display = DisplayStyle.Flex;
             RenderNode();
             LineChanged?.Invoke(asset, entry.id);
@@ -171,12 +323,13 @@ namespace Puzzle.Dialogue
 
         void ToggleLanguage()
         {
+            if (suspended || !IsPlaying) return;
             var next = language == DialogueLanguage.Japanese
                 ? DialogueLanguage.TraditionalChinese : DialogueLanguage.Japanese;
             SetLanguage(next);
             PlayerPrefs.SetInt(LanguagePreference, (int)next);
             PlayerPrefs.Save();
-            RenderNode();
+            PrepareLine();
         }
 
         void SetLanguage(DialogueLanguage value)
@@ -189,9 +342,7 @@ namespace Puzzle.Dialogue
 
             languageButton.text = Local("日本語", "繁體中文");
             closeButton.text = Local("關閉", "閉じる");
-            string key = Keyboard.current != null && interactKey != Key.None
-                ? Keyboard.current[interactKey].displayName : interactKey.ToString();
-            prompt.text = $"{key}　{Local("對話", "話す")}";
+            prompt.text = $"{InteractionKeyLabel}　{Local("對話", "話す")}";
         }
 
         void ApplyAppearance(DialogueAppearance appearance)
@@ -211,34 +362,196 @@ namespace Puzzle.Dialogue
 
         void RenderNode()
         {
-            SetText(speaker, currentNode.speaker);
-            speaker.style.display = string.IsNullOrWhiteSpace(speaker.text) ? DisplayStyle.None : DisplayStyle.Flex;
-            SetText(line, currentNode.line);
+            renderedFrame = Time.frameCount;
+            scrolling = page != null;
+            lineReady = false;
+            page = new VisualElement();
+            page.AddToClassList("dialogue-page");
+            speaker = new Label { enableRichText = false };
+            speaker.AddToClassList("dialogue-speaker");
+            line = new Label { enableRichText = false };
+            line.AddToClassList("dialogue-line");
+            page.Add(speaker);
+            page.Add(line);
+            scroll.Add(page);
             if (portrait != null)
             {
                 portrait.image = currentNode.portrait;
                 portrait.EnableInClassList("dialogue-portrait-visible", currentNode.portrait != null);
                 portrait.EnableInClassList("dialogue-portrait-right", currentNode.portraitOnRight);
             }
-            actions.Clear();
+            PrepareLine();
+        }
 
-            if (currentNode.choices is { Length: > 0 })
+        void PrepareLine()
+        {
+            if (lineSequence != null) StopCoroutine(lineSequence);
+            preparingLine = true;
+            speaker.style.visibility = Visibility.Hidden;
+            line.style.visibility = Visibility.Hidden;
+            SetText(speaker, currentNode.speaker);
+            speaker.style.display = string.IsNullOrWhiteSpace(speaker.text) ? DisplayStyle.None : DisplayStyle.Flex;
+            fullLine = currentNode.line.Get(language, out lineLanguage);
+            ApplyFont(line, lineLanguage);
+            textElements = StringInfo.ParseCombiningCharacters(fullLine);
+            visibleCharacters = 0;
+            line.text = fullLine;
+            SetActionsVisible(false);
+            BuildActions();
+            overlay.Focus();
+            lineSequence = StartCoroutine(PlayLine());
+        }
+
+        IEnumerator PlayLine()
+        {
+            // Measure the wrapped line and the choices while they are hidden.
+            do { yield return null; }
+            while (suspended);
+            float targetLineHeight = Mathf.Clamp(line.layout.yMax + LineBottomPadding, 32f, MaxLineHeight);
+            float targetChoiceHeight = 0f;
+            if (HasChoices)
+            {
+                var lastChoice = actions.ElementAt(actions.childCount - 1);
+                targetChoiceHeight = Mathf.Min(lastChoice.layout.yMax + lastChoice.resolvedStyle.marginBottom,
+                    MaxChoiceHeight);
+            }
+            if (!lineReady) line.text = string.Empty;
+
+            if (scrolling)
+            {
+                float from = scroll.scrollOffset.y;
+                float fromLineHeight = scroll.resolvedStyle.height;
+                float fromChoiceHeight = actions.resolvedStyle.height;
+                for (float elapsed = 0f; elapsed < PageScrollSeconds;)
+                {
+                    if (!suspended)
+                    {
+                        elapsed += Time.unscaledDeltaTime;
+                        float progress = Mathf.SmoothStep(0f, 1f, elapsed / PageScrollSeconds);
+                        SetDialogueHeights(Mathf.Lerp(fromLineHeight, targetLineHeight, progress),
+                            Mathf.Lerp(fromChoiceHeight, targetChoiceHeight, progress));
+                        ScrollTo(Mathf.Lerp(from, page.layout.y, progress));
+                    }
+                    yield return null;
+                }
+                scrolling = false;
+            }
+            else
+            {
+                SetDialogueHeights(targetLineHeight, targetChoiceHeight);
+                yield return null;
+            }
+            while (suspended) yield return null;
+
+            preparingLine = false;
+            speaker.style.visibility = Visibility.Visible;
+            line.style.visibility = Visibility.Visible;
+            FollowCurrentLine();
+            if (lineReady)
+            {
+                lineSequence = null;
+                SetActionsVisible(true);
+                yield break;
+            }
+
+            float remaining = 0f;
+            while (suspended || visibleCharacters < textElements.Length)
+            {
+                if (!suspended)
+                {
+                    FollowCurrentLine();
+                    remaining -= Time.unscaledDeltaTime;
+                    if (remaining <= 0f)
+                    {
+                        do
+                        {
+                            visibleCharacters++;
+                            remaining += 1f / Mathf.Max(1f, charactersPerSecond);
+                        }
+                        while (remaining <= 0f && visibleCharacters < textElements.Length);
+                        line.text = visibleCharacters == textElements.Length
+                            ? fullLine : fullLine.Substring(0, textElements[visibleCharacters]);
+                    }
+                }
+                yield return null;
+            }
+            FollowCurrentLine();
+            lineSequence = null;
+            FinishLine();
+        }
+
+        void SetDialogueHeights(float lineHeight, float choiceHeight)
+        {
+            scroll.style.height = lineHeight;
+            actions.style.height = choiceHeight;
+        }
+
+        void ScrollTo(float offset)
+        {
+            if (!float.IsNaN(offset) && !float.IsInfinity(offset))
+                scroll.scrollOffset = new Vector2(0f, offset);
+        }
+
+        void FollowCurrentLine()
+        {
+            float viewportHeight = scroll.contentViewport.layout.height;
+            float overflow = line.layout.yMax + LineBottomPadding - viewportHeight;
+            ScrollTo(page.layout.y + Mathf.Max(0f, overflow));
+        }
+
+        void FinishLine()
+        {
+            if (lineSequence != null) StopCoroutine(lineSequence);
+            lineSequence = null;
+            lineReady = true;
+            renderedFrame = Time.frameCount;
+            speaker.style.visibility = Visibility.Visible;
+            if (line.text != fullLine)
+            {
+                line.text = fullLine;
+                var currentPage = page;
+                currentPage.schedule.Execute(() =>
+                {
+                    if (page == currentPage && !suspended) FollowCurrentLine();
+                });
+            }
+            RecordHistory(speaker.text, line.text, lineLanguage);
+            SetActionsVisible(true);
+        }
+
+        void BuildActions()
+        {
+            actions.Clear();
+            actions.scrollOffset = Vector2.zero;
+            if (HasChoices)
             {
                 foreach (var choice in currentNode.choices)
-                    SetText(AddAction(choice.nextNodeId), choice.text);
+                {
+                    var button = new Button(() => SelectChoice(choice)) { enableRichText = false };
+                    button.AddToClassList("dialogue-action");
+                    SetText(button, choice.text);
+                    actions.Add(button);
+                }
             }
             else
             {
                 string nextId = currentNode.nextNodeId;
-                string label = string.IsNullOrEmpty(nextId) ? Local("結束", "会話を終える") : Local("繼續", "続ける");
-                var button = AddAction(nextId);
-                button.AddToClassList("dialogue-advance");
-                button.text = label;
-                ApplyFont(button, language);
+                string label = string.IsNullOrEmpty(nextId)
+                    ? Local("結束", "会話を終える") : Local("繼續", "続ける");
+                advanceButton.text = interactKey == Key.None ? label : $"{label}　[{interactKey}]";
+                ApplyFont(advanceButton, language);
             }
+        }
 
-            scroll.scrollOffset = Vector2.zero;
-            actions.ElementAt(0).Focus();
+        void SetActionsVisible(bool ready)
+        {
+            bool showChoices = ready && HasChoices;
+            bool showAdvance = ready && !HasChoices;
+            actions.EnableInClassList("dialogue-actions-hidden", !showChoices);
+            actions.SetEnabled(showChoices);
+            advanceButton.EnableInClassList("dialogue-actions-hidden", !showAdvance);
+            advanceButton.SetEnabled(showAdvance);
+            if (showChoices) actions.ElementAt(0).Focus();
         }
 
         void ResizeShade(GeometryChangedEvent change)
@@ -246,21 +559,45 @@ namespace Puzzle.Dialogue
             shade.style.height = change.newRect.height + 104f;
         }
 
-        Button AddAction(string nextId)
+        void OnOverlayClick(ClickEvent click)
         {
-            var button = new Button(() => Advance(nextId)) { enableRichText = false };
-            button.AddToClassList("dialogue-action");
-            actions.Add(button);
-            return button;
+            if (click.button == 0 && click.target is VisualElement target
+                && target is not Button && target.GetFirstAncestorOfType<Button>() == null)
+                AdvanceLinearNode();
         }
 
-        void SetText(TextElement element, DialogueText text)
+        void OnOverlaySubmit(NavigationSubmitEvent submit)
+        {
+            if (submit.target == overlay) AdvanceLinearNode();
+        }
+
+        void AdvanceLinearNode()
+        {
+            if (!CanInteract() || scrolling) return;
+            if (!lineReady) FinishLine();
+            else if (!HasChoices)
+                Advance(currentNode.nextNodeId);
+        }
+
+        bool CanInteract() => IsPlaying && !suspended && !preparingLine
+            && renderedFrame != Time.frameCount && closedFrame != Time.frameCount;
+
+        void SelectChoice(DialogueConversation.Choice choice)
+        {
+            if (!CanInteract() || !lineReady) return;
+            string text = choice.text.Get(language, out var textLanguage);
+            RecordHistory(Local("已選選項", "選んだ返答"), text, textLanguage);
+            Advance(choice.nextNodeId);
+        }
+
+        DialogueLanguage SetText(TextElement element, DialogueText text)
         {
             element.text = text.Get(language, out var resolvedLanguage);
             ApplyFont(element, resolvedLanguage);
+            return resolvedLanguage;
         }
 
-        void ApplyFont(TextElement element, DialogueLanguage value)
+        internal void ApplyFont(TextElement element, DialogueLanguage value)
         {
             Font font = value == DialogueLanguage.Japanese ? japaneseFont : traditionalChineseFont;
             element.style.unityFontDefinition = font != null
@@ -269,7 +606,6 @@ namespace Puzzle.Dialogue
 
         void Advance(string nextId)
         {
-            if (!IsPlaying) return;
             if (!string.IsNullOrEmpty(nextId))
             {
                 currentNode = nodes[nextId];
@@ -287,6 +623,11 @@ namespace Puzzle.Dialogue
 
         void Close()
         {
+            if (lineSequence != null) StopCoroutine(lineSequence);
+            lineSequence = null;
+            if (!lineReady && !preparingLine) RecordHistory(speaker.text, line.text, lineLanguage);
+            scroll.Clear();
+            page = null;
             conversation = null;
             currentNode = null;
             nodes = null;
@@ -300,6 +641,6 @@ namespace Puzzle.Dialogue
             Cursor.visible = previousCursorVisibility;
         }
 
-        string Local(string chinese, string japanese) => language == DialogueLanguage.Japanese ? japanese : chinese;
+        internal string Local(string chinese, string japanese) => language == DialogueLanguage.Japanese ? japanese : chinese;
     }
 }

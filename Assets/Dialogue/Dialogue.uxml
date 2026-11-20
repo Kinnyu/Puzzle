@@ -1,20 +1,27 @@
 <ui:UXML xmlns:ui="UnityEngine.UIElements">
-    <Style src="Dialogue.uss" />
+    <ui:Style src="Dialogue.uss" />
     <ui:VisualElement class="dialogue-root" picking-mode="Ignore">
         <ui:Label name="dialogue-prompt" class="dialogue-prompt" picking-mode="Ignore" />
-        <ui:VisualElement name="dialogue-overlay" class="dialogue-overlay">
+        <ui:VisualElement name="dialogue-overlay" class="dialogue-overlay" focusable="true">
             <ui:VisualElement name="dialogue-shade" class="dialogue-shade" picking-mode="Ignore" />
             <ui:Image name="dialogue-portrait" class="dialogue-portrait" picking-mode="Ignore" />
             <ui:VisualElement name="dialogue-card" class="dialogue-card">
-                <ui:ScrollView name="dialogue-scroll" class="dialogue-scroll" horizontal-scroller-visibility="Hidden">
-                    <ui:Label name="dialogue-speaker" class="dialogue-speaker" />
-                    <ui:Label name="dialogue-line" class="dialogue-line" />
-                    <ui:VisualElement name="dialogue-actions" />
-                </ui:ScrollView>
+                <ui:ScrollView name="dialogue-scroll" class="dialogue-scroll" horizontal-scroller-visibility="Hidden" vertical-scroller-visibility="Hidden" />
+                <ui:ScrollView name="dialogue-actions" class="dialogue-actions dialogue-actions-hidden" horizontal-scroller-visibility="Hidden" />
             </ui:VisualElement>
+            <ui:Button name="dialogue-advance" class="dialogue-advance dialogue-actions-hidden" />
             <ui:VisualElement class="dialogue-toolbar" picking-mode="Ignore">
                 <ui:Button name="dialogue-language" class="dialogue-control" />
                 <ui:Button name="dialogue-close" class="dialogue-control" />
+            </ui:VisualElement>
+        </ui:VisualElement>
+        <ui:VisualElement name="chapter-title-screen" class="chapter-message chapter-title-screen" picking-mode="Ignore">
+            <ui:Label name="chapter-title" class="chapter-title" picking-mode="Ignore" />
+        </ui:VisualElement>
+        <ui:VisualElement name="chapter-objective-screen" class="chapter-message" picking-mode="Ignore">
+            <ui:VisualElement class="chapter-objective-card" picking-mode="Ignore">
+                <ui:Label name="chapter-objective-heading" class="chapter-objective-heading" picking-mode="Ignore" />
+                <ui:Label name="chapter-objective-text" class="chapter-objective-text" picking-mode="Ignore" />
             </ui:VisualElement>
         </ui:VisualElement>
     </ui:VisualElement>
