@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: Chapter 3 - Try Again
   m_EditorClassIdentifier:
   title:
-    traditionalChinese: "再試一次"
-    japanese: "もう一度"
+    traditionalChinese: "小屋的門"
+    japanese: "黄色い家の扉"
   objective:
-    traditionalChinese: "在辯論結束前，到門口請鄰居找醫生。"
-    japanese: "議論が終わる前に玄関で近所の人に医師を呼んでもらおう。"
+    traditionalChinese: "梵谷想請醫師。到門口找鄰居，再回來陪他。"
+    japanese: "ゴッホは医師に来てほしいと言った。玄関で近所の人に頼み、そばへ戻ろう。"

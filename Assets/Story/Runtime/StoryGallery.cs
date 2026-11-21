@@ -93,7 +93,7 @@ namespace Puzzle.Story
                 prompt.text = "點擊畫面，繼續探索";
             else if (aimed)
             {
-                prompt.text = $"E  或點擊   查看《{painting.Story.Title}》";
+                prompt.text = $"按 E 查看《{painting.Story.Title}》";
                 if (keys?.eKey.wasPressedThisFrame == true || Mouse.current?.leftButton.wasPressedThisFrame == true)
                     Open(painting.Story);
             }

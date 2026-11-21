@@ -137,8 +137,8 @@ MonoBehaviour:
       traditionalChinese: "高更"
       japanese: "ゴーギャン"
     line:
-      traditionalChinese: "同一片景色，我們看見的也許不一樣。你也去走走，想想有哪些東西值得放進畫裡。"
-      japanese: "同じ景色でも、私たちの目には違って映るかもしれない。君も歩いて、何を絵に入れたいか考えてみてくれ。"
+      traditionalChinese: "我想找一個能讓這條路安靜下來的角度。你也走走吧，哪裡讓你停下來，就從哪裡開始。"
+      japanese: "この道の静けさが残る角度を探したいな。君も歩いてみて。足が止まったところから始めればいい。"
     portrait: {fileID: 2800000, guid: 9f662b0d40b2f40448daff9254c1a452, type: 3}
     portraitOnRight: 1
     nextNodeId:
@@ -148,43 +148,31 @@ MonoBehaviour:
       traditionalChinese: "梵谷"
       japanese: "ゴッホ"
     line:
-      traditionalChinese: "怎麼樣？有找到值得畫下來的景物嗎？"
-      japanese: "どうだい？ 描き留めたいと思う景色は見つかった？"
+      traditionalChinese: "不用急著回來。你選一個地方停下，仔細看看。"
+      japanese: "急いで戻らなくていいよ。どこか一か所で足を止めて、よく見てごらん。"
     portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
     portraitOnRight: 0
     nextNodeId:
-    choices:
-    - text:
-        traditionalChinese: "取景完成了！"
-        japanese: "観察は終わったよ！"
-      nextNodeId: submit
-    - text:
-        traditionalChinese: "我再去附近看看。"
-        japanese: "もう少し見てくるよ。"
-      nextNodeId: more
+    choices: []
   - id: survey-angle
     speaker:
       traditionalChinese: "梵谷"
       japanese: "ゴッホ"
     line:
-      traditionalChinese: "怎麼樣？從這裡看去，你注意到了什麼？"
-      japanese: "どうだい？ ここから眺めて、何か気づいたことはある？"
+      traditionalChinese: "你也在看這條路？它到了遠處，幾乎只剩一線光。"
+      japanese: "君もこの道を見ていたの？ 遠くでは、光が一本残るだけみたいだ。"
     portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
     portraitOnRight: 0
     nextNodeId:
     choices:
     - text:
-        traditionalChinese: "取景完成了！"
-        japanese: "観察は終わったよ！"
-      nextNodeId: submit
-    - text:
-        traditionalChinese: "我再去附近看看。"
-        japanese: "もう少し見てくるよ。"
-      nextNodeId: more
-    - text:
-        traditionalChinese: "沿著道路望過去，畫面很有深度。"
-        japanese: "道の先を眺めると、奥行きが感じられるね。"
+        traditionalChinese: "把那一線光留在畫裡。"
+        japanese: "あの一本の光を絵に残したい。"
       nextNodeId: perspective
+    - text:
+        traditionalChinese: "先看看我們已經畫下的地方。"
+        japanese: "先に、もう描いたところを見てみる。"
+      nextNodeId: submit
   - id: submit
     speaker:
       traditionalChinese: "高更"
@@ -212,53 +200,31 @@ MonoBehaviour:
       traditionalChinese: "梵谷"
       japanese: "ゴッホ"
     line:
-      traditionalChinese: "你也發現了！道路往遠方延伸，兩旁的樹讓畫面更有深度。把這個角度留在畫裡吧。"
-      japanese: "君も気づいたね！ 遠くまで続く道と両側の木々が奥行きを生んでいる。この構図を絵に残そう。"
+      traditionalChinese: "我先畫近處，再把遠處留成一小線。你往那裡看，眼睛會自己沿著路走。"
+      japanese: "手前から描いて、遠くは細い線だけ残す。ほら、目がひとりでに道をたどっていく。"
     portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
     portraitOnRight: 0
     nextNodeId:
     choices: []
   - id: leaves
     speaker:
-      traditionalChinese: "你"
-      japanese: "あなた"
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
     line:
-      traditionalChinese: "金黃色的葉子落在地上，連整條路都染上了秋天的顏色。這些色彩值得畫下來。"
-      japanese: "金色の葉が地面に落ちて、道まで秋色に染まっている。この色は絵に残したい。"
+      traditionalChinese: "你停在這裡啊。看葉子貼著地面的那一面。連陰影裡也有顏色。"
+      japanese: "ここで足を止めたんだね。葉っぱの地面に近いところを見て。影にも色がある。"
     portrait: {fileID: 0}
     portraitOnRight: 0
     nextNodeId:
     choices: []
   - id: stone
     speaker:
-      traditionalChinese: "你"
-      japanese: "あなた"
-    line:
-      traditionalChinese: "古老的石棺沿著路邊排開。把它們畫進去，才能看出這片風景為何與別處不同。"
-      japanese: "古い石棺が道沿いに並んでいる。絵に入れれば、この場所ならではの風景が伝わる。"
-    portrait: {fileID: 0}
-    portraitOnRight: 0
-    nextNodeId:
-    choices: []
-  - id: incomplete
-    speaker:
-      traditionalChinese: "高更"
-      japanese: "ゴーギャン"
-    line:
-      traditionalChinese: "文森特，你的畫似乎還少了一些你想留住的東西。"
-      japanese: "フィンセント、この絵には、君が残したかった何かがまだ足りないみたいだ。"
-    portrait: {fileID: 2800000, guid: 9f662b0d40b2f40448daff9254c1a452, type: 3}
-    portraitOnRight: 1
-    nextNodeId: retry-survey
-    choices: []
-  - id: retry-survey
-    speaker:
       traditionalChinese: "梵谷"
       japanese: "ゴッホ"
     line:
-      traditionalChinese: "你說得對。我們再回去看看，把值得留下的景物找齊吧。"
-      japanese: "そのとおりだね。もう一度戻って、残しておきたい景色を探そう。"
-    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+      traditionalChinese: "原來你在看石棺。靠近一點，灰色底下還透著紫。我想把那一點紫留下。"
+      japanese: "石棺を見ていたんだね。近くで見ると、灰色の奥に紫が透けている。あの紫を残したい。"
+    portrait: {fileID: 0}
     portraitOnRight: 0
     nextNodeId:
     choices: []
@@ -267,8 +233,8 @@ MonoBehaviour:
       traditionalChinese: "梵谷"
       japanese: "ゴッホ"
     line:
-      traditionalChinese: "這就是我想畫下來的景色！延伸的道路、金黃的秋葉，還有那些古老的石棺。"
-      japanese: "これが描きたかった景色だ！ 遠くへ続く道、金色の葉、そして古い石棺。"
+      traditionalChinese: "我記得你在哪裡停下來。回去把畫攤在桌上吧，趁那道光還留在眼睛裡。"
+      japanese: "君が立ち止まった場所を覚えているよ。あの光がまだ目に残っているうちに、帰って絵を広げよう。"
     portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
     portraitOnRight: 0
     nextNodeId: complete-g
@@ -284,35 +250,13 @@ MonoBehaviour:
     portraitOnRight: 1
     nextNodeId:
     choices: []
-  - id: failure
-    speaker:
-      traditionalChinese: "旁白"
-      japanese: "語り"
-    line:
-      traditionalChinese: "小屋安靜下來。兩個人都沒能把想說的話說完。夜裡，梵谷需要有人來陪他。"
-      japanese: "家は静まり返った。二人とも伝えたいことを言い切れなかった。その夜、フィンセントにはそばにいてくれる人が必要だった。"
-    portrait: {fileID: 0}
-    portraitOnRight: 0
-    nextNodeId: failure-retry
-    choices: []
-  - id: failure-retry
-    speaker:
-      traditionalChinese: "旁白"
-      japanese: "語り"
-    line:
-      traditionalChinese: "如果能再回到那三十秒，也許來得及請人過來。"
-      japanese: "あの三十秒に戻れたら、誰かを呼びに行けるかもしれない。"
-    portrait: {fileID: 0}
-    portraitOnRight: 0
-    nextNodeId:
-    choices: []
   - id: ending
     speaker:
       traditionalChinese: "旁白"
       japanese: "語り"
     line:
-      traditionalChinese: "你請鄰居帶醫生趕來。他們留在小屋陪伴梵谷，直到他得到照護。"
-      japanese: "君が頼んだ近所の人が医師を連れてきた。二人はフィンセントが手当てを受けられるまでそばにいた。"
+      traditionalChinese: "你把門留了一條縫，回到梵谷身旁。這次聽見敲門聲，來的是鄰居和醫師。"
+      japanese: "扉を少し開け、ゴッホのそばに戻った。今度、扉を叩いたのは、近所の人と医師だった。"
     portrait: {fileID: 0}
     portraitOnRight: 0
     nextNodeId: ending-final
@@ -324,6 +268,69 @@ MonoBehaviour:
     line:
       traditionalChinese: "兩位畫家的道路從此分開。那天留下的作品，仍然保存著他們並肩看過的那片秋色。"
       japanese: "二人の画家は別々の道を歩んだ。あの日の絵には、二人で眺めた秋の色が今も残っている。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: survey-ready
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "我試著把你停下來看的地方畫了幾筆。想先看，還是再走一段？"
+      japanese: "君が足を止めた場所を少し描いてみた。先に見る？ それとも、もう少し歩く？"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId:
+    choices:
+    - text:
+        traditionalChinese: "看看兩張習作。"
+        japanese: "二枚の習作を見比べる。"
+      nextNodeId: submit
+    - text:
+        traditionalChinese: "我想再走走。"
+        japanese: "もう少し歩いてみる。"
+      nextNodeId: more
+  - id: house-quiet
+    speaker:
+      traditionalChinese: "旁白"
+      japanese: "語り"
+    line:
+      traditionalChinese: "門關上後，小屋裡只剩桌上的兩張畫。梵谷坐了下來，許久沒有說話。"
+      japanese: "扉が閉まると、家には台の上の二枚の絵が残った。ゴッホは腰を下ろし、しばらく何も言わなかった。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId: house-quiet-vincent
+    choices: []
+  - id: house-quiet-vincent
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "可以請門外的鄰居來一趟嗎？我想找醫師。我會在這裡等你。"
+      japanese: "外の人を呼んできてくれる？ お医者さんに来てほしい。僕はここで待っているよ。"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: neighbor-help
+    speaker:
+      traditionalChinese: "你"
+      japanese: "あなた"
+    line:
+      traditionalChinese: "文森特需要醫師。我會回去陪他等，你可以幫我們去請人嗎？"
+      japanese: "フィンセントにお医者さんが必要です。僕はそばで待つので、呼んできてもらえますか？"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId: neighbor-answer
+    choices: []
+  - id: neighbor-answer
+    speaker:
+      traditionalChinese: "鄰居"
+      japanese: "近所の人"
+    line:
+      traditionalChinese: "我這就去。回去告訴他，讓門留一條縫，我們到了就敲門。"
+      japanese: "すぐに行ってくる。扉を少し開けて待っていてくれ。着いたら戸を叩くから。"
     portrait: {fileID: 0}
     portraitOnRight: 0
     nextNodeId:

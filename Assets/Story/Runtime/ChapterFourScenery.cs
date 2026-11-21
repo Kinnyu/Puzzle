@@ -15,6 +15,7 @@ namespace Puzzle.Story
         internal readonly Vector3[] Inspiration, Paintings, Display, Tools;
         internal readonly GameObject[] Copies = new GameObject[3], Exhibits = new GameObject[3],
             Supplies = new GameObject[4], Setup = new GameObject[3];
+        internal readonly GameObject[] Frames = new GameObject[3], Backings = new GameObject[3];
         internal Texture2D GiftPainting { get; }
 
         internal ChapterFourScenery(Transform parent, Func<Vector3, Vector3> ground, Vector3 clinicLot, Vector3 galleryLot,
@@ -47,16 +48,16 @@ namespace Puzzle.Story
             for (int i = 0; i < art.Length; i++)
             {
                 Copies[i] = Canvas("Collectible canvas", Paintings[i] + Vector3.up * 1.20f, art[i], .95f, .72f);
-                var wall = new Vector3(Display[i].x, Gallery.y + 1.61f, Gallery.z + 2.065f);
-                Box("Exhibit frame", wall + Vector3.forward * .03f, new Vector3(1.50f, 1.12f, .07f), timber, false);
-                Box("Empty exhibit", wall, new Vector3(1.38f, 1.00f, .022f), linen, false);
+                var wall = new Vector3(Display[i].x, Gallery.y + 1.61f, Gallery.z + 1.94f);
+                Frames[i] = Box("Exhibit frame", wall + Vector3.forward * .03f, new Vector3(1.50f, 1.12f, .07f), timber, false);
+                Backings[i] = Box("Empty exhibit", wall, new Vector3(1.38f, 1.00f, .022f), linen, false);
                 Exhibits[i] = Canvas("Exhibited canvas", wall - Vector3.forward * .02f, art[i], 1.36f, .98f);
             }
 
             Tools = new[] { House + new Vector3(1.80f, 0, .78f), House + new Vector3(-.94f, 0, -.98f),
                 House + new Vector3(1.77f, 0, -.95f), House + new Vector3(-1.50f, 0, .90f) };
             Supplies[0] = Box("Blank canvas", Tools[0] + Vector3.up * .54f, new Vector3(.59f, .69f, .10f), linen, false);
-            Supplies[1] = Box("Brushes", Tools[1] + new Vector3(-.41f, .928f, .06f), new Vector3(.23f, .036f, .17f), brass, false);
+            Supplies[1] = Box("Brushes", Tools[1] + new Vector3(-.79f, .918f, .06f), new Vector3(.23f, .036f, .17f), brass, false);
             Supplies[2] = Box("Paint box", Tools[2] + Vector3.up * .24f, new Vector3(.4f, .3f, .29f), brass, false);
             Supplies[3] = Easel(Tools[3] + Vector3.left * .32f);
             Vector3 stand = ground(Gift + new Vector3(.76f, 0, .38f));

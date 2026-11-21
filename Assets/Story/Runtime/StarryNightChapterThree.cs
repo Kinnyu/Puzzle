@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Puzzle.Dialogue;
 using Puzzle.StarryNight;
 using UnityEngine;
@@ -15,7 +14,7 @@ namespace Puzzle.Story
         const string RetryCheckpoint = "yellow-house-retry";
         const float DebateDuration = 30f;
 
-        enum Stage { House, Guest, Escort, Cemetery, Survey, Review, ReviewResponse, Debate, Ending, Finished }
+        enum Stage { House, Guest, Escort, Cemetery, Survey, Review, ReviewResponse, Return, Debate, Help, Stay, Finished }
 
         [SerializeField] StarryNightWalk walk;
         [SerializeField] DialoguePlayer dialogue;
@@ -31,6 +30,11 @@ namespace Puzzle.Story
         [SerializeField] Vector3 church = new(5, 0, 2);
         [SerializeField] Vector3 cemetery = new(10, 0, -27);
 
+        internal Sprite GauguinSprite => gauguinSprite;
+        internal Sprite VincentSprite => vincentSprite;
+        internal Sprite NeighborSprite => neighborSprite;
+        internal Texture2D GauguinArt => gauguinPainting;
+
         static readonly (bool Gauguin, string Chinese, string Japanese)[] Debate =
         {
             (false, "我想把眼前這片秋天，連同它帶給我的感受，一起留在畫裡。", "目の前の秋と、それを見て感じたことを、一緒に絵に残したいんだ。"),
@@ -41,23 +45,21 @@ namespace Puzzle.Story
             (true, "我沒有要你放棄自己的畫。可是今天，我想我們需要先停一下。", "自分の絵を捨てろとは言っていない。ただ今日は、一度ここでやめておこう。")
         };
 
-        readonly Queue<Vector3> trail = new();
+        readonly WalkingTrail trail = new();
         StorySceneProgress progress;
         ChapterThreeScenery scenery;
         DialogueTrigger vincent;
         DialogueTrigger gauguin;
         GameObject neighbor;
         VisualElement review;
-        Label reviewTitle, result, vincentCaption, gauguinCaption, timer, debateSpeaker, debateLine;
+        Label reviewTitle, result, vincentCaption, gauguinCaption, debateSpeaker, debateLine;
         Image studyImage;
         Button reviewContinue;
         VisualElement debateSubtitle;
         Stage stage;
         PaintingStudy elements;
-        Vector3 lastTrailPoint;
         string lastNode;
-        bool secondChance;
-        bool sentForHelp;
+        PaintingStudy lookingAt;
         bool reviewCapturedCursor;
         int debateBeat;
         float remaining;
@@ -86,8 +88,15 @@ namespace Puzzle.Story
                     break;
                 case DebateCheckpoint:
                 case RetryCheckpoint:
-                    elements = PaintingStudy.All;
-                    BeginDebate(checkpoint == RetryCheckpoint);
+                    elements = progress.LoadCemeteryStudy();
+                    scenery.UpdateStudyColors(elements, 1f);
+                    if (checkpoint == RetryCheckpoint)
+                    {
+                        PrepareDebate();
+                        AskForHelp();
+                        dialogue.ShowOpening(retry);
+                    }
+                    else BeginDebate();
                     break;
                 default:
                     stage = Stage.House;
@@ -122,9 +131,7 @@ namespace Puzzle.Story
             var actor = new GameObject(name);
             actor.SetActive(false);
             actor.transform.SetParent(transform);
-            var renderer = actor.AddComponent<SpriteRenderer>();
-            renderer.sprite = sprite;
-            actor.AddComponent<CharacterBillboard>();
+            CharacterBillboard.AddSprite(actor, sprite);
             var trigger = actor.AddComponent<DialogueTrigger>();
             trigger.Initialize(dialogue, walk.Player, script, range);
             trigger.SetInteraction(null, null);
@@ -156,28 +163,7 @@ namespace Puzzle.Story
         {
             stage = Stage.Escort;
             gauguin.SetInteraction(null, null);
-            trail.Clear();
-            lastTrailPoint = Player;
-            trail.Enqueue(lastTrailPoint);
-        }
-
-        void FollowTrail()
-        {
-            Vector3 position = Player;
-            if (HorizontalDistance(lastTrailPoint, position) >= .45f)
-            {
-                trail.Enqueue(position);
-                lastTrailPoint = position;
-            }
-            var follower = gauguin.transform;
-            if (!trail.TryPeek(out Vector3 next)) return;
-            if (trail.Count < 4 && HorizontalDistance(follower.position, position) < 1.55f) return;
-            if (HorizontalDistance(follower.position, next) < .12f) trail.Dequeue();
-            else
-            {
-                var destination = Vector3.MoveTowards(follower.position, next, 5.5f * Time.deltaTime);
-                follower.position = previousChapter.Ground(destination);
-            }
+            trail.StartAt(Player);
         }
 
         void SetCemeteryCast()
@@ -191,6 +177,8 @@ namespace Puzzle.Story
 
         void Update()
         {
+            if (progress != null && lookingAt != PaintingStudy.None)
+                scenery.UpdateStudyColors(elements | lookingAt, 1f - Mathf.Exp(-2.4f * Time.deltaTime));
             if (progress == null || walk.InputSuppressed || dialogue.BlocksGameplayInput) return;
             switch (stage)
             {
@@ -201,7 +189,7 @@ namespace Puzzle.Story
                     Objective("遠方的訪客　回到教堂找高更", "遠方からの客　教会でゴーギャンを探す", gauguin.transform.position);
                     break;
                 case Stage.Escort:
-                    FollowTrail();
+                    trail.Follow(gauguin.transform, Player, previousChapter.Ground);
                     Objective("畫家的相遇　帶高更到黃色小屋", "画家たちの出会い　ゴーギャンを黄色い家へ案内する", scenery.Door);
                     if (Near(scenery.Door, 1.55f) && HorizontalDistance(gauguin.transform.position, scenery.Door) < 3.5f)
                     {
@@ -228,12 +216,29 @@ namespace Puzzle.Story
                 case Stage.ReviewResponse:
                     PlayReviewResponse();
                     break;
+                case Stage.Return:
+                    Objective("帶著習作回黃色小屋", "習作を持って黄色い家に戻る", scenery.Door);
+                    if (Near(scenery.Door, 1.5f))
+                    {
+                        progress.SaveCheckpoint(DebateCheckpoint);
+                        BeginDebate();
+                    }
+                    break;
                 case Stage.Debate:
                     UpdateDebate();
                     break;
-                case Stage.Ending:
-                    if (sentForHelp) Play("ending", Finish);
-                    else Play("failure", RetryDebate);
+                case Stage.Help:
+                    UpdateHelp();
+                    break;
+                case Stage.Stay:
+                    if (Near(vincent.transform.position, 1.55f))
+                    {
+                        var key = dialogue.InteractionKeyLabel;
+                        Objective($"按 {key} 留下來陪梵谷", $"{key} でゴッホのそばにいる");
+                        if (dialogue.TryConsumeGameplayInteraction()) Play("ending", Finish);
+                    }
+                    else
+                        Objective("回小屋陪梵谷等醫師", "家に戻ってゴッホと医師を待つ", vincent.transform.position);
                     break;
             }
         }
@@ -244,13 +249,13 @@ namespace Puzzle.Story
             if (!elements.HasFlag(PaintingStudy.Leaves) && Near(scenery.Leaves, 1.1f))
             {
                 Objective($"按 {key} 觀察金黃色的樹葉", $"{key} で金色の葉を観察");
-                if (dialogue.TryConsumeGameplayInteraction()) Play("leaves", () => Discover(PaintingStudy.Leaves));
+                if (dialogue.TryConsumeGameplayInteraction()) Observe(PaintingStudy.Leaves, "leaves");
                 return;
             }
             if (!elements.HasFlag(PaintingStudy.Stone) && Near(scenery.Stone, 1.1f))
             {
                 Objective($"按 {key} 觀察墓園的石棺", $"{key} で石棺を観察");
-                if (dialogue.TryConsumeGameplayInteraction()) Play("stone", () => Discover(PaintingStudy.Stone));
+                if (dialogue.TryConsumeGameplayInteraction()) Observe(PaintingStudy.Stone, "stone");
                 return;
             }
             if (Near(vincent.transform.position, 2.6f))
@@ -262,44 +267,45 @@ namespace Puzzle.Story
                     && Vector3.Angle(walk.transform.forward, sight) <= 37f;
                 if (goodAngle)
                     Objective($"按 {key} 和梵谷談談構圖", $"{key} でゴッホと構図について話す");
-                else if (!hasPerspective)
+                else if (elements == PaintingStudy.None)
                     Objective("站到梵谷面前，面向墓園道路", "ゴッホの前に立ち、並木道に目を向ける");
                 else
-                    Objective($"按 {key} 與梵谷交談", $"{key} でゴッホと話す");
+                    Objective($"按 {key} 和梵谷看習作", $"{key} でゴッホと習作を見る");
                 if (dialogue.TryConsumeGameplayInteraction())
                 {
-                    Play(goodAngle ? "survey-angle" : "survey", () =>
-                    {
-                        if (lastNode == "perspective") Discover(PaintingStudy.Perspective);
-                        else if (lastNode == "submit") ShowReview();
-                    });
+                    if (goodAngle && elements == PaintingStudy.None)
+                        Observe(PaintingStudy.Perspective, "perspective");
+                    else
+                        Play(goodAngle ? "survey-angle" : elements == PaintingStudy.None ? "survey" : "survey-ready", () =>
+                        {
+                            if (lastNode == "perspective") Discover(PaintingStudy.Perspective);
+                            else if (lastNode == "submit") ShowReview();
+                        });
                 }
                 return;
             }
 
-            var target = !elements.HasFlag(PaintingStudy.Perspective) ? scenery.Lookout
-                : !elements.HasFlag(PaintingStudy.Leaves) ? scenery.Leaves : !elements.HasFlag(PaintingStudy.Stone)
-                    ? scenery.Stone : scenery.Cemetery;
-            int collected = (elements.HasFlag(PaintingStudy.Perspective) ? 1 : 0)
-                + (elements.HasFlag(PaintingStudy.Leaves) ? 1 : 0) + (elements.HasFlag(PaintingStudy.Stone) ? 1 : 0);
-            Objective($"尋找取景素材（{collected}/3）　道路、秋葉、石棺",
-                $"写生の題材を探す（{collected}/3）　道・紅葉・石棺", target);
+            if (elements == PaintingStudy.None)
+                Objective("在墓園走走，選一樣想留在畫裡的景物", "並木道を歩いて、絵に残したいものを見つける", scenery.Lookout);
+            else
+                Objective("可以繼續看看，或回去和梵谷看習作", "もう少し見て回るか、ゴッホのところで習作を見る", scenery.Cemetery);
+        }
+
+        void Observe(PaintingStudy item, string node)
+        {
+            lookingAt = item;
+            Play(node, () => Discover(item));
         }
 
         void Discover(PaintingStudy item)
         {
             elements |= item;
-            var name = item switch
-            {
-                PaintingStudy.Perspective => dialogue.Local("道路的透視感", "並木道の奥行き"),
-                PaintingStudy.Leaves => dialogue.Local("金黃色的秋葉", "金色の秋の葉"),
-                _ => dialogue.Local("墓園的石棺", "墓地の石棺")
-            };
-            progress.Notify(dialogue.Local($"取景素材　{name}", $"写生の題材　{name}"), 2.8f);
+            lookingAt = item;
         }
 
         void ShowReview()
         {
+            progress.Sound?.PlayMotif();
             stage = Stage.Review;
             reviewCapturedCursor = UnityEngine.Cursor.lockState == CursorLockMode.Locked;
             walk.InputSuppressed = true;
@@ -308,19 +314,11 @@ namespace Puzzle.Story
             reviewTitle.text = dialogue.Local("同一片秋色", "同じ秋の色");
             vincentCaption.text = dialogue.Local("梵谷的取景習作", "ゴッホの写生習作");
             gauguinCaption.text = dialogue.Local("高更《阿里斯康墓園》", "ゴーギャン《アリスカン》");
-            result.text = elements == PaintingStudy.All ? dialogue.Local("三項素材已齊全", "三つの題材がそろった") : MissingStudies();
-            reviewContinue.text = dialogue.Local("繼續", "続ける");
+            result.text = dialogue.Local("看看你剛才停下來看的地方，在兩張畫裡各是什麼樣子。",
+                "さっき足を止めた場所が、二枚の絵でどう描かれているか見比べてみよう。");
+            reviewContinue.text = dialogue.Local("帶著習作回小屋", "習作を持って家に戻る");
             StoryMenu.Show(review, true);
             reviewContinue.Focus();
-        }
-
-        string MissingStudies()
-        {
-            var names = new List<string>(3);
-            if (!elements.HasFlag(PaintingStudy.Perspective)) names.Add(dialogue.Local("從梵谷面前望向道路", "ゴッホの前から並木道を見る"));
-            if (!elements.HasFlag(PaintingStudy.Leaves)) names.Add(dialogue.Local("觀察金黃色的秋葉", "金色の秋の葉を見る"));
-            if (!elements.HasFlag(PaintingStudy.Stone)) names.Add(dialogue.Local("觀察路邊的石棺", "道沿いの石棺を見る"));
-            return string.Join("　·　", names);
         }
 
         void CloseReview()
@@ -333,63 +331,41 @@ namespace Puzzle.Story
 
         void PlayReviewResponse()
         {
-            if (elements == PaintingStudy.All)
+            Play("complete-study", () =>
             {
-                Play("complete-study", () =>
-                {
-                    progress.Notify(dialogue.Local("取景完成", "写生完了"), 2.5f);
-                    progress.SaveCheckpoint(DebateCheckpoint);
-                    BeginDebate(false);
-                });
-            }
-            else
-            {
-                Play("incomplete", () =>
-                {
-                    stage = Stage.Survey;
-                    progress.Notify(MissingStudies(), 4f);
-                    MovePlayer(scenery.Lookout + Vector3.forward * .7f, scenery.Cemetery);
-                });
-            }
+                progress.SaveCemeteryStudy(elements);
+                stage = Stage.Return;
+            });
         }
 
-        void BeginDebate(bool tryAgain)
+        void PrepareDebate()
         {
-            stage = Stage.Debate;
-            secondChance = tryAgain;
-            sentForHelp = false;
-            remaining = DebateDuration;
-            debateBeat = -1;
-            scenery.HangStudy();
+            scenery.HangStudy(elements);
             vincent.transform.position = scenery.House + new Vector3(-.88f, 0, 1.13f);
             gauguin.gameObject.SetActive(true);
-            neighbor.SetActive(tryAgain);
+            neighbor.SetActive(false);
             gauguin.transform.position = scenery.House + new Vector3(.88f, 0, 1.13f);
             MovePlayer(scenery.House + Vector3.back * .55f, scenery.House + Vector3.forward);
-            if (tryAgain) dialogue.ShowOpening(retry);
-            else RevealDebate();
         }
 
-        void RevealDebate()
+        void BeginDebate()
         {
-            StoryMenu.Show(timer, true);
+            PrepareDebate();
+            stage = Stage.Debate;
+            remaining = DebateDuration;
+            debateBeat = -1;
             StoryMenu.Show(debateSubtitle, true);
         }
 
         void UpdateDebate()
         {
-            RevealDebate();
             remaining = Mathf.Max(0f, remaining - Time.deltaTime);
-            timer.text = $"00:{Mathf.CeilToInt(remaining):00}";
             if (remaining <= 0f)
             {
-                StoryMenu.Show(timer, false);
+                progress.SetObjective("");
                 StoryMenu.Show(debateSubtitle, false);
                 gauguin.gameObject.SetActive(false);
-                neighbor.SetActive(false);
-                if (!sentForHelp) progress.Notify(dialogue.Local("未能及時求援　— RETRY —", "助けを呼ぶのに間に合わなかった　— RETRY —"), 3f);
-                progress.SetObjective("");
-                stage = Stage.Ending;
+                Play("house-quiet", AskForHelp);
                 return;
             }
 
@@ -403,29 +379,32 @@ namespace Puzzle.Story
                 dialogue.RecordHistory(debateSpeaker.text, debateLine.text);
             }
 
-            if (!secondChance)
-                Objective("藝術的辯論　聆聽兩位畫家", "芸術の議論　二人の話を聞く");
-            else if (sentForHelp)
-                Objective("鄰居已去請醫生，留在小屋附近等候", "近所の人が医師を呼びに行った。家のそばで待とう");
-            else if (Near(scenery.Door, 1.15f))
+            Objective("留在小屋，聽聽兩人的想法", "家に残り、二人の話を聞く");
+        }
+
+        void UpdateHelp()
+        {
+            if (Near(scenery.Door, 1.5f))
             {
                 var key = dialogue.InteractionKeyLabel;
                 Objective($"按 {key} 請門外的鄰居找醫生", $"{key} で玄関の近所の人に医師を呼んでもらう");
                 if (dialogue.TryConsumeGameplayInteraction())
-                {
-                    sentForHelp = true;
-                    neighbor.SetActive(false);
-                    progress.Notify(dialogue.Local("鄰居已出發求援", "近所の人が助けを呼びに向かった"), 3f);
-                }
+                    Play("neighbor-help", () =>
+                    {
+                        neighbor.SetActive(false);
+                        stage = Stage.Stay;
+                    });
             }
             else
-                Objective("在倒數結束前，到門口請鄰居找醫生", "時間内に玄関で近所の人に医師を呼んでもらう", scenery.Door);
+                Objective("到門口請鄰居幫忙", "玄関で近所の人に助けを頼む", scenery.Door);
         }
 
-        void RetryDebate()
+        void AskForHelp()
         {
+            gauguin.gameObject.SetActive(false);
+            neighbor.SetActive(true);
             progress.SaveCheckpoint(RetryCheckpoint);
-            BeginDebate(true);
+            stage = Stage.Help;
         }
 
         void Finish()
@@ -491,15 +470,11 @@ namespace Puzzle.Story
             reviewContinue = StoryMenu.Button(card, "", CloseReview, "story-primary");
             StoryMenu.Show(review, false);
 
-            timer = new Label { pickingMode = PickingMode.Ignore };
-            timer.AddToClassList("chapter-three-timer");
-            progress.AddChapterUI(timer);
             debateSubtitle = new VisualElement { pickingMode = PickingMode.Ignore };
             debateSubtitle.AddToClassList("chapter-three-subtitle");
             progress.AddChapterUI(debateSubtitle);
             debateSpeaker = StoryMenu.Label(debateSubtitle, "", "chapter-three-speaker");
             debateLine = StoryMenu.Label(debateSubtitle, "", "chapter-three-line");
-            StoryMenu.Show(timer, false);
             StoryMenu.Show(debateSubtitle, false);
         }
 

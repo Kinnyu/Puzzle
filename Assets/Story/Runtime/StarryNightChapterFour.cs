@@ -15,25 +15,27 @@ namespace Puzzle.Story
         const string OpenCheckpoint = "exhibition-open";
         const string DayCheckpoint = "a-quiet-day";
         const string SpringCheckpoint = "gift-of-spring";
-        const int FameThreshold = 80;
 
         enum Stage
         {
-            Visit, Inspiration, Proposal, Collect, Hang, InviteBrief, Invite, InviteRetry,
-            FameBrief, Fame, FameRetry, ExhibitEnd, Doctor, Breakfast, Walk, Lunch, Tools,
+            Visit, Inspiration, Proposal, Collect, Hang, InviteBrief, Invite,
+            FameBrief, Fame, ExhibitEnd, Doctor, Breakfast, Walk, Lunch, Tools,
             Setup, Paint, Gift, Evening, Morning, Finished
         }
 
         readonly struct Interaction
         {
-            internal readonly Vector3 Position;
+            readonly Vector3 position;
+            readonly Transform target;
+            internal Vector3 Position => target != null ? target.position : position;
             internal readonly string Chinese, Japanese;
             internal readonly Action Action;
             internal readonly bool Guide;
 
-            internal Interaction(Vector3 position, string chinese, string japanese, Action action, bool guide)
+            internal Interaction(Vector3 position, string chinese, string japanese, Action action, bool guide, Transform target)
             {
-                Position = position;
+                this.position = position;
+                this.target = target;
                 Chinese = chinese;
                 Japanese = japanese;
                 Action = action;
@@ -46,15 +48,6 @@ namespace Puzzle.Story
             ("《星夜》", "『星月夜』"), ("《吃馬鈴薯的人》", "『ジャガイモを食べる人々』"),
             ("《阿里斯康墓園》", "『アリスカン』")
         };
-        static readonly (string Chinese, string Japanese)[] ToolNames =
-        {
-            ("畫布", "カンヴァス"), ("畫筆", "筆"), ("顏料", "絵の具"), ("畫架", "イーゼル")
-        };
-        static readonly (string Chinese, string Japanese)[] SetupNames =
-        {
-            ("架好畫架", "イーゼルを立てる"), ("放上畫布", "カンヴァスを載せる"), ("擺好畫筆與顏料", "筆と絵の具を並べる")
-        };
-
         [SerializeField] StarryNightWalk walk;
         [SerializeField] DialoguePlayer dialogue;
         [SerializeField] StarryNightChapterTwo terrain;
@@ -68,23 +61,40 @@ namespace Puzzle.Story
         [SerializeField] Vector3 church = new(5, 0, 2);
         [SerializeField] Vector3 mine = new(34, 0, 0);
 
+        internal Sprite TheoSprite => theoSprite;
+        internal Sprite VincentSprite => vincentSprite;
+        internal Sprite DoctorSprite => doctorSprite;
+        internal Sprite VisitorSprite(int index) => visitorSprites[index % visitorSprites.Length];
+        internal Texture2D StarryArt => starryNight;
+        internal Texture2D PotatoArt => potatoEaters;
+
+        internal ChapterFourScenery CreateExpandedScenery(ChapterThreeScenery village, Transform parent)
+        {
+            var result = new ChapterFourScenery(parent, terrain.Ground, clinicLot.transform.position,
+                galleryLot.transform.position, village.House,
+                new[] { starryNight, potatoEaters, village.Study(PaintingStudy.All) });
+            clinicLot.SetActive(false);
+            galleryLot.SetActive(false);
+            return result;
+        }
+
         readonly List<Interaction> interactions = new();
         readonly GameObject[] visitors = new GameObject[5];
+        readonly WalkingTrail companionTrail = new();
         StorySceneProgress progress;
         ChapterThreeScenery oldVillage;
         ChapterFourScenery scenery;
+        Texture2D[] exhibitArt;
         GameObject vincent, theo, doctor, miner, letter;
         Vector3 letterPoint;
         VisualElement artCard;
         Image artwork;
-        Label artTitle, timer;
+        Label artTitle;
         Button artContinue;
         Action afterArtwork;
         Stage stage;
         int checkedItems;
-        int fame;
-        float remaining;
-        string lastNode;
+        float visitorWalkTime;
         string goalChinese, goalJapanese;
         bool artHadCursorLock;
 
@@ -99,9 +109,9 @@ namespace Puzzle.Story
             terrain.EndVisit();
             previous.EndVisit();
             oldVillage = previous.GetVillageScenery();
-            var art = new[] { starryNight, potatoEaters, oldVillage.Study(PaintingStudy.All) };
+            exhibitArt = new[] { starryNight, potatoEaters, oldVillage.Study(progress.LoadCemeteryStudy()) };
             scenery = new ChapterFourScenery(transform, terrain.Ground, clinicLot.transform.position, galleryLot.transform.position,
-                oldVillage.House, art);
+                oldVillage.House, exhibitArt);
             clinicLot.SetActive(false);
             galleryLot.SetActive(false);
             vincent = Actor("Vincent - Chapter 4", vincentSprite);
@@ -118,7 +128,6 @@ namespace Puzzle.Story
             SetVisible(scenery.Supplies, false);
             SetVisible(scenery.Setup, false);
             BuildUI();
-            dialogue.LineChanged += TrackNode;
             switch (checkpoint)
             {
                 case StarryCheckpoint:
@@ -153,8 +162,7 @@ namespace Puzzle.Story
         {
             var actor = new GameObject(name);
             actor.transform.SetParent(transform);
-            actor.AddComponent<SpriteRenderer>().sprite = sprite;
-            actor.AddComponent<CharacterBillboard>();
+            CharacterBillboard.AddSprite(actor, sprite);
             actor.SetActive(false);
             return actor;
         }
@@ -180,7 +188,7 @@ namespace Puzzle.Story
         {
             stage = next;
             checkedItems = 0;
-            remaining = 0f;
+            visitorWalkTime = 0f;
             SetVisible(visitors, false);
             vincent.SetActive(false);
             theo.SetActive(false);
@@ -223,33 +231,18 @@ namespace Puzzle.Story
                     {
                         Move(church + new Vector3(2f, 0, -3.8f), church);
                         SetStage(Stage.Invite);
-                        remaining = 90f;
                     }, "西奧", "テオ");
                     break;
                 case Stage.Invite:
                     SetVisitors(false);
                     break;
-                case Stage.InviteRetry:
-                    Goal("重新準備宣傳", "もう一度、宣伝の準備をする");
-                    Talk(theo, Gallery + new Vector3(-1.53f, 0, -.91f), "invite-fail",
-                        () => SetStage(Stage.InviteBrief), "西奧", "テオ");
-                    break;
                 case Stage.FameBrief:
                     Goal("回畫館找西奧開幕", "画廊に戻り、テオと開幕する");
-                    Talk(theo, Gallery + new Vector3(-1.53f, 0, -.91f), "fame-brief", () =>
-                    {
-                        fame = 50;
-                        SetStage(Stage.Fame);
-                        remaining = 120f;
-                    }, "西奧", "テオ");
+                    Talk(theo, Gallery + new Vector3(-1.53f, 0, -.91f), "fame-brief",
+                        () => SetStage(Stage.Fame), "西奧", "テオ");
                     break;
                 case Stage.Fame:
                     SetVisitors(true);
-                    break;
-                case Stage.FameRetry:
-                    Goal("重新準備作品介紹", "もう一度、作品の紹介を準備する");
-                    Talk(theo, Gallery + new Vector3(-1.53f, 0, -.91f), "fame-fail",
-                        () => SetStage(Stage.FameBrief), "西奧", "テオ");
                     break;
                 case Stage.ExhibitEnd:
                     Goal("到《星夜》前找梵谷", "『星月夜』の前にいるゴッホに会う");
@@ -267,6 +260,11 @@ namespace Puzzle.Story
                     Talk(theo, House + new Vector3(-.6f, 0, .70f), "breakfast", () => SetStage(Stage.Walk), "西奧", "テオ");
                     break;
                 case Stage.Walk:
+                    if (!vincent.activeSelf)
+                    {
+                        Put(vincent, House + new Vector3(.8f, 0, .98f));
+                        companionTrail.StartAt(Player);
+                    }
                     SetWalk();
                     break;
                 case Stage.Lunch:
@@ -284,13 +282,19 @@ namespace Puzzle.Story
                     SetCanvas();
                     break;
                 case Stage.Paint:
-                    Goal("畫具已經備好，請梵谷開始作畫", "画材がそろった。ゴッホに絵を描いてもらう");
+                    Goal("留在杏樹旁陪梵谷", "杏の木のそばでゴッホと過ごす");
                     Put(vincent, scenery.Gift + Vector3.left * .72f);
-                    Add(scenery.Gift, "請梵谷開始畫畫", "ゴッホに絵を描いてもらう", PaintGift);
+                    Add(scenery.Gift, "坐在梵谷身邊", "ゴッホのそばに座る", PaintGift);
                     break;
                 case Stage.Gift:
-                    Goal("在杏樹旁和梵谷聊聊", "杏の木のそばでゴッホと話す");
-                    Talk(vincent, scenery.Gift + Vector3.left * .72f, "thanks", () => SetStage(Stage.Evening), "梵谷", "ゴッホ");
+                    Goal("看看梵谷留給你的畫", "ゴッホが贈ってくれた絵を見る");
+                    Put(vincent, scenery.Gift + Vector3.left * .72f);
+                    Add(scenery.Gift, "拿起杏花畫作", "杏の花の絵を手に取る", () =>
+                    {
+                        progress.Sound?.PlayMotif();
+                        ShowArtwork(scenery.GiftPainting, "《春天的禮物》", "『春の贈り物』",
+                            () => Play("thanks", () => SetStage(Stage.Evening)));
+                    });
                     break;
                 case Stage.Evening:
                     Goal("回小屋一起吃晚餐並休息", "家に戻り、夕食を取って休む");
@@ -360,8 +364,8 @@ namespace Puzzle.Story
         void SetVisitors(bool atGallery)
         {
             int total = atGallery ? 3 : visitors.Length;
-            Goal(atGallery ? $"讓作品被理解（{Count}/3）" : $"邀請觀眾（{Count}/5）",
-                atGallery ? $"作品の背景を伝える（{Count}/3）" : $"来場者を誘う（{Count}/5）");
+            Goal(atGallery ? "和觀眾一起看畫" : "到教堂外邀請街坊來看畫",
+                atGallery ? "来場者と一緒に絵を見る" : "教会の前で近所の人を展覧会に誘う");
             for (int i = 0; i < total; i++)
             {
                 int index = i;
@@ -371,48 +375,47 @@ namespace Puzzle.Story
                     visitor.SetActive(atGallery);
                     continue;
                 }
-                Vector3 position = atGallery ? scenery.Display[i] + Vector3.back * .63f
-                    : terrain.Ground(church + new Vector3(-.85f + 1.30f * i, 0, -2.14f - .42f * (i % 2)));
-                Put(visitor, position);
                 string node = atGallery ? i == 0 ? "night" : i == 1 ? "potato" : "cemetery" : $"invite-{i + 1}";
-                Add(position, atGallery ? "向觀眾介紹" + PaintingNames[i].Chinese : "邀請這位路人",
-                    atGallery ? PaintingNames[i].Japanese + "を紹介する" : "展覧会に誘う",
-                    () => Play(node, () => AnswerVisitor(index, atGallery)));
+                if (atGallery)
+                {
+                    Vector3 position = scenery.Display[i] + Vector3.back * .63f;
+                    Put(visitor, position);
+                    var name = PaintingNames[index];
+                    Add(position, "一起看" + name.Chinese, "一緒に" + name.Japanese + "を見る", () =>
+                        ShowArtwork(exhibitArt[index], name.Chinese, name.Japanese,
+                            () => Play(node, () => FinishVisitor(index, true))));
+                }
+                else
+                {
+                    if (!visitor.activeSelf) Put(visitor, VisitorPosition(i));
+                    Add(visitor.transform.position, "邀請這位路人", "展覧会に誘う",
+                        () => Play(node, () => FinishVisitor(index, false)), target: visitor.transform);
+                }
             }
         }
 
-        void AnswerVisitor(int i, bool atGallery)
+        Vector3 VisitorPosition(int index)
         {
-            if (atGallery) fame = Mathf.Clamp(fame + (lastNode.EndsWith("-good", StringComparison.Ordinal) ? 15 : -10), 0, 100);
+            float route = Mathf.PingPong(visitorWalkTime * (.38f + .03f * index) + .43f * index, 1f);
+            float lane = -.85f + 1.30f * index;
+            return terrain.Ground(church + new Vector3(lane + .45f * route, 0f, Mathf.Lerp(-1.95f, -4.35f, route)));
+        }
+
+        void FinishVisitor(int i, bool atGallery)
+        {
             checkedItems |= 1 << i;
-            if (Count != (atGallery ? 3 : 5))
+            if (Count != (atGallery ? PaintingNames.Length : visitors.Length))
             {
                 RefreshInteractions();
                 return;
             }
-            FinishTimedStage(atGallery, !atGallery || fame >= FameThreshold);
-        }
-
-        void FinishTimedStage(bool atGallery, bool success)
-        {
-            StoryMenu.Show(timer, false);
-            if (dialogue.IsPlaying) dialogue.Cancel();
-            Move(Gallery + Vector3.back * 1.19f, Gallery);
-            if (!success)
-            {
-                progress.Notify(dialogue.Local("CHAPTER 4　— FAILED —　再試一次", "CHAPTER 4　— FAILED —　もう一度"), 3f);
-                SetStage(atGallery ? Stage.FameRetry : Stage.InviteRetry);
-                return;
-            }
             if (atGallery)
             {
-                progress.Notify(dialogue.Local($"畫展名聲達標　{fame}/100", $"展覧会の評判　{fame}/100"), 3f);
                 progress.SaveCheckpoint(DayCheckpoint);
                 SetStage(Stage.ExhibitEnd);
             }
             else
             {
-                progress.Notify(dialogue.Local("觀眾招攬成功　5/5", "来場者の招待に成功　5/5"), 3f);
                 progress.SaveCheckpoint(OpenCheckpoint);
                 SetStage(Stage.FameBrief);
             }
@@ -420,7 +423,7 @@ namespace Puzzle.Story
 
         void SetWalk()
         {
-            Goal($"重訪過去的足跡（{Count}/3）", $"思い出の場所を訪ねる（{Count}/3）");
+            Goal("和梵谷重訪以前一起走過的地方", "ゴッホと一緒に歩いた場所を訪ねる");
             var locations = new[] { terrain.Ground(church + Vector3.back * 2f), terrain.Ground(mine), letterPoint };
             string[] nodes = { "walk-church", "walk-farm", "walk-graves" };
             string[] chinese = { "和神職人員交談", "和礦工交談", "讀高更的信" };
@@ -434,7 +437,6 @@ namespace Puzzle.Story
                 int index = i;
                 Add(locations[i], chinese[i], japanese[i], () =>
                 {
-                    Put(vincent, terrain.Ground(locations[index] + Vector3.left * .7f));
                     Play(nodes[index], () =>
                     {
                         checkedItems |= 1 << index;
@@ -447,63 +449,58 @@ namespace Puzzle.Story
 
         void SetTools()
         {
-            Goal($"準備繪畫工具（{Count}/4）", $"画材を集める（{Count}/4）");
-            for (int i = 0; i < ToolNames.Length; i++)
+            Goal("從小屋拿畫具，到杏樹旁找梵谷", "家から画材を持って、杏の木のそばへ行く");
+            SetVisible(scenery.Supplies, true);
+            Add(scenery.Tools[1], "把畫具收進提箱", "画材を箱にまとめる", () =>
             {
-                int index = i;
-                scenery.Supplies[i].SetActive(!Has(i));
-                if (Has(i)) continue;
-                var name = ToolNames[i];
-                Add(scenery.Tools[i], "拿取" + name.Chinese, name.Japanese + "を取る", () =>
-                {
-                    scenery.Supplies[index].SetActive(false);
-                    checkedItems |= 1 << index;
-                    if (Count == 4) SetStage(Stage.Setup);
-                    else RefreshInteractions();
-                });
-            }
+                SetVisible(scenery.Supplies, false);
+                SetStage(Stage.Setup);
+            });
         }
 
         void SetCanvas()
         {
-            Goal($"把畫具放到杏樹旁（{Count}/3）", $"杏の木のそばで画材を用意する（{Count}/3）");
-            int index = Count;
-            var placement = SetupNames[index];
-            Add(scenery.Gift, placement.Chinese, placement.Japanese, () =>
+            Goal("把畫具放在杏樹旁", "杏の木のそばに画材を置く");
+            Put(vincent, scenery.Gift + Vector3.left * .72f);
+            Add(scenery.Gift, "和梵谷一起架好畫架", "ゴッホと一緒にイーゼルを立てる", () =>
             {
-                scenery.Setup[index].SetActive(true);
-                checkedItems |= 1 << index;
-                if (Count == 3)
-                {
-                    SetStage(Stage.Paint);
-                    PaintGift();
-                }
-                else RefreshInteractions();
+                SetVisible(scenery.Setup, true);
+                SetStage(Stage.Paint);
             });
         }
 
-        void PaintGift() => Play("spring", () =>
+        void PaintGift()
         {
-            scenery.FinishCanvas();
-            ShowArtwork(scenery.GiftPainting, "《春天的禮物》", "『春の贈り物』", () => SetStage(Stage.Gift));
-        });
+            if (!dialogue.TryPlay(script, completed: () =>
+            {
+                dialogue.LineChanged -= SoundFirstStroke;
+                scenery.FinishCanvas();
+                walk.SetSeated(false);
+                SetStage(Stage.Gift);
+            }, startNodeId: "spring")) return;
+            walk.SetSeated(true);
+            dialogue.LineChanged += SoundFirstStroke;
+        }
+
+        void SoundFirstStroke(DialogueConversation asset, string node)
+        {
+            if (asset != script || node != "spring-2") return;
+            dialogue.LineChanged -= SoundFirstStroke;
+            progress.Sound?.PlayBrush();
+        }
 
         void Update()
         {
-            if (progress == null || walk.InputSuppressed) return;
-            if (stage is Stage.Invite or Stage.Fame)
+            if (progress == null || walk.InputSuppressed || dialogue.BlocksGameplayInput || interactions.Count == 0) return;
+
+            if (stage == Stage.Walk)
+                companionTrail.Follow(vincent.transform, Player, terrain.Ground);
+            if (stage == Stage.Invite)
             {
-                remaining = Mathf.Max(remaining - Time.deltaTime, 0);
-                if (remaining <= 0f)
-                {
-                    FinishTimedStage(stage == Stage.Fame, false);
-                    return;
-                }
-                int seconds = Mathf.CeilToInt(remaining);
-                timer.text = $"{seconds / 60:00}:{seconds % 60:00}" + (stage == Stage.Fame ? $"   {fame}/100" : $"   {Count}/5");
-                StoryMenu.Show(timer, true);
+                visitorWalkTime += Time.deltaTime;
+                for (int i = 0; i < visitors.Length; i++)
+                    if (visitors[i].activeSelf) visitors[i].transform.position = VisitorPosition(i);
             }
-            if (dialogue.BlocksGameplayInput || interactions.Count == 0) return;
 
             int nearest = -1, available = -1;
             float nearestDistance = float.PositiveInfinity, availableDistance = float.PositiveInfinity;
@@ -547,8 +544,8 @@ namespace Puzzle.Story
             progress.SetObjective(dialogue.Local(chinese, japanese));
         }
 
-        void Add(Vector3 position, string chinese, string japanese, Action action, bool guide = true) =>
-            interactions.Add(new Interaction(position, chinese, japanese, action, guide));
+        void Add(Vector3 position, string chinese, string japanese, Action action, bool guide = true, Transform target = null) =>
+            interactions.Add(new Interaction(position, chinese, japanese, action, guide, target));
 
         void Talk(GameObject actor, Vector3 position, string node, Action completion, string chinese, string japanese)
         {
@@ -578,19 +575,10 @@ namespace Puzzle.Story
             foreach (var item in objects) item.SetActive(visible);
         }
 
-        void TrackNode(DialogueConversation asset, string node)
-        {
-            if (asset == script) lastNode = node;
-        }
-
         void Play(string node, Action complete) => dialogue.TryPlay(script, completed: complete, startNodeId: node);
 
         void BuildUI()
         {
-            timer = new Label { pickingMode = PickingMode.Ignore };
-            timer.AddToClassList("chapter-three-timer");
-            progress.AddChapterUI(timer);
-            StoryMenu.Show(timer, false);
             artCard = new VisualElement();
             artCard.AddToClassList("story-overlay");
             progress.AddChapterUI(artCard);
@@ -629,7 +617,7 @@ namespace Puzzle.Story
 
         void OnDestroy()
         {
-            if (dialogue != null) dialogue.LineChanged -= TrackNode;
+            if (dialogue != null) dialogue.LineChanged -= SoundFirstStroke;
             scenery?.Dispose();
         }
     }

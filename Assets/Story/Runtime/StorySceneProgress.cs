@@ -30,6 +30,7 @@ namespace Puzzle.Story
         [SerializeField] StarryNightWalk walk;
         [SerializeField] DialoguePlayer dialoguePlayer;
         [SerializeField] Font font;
+        [SerializeField] DialogueTrigger chapterOneVincent;
         [SerializeField] StarryNightChapterTwo chapterTwo;
         [SerializeField] StarryNightChapterThree chapterThree;
         [SerializeField] StarryNightChapterFour chapterFour;
@@ -55,6 +56,13 @@ namespace Puzzle.Story
         bool historyOpen;
         float toastUntil;
         bool transitioning;
+        bool inputBeforeFade;
+        VisualElement sceneFade;
+        Action afterReveal;
+        ExpandedStarryNight expanded;
+        internal bool SceneTransitioning { get; private set; }
+        internal StarryNightSound Sound { get; private set; }
+        internal StarryNightWalk Walker => walk;
 
         void Start()
         {
@@ -72,6 +80,8 @@ namespace Puzzle.Story
             overlay = StoryMenu.Panel(screen, "story-overlay");
             card = StoryMenu.Panel(overlay, "story-card");
             if (dialoguePlayer != null) CreateHistoryUI(screen);
+            sceneFade = StoryMenu.Panel(screen, "story-scene-fade");
+            StoryMenu.Show(sceneFade, false);
             StoryMenu.Show(toast, false);
             StoryMenu.Show(objective, false);
             StoryMenu.Show(overlay, false);
@@ -80,6 +90,8 @@ namespace Puzzle.Story
             {
                 walk.EscapeHandledExternally = true;
                 walk.PointerOverMenu = PointerOverHistoryButton;
+                Sound = walk.gameObject.AddComponent<StarryNightSound>();
+                Sound.Initialize(walk.Player);
             }
             if (dialoguePlayer != null) dialoguePlayer.LineChanged += OnDialogueLine;
             BeginChapter(checkpoint);
@@ -87,8 +99,25 @@ namespace Puzzle.Story
 
         void BeginChapter(string checkpoint, bool continuing = false)
         {
+            if (story.Id == "starry-night" && walk != null && dialoguePlayer != null &&
+                chapterOneVincent != null && chapterTwo != null && chapterThree != null && chapterFour != null)
+            {
+                if (expanded == null)
+                {
+                    expanded = gameObject.AddComponent<ExpandedStarryNight>();
+                    expanded.Initialize(this, walk, dialoguePlayer, chapterOneVincent, chapterTwo, chapterThree, chapterFour);
+                }
+                expanded.Begin(chapter.id, checkpoint);
+                return;
+            }
             switch (chapter.id)
             {
+                case "chapter-1" when chapterOneVincent != null:
+                    var point = Array.Find(checkpoints ?? Array.Empty<CheckpointBinding>(), binding => binding?.id == checkpoint);
+                    if (point?.spawn != null) walk.EnterWalking(point.spawn);
+                    gameObject.AddComponent<StarryNightChapterOne>().Begin(this, walk, dialoguePlayer, chapterOneVincent,
+                        checkpoint);
+                    break;
                 case StarryNightChapterTwo.ChapterId when chapterTwo != null:
                     chapterTwo.Begin(this, checkpoint, continuing);
                     break;
@@ -112,6 +141,14 @@ namespace Puzzle.Story
 
         void OnDisable()
         {
+            if (SceneTransitioning)
+            {
+                StopAllCoroutines();
+                SceneTransitioning = false;
+                afterReveal = null;
+                if (walk != null) walk.InputSuppressed = inputBeforeFade;
+                StoryMenu.Show(sceneFade, false);
+            }
             if (!modalOpen) return;
             StoryMenu.Show(overlay, false);
             if (historyOverlay != null) StoryMenu.Show(historyOverlay, false);
@@ -123,7 +160,7 @@ namespace Puzzle.Story
         void Update()
         {
             if (chapter == null) return;
-            StoryMenu.Show(objective, !modalOpen && !string.IsNullOrEmpty(objective.text)
+            StoryMenu.Show(objective, !modalOpen && !SceneTransitioning && !string.IsNullOrEmpty(objective.text)
                 && (dialoguePlayer == null || !dialoguePlayer.BlocksGameplayInput));
             if (toastUntil > 0 && Time.time >= toastUntil)
             {
@@ -131,14 +168,16 @@ namespace Puzzle.Story
                 StoryMenu.Show(toast, false);
             }
 
+            if (SceneTransitioning || transitioning) return;
             var keys = Keyboard.current;
             if (keys?.escapeKey.wasPressedThisFrame == true)
             {
                 if (historyOpen) CloseHistory();
                 else if (modalOpen) CloseOverlay();
+                else if (expanded != null && expanded.CloseCanvas()) return;
                 else OpenOverlay(chapter.title, false);
             }
-            else if (historyButton != null && keys?.hKey.wasPressedThisFrame == true)
+            else if (historyButton != null && keys?.hKey.wasPressedThisFrame == true && expanded?.CanvasOpen != true)
                 ToggleHistory();
         }
 
@@ -147,6 +186,23 @@ namespace Puzzle.Story
         {
             if (chapter == null || !StoryProgress.SaveCheckpoint(story, chapter, id)) return;
             Notify($"已記錄　{chapter.FindCheckpoint(id).title}", 2.8f);
+        }
+
+        internal void SaveCemeteryStudy(PaintingStudy study) => StoryProgress.SaveCemeteryStudy(story, chapter, study);
+
+        internal void SaveChoice(string id, int value) => StoryProgress.SaveChoice(story, chapter, id, value);
+
+        internal int ReadChoice(int act, string id, int fallback = -1)
+        {
+            var record = StoryProgress.Read(story, story.FindChapter($"chapter-{act}"));
+            return record.choices?.Find(item => item.id == id)?.value ?? fallback;
+        }
+
+        internal PaintingStudy LoadCemeteryStudy()
+        {
+            var cemeteryChapter = story.FindChapter(StarryNightChapterThree.ChapterId);
+            int saved = StoryProgress.Read(story, cemeteryChapter).cemeteryStudy;
+            return saved > 0 && saved <= (int)PaintingStudy.All ? (PaintingStudy)saved : PaintingStudy.All;
         }
 
         public void CompleteChapter()
@@ -190,6 +246,56 @@ namespace Puzzle.Story
         }
 
         internal void AddChapterUI(VisualElement element) => overlay.parent.Insert(overlay.parent.IndexOf(overlay), element);
+
+        internal void AfterReveal(Action action)
+        {
+            if (SceneTransitioning) afterReveal += action;
+            else action();
+        }
+
+        internal void TransitionScene(Action change, bool distant, bool opening = false)
+        {
+            if (!SceneTransitioning) StartCoroutine(FadeScene(change, distant, opening));
+        }
+
+        IEnumerator FadeScene(Action change, bool distant, bool opening)
+        {
+            SceneTransitioning = true;
+            inputBeforeFade = walk.InputSuppressed;
+            walk.InputSuppressed = true;
+            sceneFade.style.opacity = opening ? 1f : 0f;
+            StoryMenu.Show(sceneFade, true);
+            Action revealed = null;
+            try
+            {
+                if (!opening) yield return FadeOpacity(0f, 1f, distant ? .42f : .17f);
+                change();
+                // Give the renderer and the new scene's layouts a frame while the screen is covered.
+                yield return null;
+                if (distant) yield return new WaitForSecondsRealtime(.12f);
+                yield return FadeOpacity(1f, 0f, distant ? .48f : .24f);
+                revealed = afterReveal;
+            }
+            finally
+            {
+                StoryMenu.Show(sceneFade, false);
+                SceneTransitioning = false;
+                walk.InputSuppressed = inputBeforeFade;
+                afterReveal = null;
+            }
+            revealed?.Invoke();
+        }
+
+        IEnumerator FadeOpacity(float from, float to, float seconds)
+        {
+            double start = Time.realtimeSinceStartupAsDouble;
+            for (double elapsed = 0; elapsed < seconds; elapsed = Time.realtimeSinceStartupAsDouble - start)
+            {
+                sceneFade.style.opacity = Mathf.Lerp(from, to, Mathf.SmoothStep(0f, 1f, (float)(elapsed / seconds)));
+                yield return null;
+            }
+            sceneFade.style.opacity = to;
+        }
 
         internal void SetObjective(string text, string detail = "")
         {
@@ -276,6 +382,7 @@ namespace Puzzle.Story
 
         void ToggleHistory()
         {
+            if (SceneTransitioning || transitioning || expanded?.CanvasOpen == true) return;
             if (historyOpen)
             {
                 CloseHistory();

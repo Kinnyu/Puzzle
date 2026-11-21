@@ -14,6 +14,69 @@ MonoBehaviour:
   m_EditorClassIdentifier:
   entryNodeId: meaning
   nodes:
+  - id: church-arrival
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "門先別關上。晚一點也許還會有人來。……我叫文森特。你也坐過那張靠門的長椅嗎？"
+      japanese: "扉はまだ閉めないで。あとで誰か来るかもしれない。……僕はフィンセント。君も入口の長椅子に座ったことがある？"
+    portrait: {fileID: 2800000, guid: 93c59f87920f4575bf47fa7db885b5d4, type: 3}
+    portraitOnRight: 0
+    nextNodeId: meeting-choice
+    choices: []
+  - id: meeting-choice
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "有個下工的人常坐在那裡。昨天他走了以後，椅背上還留著一小圈濕痕。我想給他留件乾的。"
+      japanese: "仕事帰りに、いつもあそこに座る人がいる。昨日は帰ったあとも、背もたれに小さな濡れ跡が残っていた。乾いた上着を置いておきたいんだ。"
+    portrait: {fileID: 2800000, guid: 93c59f87920f4575bf47fa7db885b5d4, type: 3}
+    portraitOnRight: 0
+    nextNodeId:
+    choices:
+    - text:
+        traditionalChinese: "你們聊過嗎？"
+        japanese: "話したことはあるの？"
+      nextNodeId: meeting-name
+    - text:
+        traditionalChinese: "你每天都在這裡等嗎？"
+        japanese: "毎日ここで待っているの？"
+      nextNodeId: meeting-wait
+  - id: meeting-name
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "還沒有。他走的時候會把椅子推回去。我一直想問他的名字。"
+      japanese: "まだ。帰るとき、いつも椅子を元の場所に戻してくれる。名前を聞いてみたいんだけどね。"
+    portrait: {fileID: 2800000, guid: 93c59f87920f4575bf47fa7db885b5d4, type: 3}
+    portraitOnRight: 0
+    nextNodeId: coat-ask
+    choices: []
+  - id: meeting-wait
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "有時候。這裡入夜之後很安靜，誰走到門口，聽腳步就知道。"
+      japanese: "ときどきね。夜になると静かで、誰かが扉まで来ると足音でわかるんだ。"
+    portrait: {fileID: 2800000, guid: 93c59f87920f4575bf47fa7db885b5d4, type: 3}
+    portraitOnRight: 0
+    nextNodeId: coat-ask
+    choices: []
+  - id: coat-ask
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "可以幫我把小桌上的外套摺好嗎？袖子往裡收，免得拖到地上。"
+      japanese: "あの小さな台の上の上着をたたんでくれる？ 袖を内側に折っておくと、床につかないから。"
+    portrait: {fileID: 2800000, guid: 93c59f87920f4575bf47fa7db885b5d4, type: 3}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
   - id: meaning
     speaker:
       traditionalChinese: "\u68b5\u8c37"
@@ -78,7 +141,7 @@ MonoBehaviour:
     line:
       traditionalChinese: "\u662f\u554a\u2026\u2026\u5c0d\u90a3\u4e9b\u9023\u6eab\u98fd\u90fd\u6709\u56f0\u96e3\u7684\u4eba\u4f86\u8aaa\uff0c\u4e00\u9813\u98ef\u3001\u4e00\u4ef6\u8863\u670d\uff0c\u6216\u8a31\u5c31\u662f\u5f88\u5927\u7684\u5e6b\u52a9\u3002"
       japanese: "\u305d\u3046\u3060\u306d\u2026\u2026\u98df\u3079\u308b\u3053\u3068\u306b\u3082\u7740\u308b\u3082\u306e\u306b\u3082\u56f0\u3063\u3066\u3044\u308b\u4eba\u306b\u306f\u3001\u4e00\u98df\u306e\u3054\u306f\u3093\u3084\u4e00\u679a\u306e\u670d\u304c\u5927\u304d\u306a\u52a9\u3051\u306b\u306a\u308b\u306e\u304b\u3082\u3057\u308c\u306a\u3044\u3002"
-    nextNodeId: value
+    nextNodeId: church-seat
     choices: []
   - id: help-listen
     speaker:
@@ -88,7 +151,7 @@ MonoBehaviour:
     line:
       traditionalChinese: "\u6211\u5f88\u8a8d\u540c\u3002\u6709\u6642\u5019\uff0c\u4eba\u5011\u9700\u8981\u7684\u4e0d\u53ea\u662f\u7269\u8cea\u4e0a\u7684\u5e6b\u52a9\uff0c\u66f4\u9700\u8981\u6709\u4eba\u9858\u610f\u7406\u89e3\u4ed6\u5011\u7684\u75db\u82e6\u3002"
       japanese: "\u50d5\u3082\u305d\u3046\u601d\u3046\u3002\u7269\u3092\u5c4a\u3051\u308b\u3053\u3068\u306b\u52a0\u3048\u3066\u3001\u3064\u3089\u3055\u306b\u8033\u3092\u50be\u3051\u3066\u304f\u308c\u308b\u4eba\u304c\u5fc5\u8981\u306a\u3068\u304d\u3082\u3042\u308b\u3093\u3060\u3002"
-    nextNodeId: value
+    nextNodeId: church-seat
     choices: []
   - id: value
     speaker:
@@ -108,6 +171,17 @@ MonoBehaviour:
         traditionalChinese: "\u5373\u4f7f\u6c92\u6709\u5049\u5927\u7684\u6210\u5c31\uff0c\u53ea\u8981\u80fd\u70ba\u5225\u4eba\u5e36\u4f86\u6eab\u6696\uff0c\u5c31\u5f88\u6709\u50f9\u503c\u3002"
         japanese: "\u5927\u304d\u306a\u3053\u3068\u3092\u6210\u3057\u9042\u3052\u306a\u304f\u3066\u3082\u3001\u8ab0\u304b\u306b\u306c\u304f\u3082\u308a\u3092\u5c4a\u3051\u3089\u308c\u308b\u751f\u304d\u65b9\u3002"
       nextNodeId: value-warmth
+  - id: church-seat
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "外套就留在那裡吧。過來坐一會兒好嗎？我還想跟你聊一件事。"
+      japanese: "上着はそこに置いておこう。少し、こっちに座らない？ もう一つ、君と話したいことがあるんだ。"
+    portrait: {fileID: 2800000, guid: 93c59f87920f4575bf47fa7db885b5d4, type: 3}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
   - id: value-dream
     speaker:
       traditionalChinese: "\u68b5\u8c37"

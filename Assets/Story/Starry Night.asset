@@ -19,37 +19,83 @@ MonoBehaviour:
     title: "\u751F\u547D\u7684\u610F\u7FA9"
     scenePath: Assets/Scenes/StarryNight.unity
     checkpoints:
+    - id: church-meet
+      title: "教堂廣場・卡住的推車"
     - id: church-help
-      title: "\u6559\u5802\u30FB\u4F38\u51FA\u63F4\u624B"
+      title: "教堂側廊・分送物資"
+    - id: church-window
+      title: "教堂側廊・沒有完成的窗"
+    - id: church-anna
+      title: "教堂・安娜的長椅"
+    - id: church-sketch
+      title: "教堂・留下今天的速寫"
     - id: church-value
       title: "\u6559\u5802\u30FB\u5E73\u51E1\u7684\u529B\u91CF"
   - id: chapter-2
-    title: "\u5E73\u51E1\u751F\u547D\u7684\u50F9\u503C"
+    title: "在泥土與煤灰之間"
     scenePath: Assets/Scenes/StarryNight.unity
     checkpoints:
+    - id: mine-reunion
+      title: "礦口・再次相見"
+    - id: mine-work
+      title: "礦口・一袋煤的重量"
+    - id: mine-family
+      title: "工人住所・一頓飯"
+    - id: farm-harvest
+      title: "農田・下雨前的收成"
+    - id: farm-meal
+      title: "農舍・和梵谷一起休息"
+    - id: potato-painting
+      title: "農舍・吃馬鈴薯的人"
     - id: miner-helped
-      title: "\u8FD4\u56DE\u6559\u5802\u7684\u8DEF\u4E0A"
+      title: "礦區・記憶畫片"
   - id: chapter-3
-    title: "\u7406\u60F3\u7684\u78B0\u649E"
+    title: "理想的碰撞：梵谷與高更"
     scenePath: Assets/Scenes/StarryNight.unity
     checkpoints:
+    - id: yellow-reunion
+      title: "黃色小屋・西奧的信"
+    - id: yellow-arrange
+      title: "黃色小屋・兩個畫家"
     - id: alyscamps
       title: "阿里斯康墓園"
     - id: yellow-house-debate
       title: "黃色小屋・藝術的辯論"
+    - id: yellow-understanding
+      title: "黃色小屋・兩種畫法"
     - id: yellow-house-retry
-      title: "黃色小屋・再試一次"
+      title: "黃色小屋・夜晚的求助"
+    - id: yellow-goodbye
+      title: "黃色小屋・道別"
   - id: chapter-4
     title: "未竟的星光"
     scenePath: Assets/Scenes/StarryNight.unity
     checkpoints:
+    - id: asylum-reunion
+      title: "療養院・再次相見"
+    - id: starry-paint
+      title: "療養院・畫出星夜"
     - id: starry-night-painted
       title: "療養院・西奧的提議"
+    - id: gallery-hang
+      title: "畫廊・把畫掛上牆"
     - id: exhibition-ready
       title: "小畫館・邀請觀眾"
     - id: exhibition-open
       title: "小畫館・作品介紹"
     - id: a-quiet-day
-      title: "畫展閉幕・陪伴梵谷的一天"
+      title: "畫展閉幕・仍然需要陪伴"
+    - id: doctor
+      title: "療養院・和醫師談談"
+    - id: day-breakfast
+      title: "黃色小屋・早餐"
+    - id: day-walk
+      title: "散步・重訪三處回憶"
+    - id: day-lunch
+      title: "黃色小屋・午餐"
     - id: gift-of-spring
       title: "黃色小屋・春天的禮物"
+    - id: day-dinner
+      title: "黃色小屋・晚餐"
+    - id: ending
+      title: "黃色小屋・未竟的星光"

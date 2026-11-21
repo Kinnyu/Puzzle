@@ -98,14 +98,16 @@ namespace Puzzle.Story
             return material;
         }
 
+        Material gravel, stone, copper, gold, leaf;
+
         void BuildCemetery()
         {
-            var gravel = Surface("Alyscamps gravel", new Color(.49f, .37f, .25f));
-            var stone = Surface("Weathered limestone", new Color(.47f, .45f, .40f));
+            gravel = Surface("Alyscamps gravel", new Color(.49f, .37f, .25f));
+            stone = Surface("Weathered limestone", new Color(.47f, .45f, .40f));
             var bark = Surface("Poplar bark", new Color(.26f, .17f, .12f));
-            var copper = Surface("Copper leaves", new Color(.73f, .36f, .09f));
-            var gold = Surface("Golden leaves", new Color(.91f, .60f, .17f));
-            var leaf = Surface("Fallen leaves", new Color(.91f, .56f, .16f));
+            copper = Surface("Copper leaves", new Color(.73f, .36f, .09f));
+            gold = Surface("Golden leaves", new Color(.91f, .60f, .17f));
+            leaf = Surface("Fallen leaves", new Color(.91f, .56f, .16f));
             for (int i = 0; i < 8; i++)
             {
                 var path = ground(Cemetery + Vector3.back * (i - 1) * 1.28f);
@@ -139,6 +141,23 @@ namespace Puzzle.Story
                 fallen.transform.rotation = Quaternion.Euler(0, scatter.Next(180), 0);
             }
         }
+
+        internal void UpdateStudyColors(PaintingStudy elements, float blend)
+        {
+            if ((elements & PaintingStudy.Perspective) != 0)
+                EaseColor(gravel, new Color(.70f, .47f, .24f), blend);
+            if ((elements & PaintingStudy.Stone) != 0)
+                EaseColor(stone, new Color(.60f, .52f, .73f), blend);
+            if ((elements & PaintingStudy.Leaves) != 0)
+            {
+                EaseColor(copper, new Color(.94f, .34f, .12f), blend);
+                EaseColor(gold, new Color(1f, .78f, .22f), blend);
+                EaseColor(leaf, new Color(1f, .74f, .23f), blend);
+            }
+        }
+
+        static void EaseColor(Material material, Color target, float blend) =>
+            material.color = Color.Lerp(material.color, target, blend);
 
         GameObject HouseBox(string name, float x, float y, float z, float width, float height, float depth,
             Material material, bool solid = true) => Box(name, House + new Vector3(x, y, z),
@@ -175,7 +194,7 @@ namespace Puzzle.Story
             return studies[index] != null ? studies[index] : studies[index] = Paint(elements);
         }
 
-        internal void HangStudy() => vincentCanvas.SetTexture("_BaseMap", Study(PaintingStudy.All));
+        internal void HangStudy(PaintingStudy elements) => vincentCanvas.SetTexture("_BaseMap", Study(elements));
 
         static Texture2D Paint(PaintingStudy elements)
         {

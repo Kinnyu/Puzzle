@@ -5379,6 +5379,7 @@ MonoBehaviour:
   walk: {fileID: 330585548}
   dialoguePlayer: {fileID: 1285379369}
   font: {fileID: 12800000, guid: cafdc8ada718a6243a4caed82d90c1a7, type: 3}
+  chapterOneVincent: {fileID: 1557310017}
   chapterTwo: {fileID: 93065348}
   chapterThree: {fileID: 93065349}
   chapterFour: {fileID: 93065350}
@@ -5458,7 +5459,6 @@ MonoBehaviour:
   chapterOneVincent: {fileID: 1557310015}
   script: {fileID: 11400000, guid: e903b78abb274aaca00d4c9fabbb763c, type: 2}
   opening: {fileID: 11400000, guid: 59c08de619054f9d9abeff836a3a49c4, type: 2}
-  retry: {fileID: 11400000, guid: 0c05059cc58544f3a939272c11993ca7, type: 2}
   vincentSprite: {fileID: 21300000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
   minerSprite: {fileID: 21300000, guid: 88d41b9c621ec2844939e163eb704c85, type: 3}
   farmerSprite: {fileID: 21300000, guid: 2d3b0e9bd5c1daf44848a7a59b231a42, type: 3}
@@ -78058,7 +78058,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1557310016}
   - component: {fileID: 1557310017}
-  - component: {fileID: 1557310018}
   - component: {fileID: 1557310019}
   - component: {fileID: 1557310022}
   - component: {fileID: 1557310023}
@@ -78081,7 +78080,8 @@ Transform:
   m_LocalPosition: {x: -2.072885, y: -0.174, z: -16.03725}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1557310027}
   m_Father: {fileID: 1285379371}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1557310017
@@ -78101,42 +78101,50 @@ MonoBehaviour:
   activation: 1
   actor: {fileID: 948652742}
   range: 2.5
-  once: 1
+  once: 0
   appearance: {fileID: 0}
   onCompleted:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1557310023}
-        m_TargetAssemblyTypeName: Puzzle.Dialogue.DialogueActorAction, Assembly-CSharp
-        m_MethodName: Perform
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument:
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 93065345}
-        m_TargetAssemblyTypeName: Puzzle.Story.StorySceneProgress, Assembly-CSharp
-        m_MethodName: CompleteChapter
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: 
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
+--- !u!1 &1557310026
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1557310027}
+  - component: {fileID: 1557310018}
+  m_Layer: 0
+  m_Name: Character sprite
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1557310027
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1557310026}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1557310016}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &1557310018
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1557310015}
+  m_GameObject: {fileID: 1557310026}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -78190,6 +78198,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8e233c24e679408a9861829e89ca7e58, type: 3}
   m_Name:
   m_EditorClassIdentifier: Assembly-CSharp::Puzzle.StarryNight.CharacterBillboard
+  visual: {fileID: 1557310027}
 --- !u!114 &1557310023
 MonoBehaviour:
   m_ObjectHideFlags: 0

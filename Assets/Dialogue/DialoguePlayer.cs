@@ -15,7 +15,7 @@ namespace Puzzle.Dialogue
         const string LanguagePreference = "Puzzle.Dialogue.Language";
         const float PageScrollSeconds = 0.24f;
         const float MaxLineHeight = 152f;
-        const float MaxChoiceHeight = 112f;
+        const float MaxChoiceHeight = 164f;
         const float LineBottomPadding = 8f;
 
         [SerializeField] Font traditionalChineseFont;
@@ -75,6 +75,7 @@ namespace Puzzle.Dialogue
         internal IReadOnlyList<(string Heading, string Text, DialogueLanguage Language)> History => history;
         internal string InteractionKeyLabel => interactKey == Key.None ? string.Empty
             : Keyboard.current?[interactKey].displayName ?? interactKey.ToString();
+        internal bool HoldingInteractionKey => interactKey != Key.None && Keyboard.current?[interactKey].isPressed == true;
         bool HasChoices => currentNode.choices is { Length: > 0 };
 
         internal void SetSuspended(bool value)
@@ -150,15 +151,43 @@ namespace Puzzle.Dialogue
 
         internal void Register(DialogueTrigger trigger) => triggers.Add(trigger);
         internal void Unregister(DialogueTrigger trigger) => triggers.Remove(trigger);
+        internal Func<string> SceneInteractionPrompt { get; set; }
+        internal Action<int> RuntimeChoiceSelected { get; set; }
 
         void LateUpdate()
         {
-            if (overlay == null || suspended || showingChapterTitle || closedFrame == Time.frameCount) return;
+            if (overlay == null || suspended || showingChapterTitle || closedFrame == Time.frameCount)
+            {
+                SetPromptVisible(false);
+                return;
+            }
             var keyboard = Keyboard.current;
             if (IsPlaying)
             {
+                SetPromptVisible(false);
                 if (interactKey != Key.None && keyboard?[interactKey].wasPressedThisFrame == true)
-                    AdvanceLinearNode();
+                {
+                    if (lineReady && HasChoices)
+                    {
+                        int focused = actions.focusController?.focusedElement is VisualElement element
+                            ? actions.contentContainer.IndexOf(element) : -1;
+                        SelectChoice(currentNode.choices[Mathf.Max(0, focused)]);
+                    }
+                    else AdvanceLinearNode();
+                }
+                return;
+            }
+
+            if (SceneInteractionPrompt != null)
+            {
+                string action = SceneInteractionPrompt();
+                bool visible = !string.IsNullOrEmpty(action);
+                if (visible)
+                {
+                    prompt.text = action;
+                    ApplyFont(prompt, DialogueLanguage.TraditionalChinese);
+                }
+                SetPromptVisible(visible);
                 return;
             }
 
@@ -181,6 +210,7 @@ namespace Puzzle.Dialogue
                 }
             }
 
+            if (nearby != null) prompt.text = Local($"按 {InteractionKeyLabel} 與角色交談", $"{InteractionKeyLabel}　話す");
             SetPromptVisible(nearby != null && interactKey != Key.None);
             if (automatic != null)
                 automatic.PlayOnEntry();
@@ -407,21 +437,14 @@ namespace Puzzle.Dialogue
             // Measure the wrapped line and the choices while they are hidden.
             do { yield return null; }
             while (suspended);
-            float targetLineHeight = Mathf.Clamp(line.layout.yMax + LineBottomPadding, 32f, MaxLineHeight);
-            float targetChoiceHeight = 0f;
-            if (HasChoices)
-            {
-                var lastChoice = actions.ElementAt(actions.childCount - 1);
-                targetChoiceHeight = Mathf.Min(lastChoice.layout.yMax + lastChoice.resolvedStyle.marginBottom,
-                    MaxChoiceHeight);
-            }
+            var (targetLineHeight, targetChoiceHeight) = MeasureDialogue();
             if (!lineReady) line.text = string.Empty;
 
             if (scrolling)
             {
                 float from = scroll.scrollOffset.y;
-                float fromLineHeight = scroll.resolvedStyle.height;
-                float fromChoiceHeight = actions.resolvedStyle.height;
+                float fromLineHeight = ValidHeight(scroll.resolvedStyle.height, targetLineHeight);
+                float fromChoiceHeight = ValidHeight(actions.resolvedStyle.height, targetChoiceHeight);
                 for (float elapsed = 0f; elapsed < PageScrollSeconds;)
                 {
                     if (!suspended)
@@ -486,6 +509,20 @@ namespace Puzzle.Dialogue
             actions.style.height = choiceHeight;
         }
 
+        (float lineHeight, float choicesHeight) MeasureDialogue()
+        {
+            float lineHeight = Mathf.Clamp(ValidHeight(line.layout.yMax + LineBottomPadding, MaxLineHeight), 32f, MaxLineHeight);
+            if (!HasChoices || actions.childCount == 0) return (lineHeight, 0f);
+            var last = actions.ElementAt(actions.childCount - 1);
+            float fallback = Mathf.Min(actions.childCount * 46f, MaxChoiceHeight);
+            float measured = last.layout.height > 0f ? last.layout.yMax + last.resolvedStyle.marginBottom : fallback;
+            float choiceHeight = Mathf.Clamp(ValidHeight(measured, fallback), 44f, MaxChoiceHeight);
+            return (lineHeight, choiceHeight);
+        }
+
+        static float ValidHeight(float value, float fallback) =>
+            float.IsNaN(value) || float.IsInfinity(value) || value < 0f ? fallback : value;
+
         void ScrollTo(float offset)
         {
             if (!float.IsNaN(offset) && !float.IsInfinity(offset))
@@ -503,9 +540,17 @@ namespace Puzzle.Dialogue
         {
             if (lineSequence != null) StopCoroutine(lineSequence);
             lineSequence = null;
+            if (preparingLine || scrolling)
+            {
+                var (lineHeight, choicesHeight) = MeasureDialogue();
+                SetDialogueHeights(lineHeight, choicesHeight);
+                preparingLine = false;
+                scrolling = false;
+            }
             lineReady = true;
             renderedFrame = Time.frameCount;
             speaker.style.visibility = Visibility.Visible;
+            line.style.visibility = Visibility.Visible;
             if (line.text != fullLine)
             {
                 line.text = fullLine;
@@ -573,7 +618,7 @@ namespace Puzzle.Dialogue
 
         void AdvanceLinearNode()
         {
-            if (!CanInteract() || scrolling) return;
+            if (!IsPlaying || suspended || renderedFrame == Time.frameCount || closedFrame == Time.frameCount) return;
             if (!lineReady) FinishLine();
             else if (!HasChoices)
                 Advance(currentNode.nextNodeId);
@@ -587,6 +632,7 @@ namespace Puzzle.Dialogue
             if (!CanInteract() || !lineReady) return;
             string text = choice.text.Get(language, out var textLanguage);
             RecordHistory(Local("已選選項", "選んだ返答"), text, textLanguage);
+            RuntimeChoiceSelected?.Invoke(Array.IndexOf(currentNode.choices, choice));
             Advance(choice.nextNodeId);
         }
 
@@ -632,6 +678,7 @@ namespace Puzzle.Dialogue
             currentNode = null;
             nodes = null;
             onCompleted = null;
+            RuntimeChoiceSelected = null;
             actions.Clear();
             if (portrait != null) portrait.image = null;
             overlay.style.display = DisplayStyle.None;

@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using Puzzle.Dialogue;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -19,10 +21,11 @@ namespace Puzzle.StarryNight
         Vector3 overlook;
         Quaternion openingRotation;
         float elapsed, yaw, pitch, verticalSpeed;
+        float sittingOffset;
 
         public bool InputSuppressed { get; set; }
         internal bool EscapeHandledExternally { get; set; }
-        internal System.Func<Vector2, bool> PointerOverMenu { get; set; }
+        internal Func<Vector2, bool> PointerOverMenu { get; set; }
         internal CharacterController Player => player;
 
         void Start()
@@ -85,10 +88,19 @@ namespace Puzzle.StarryNight
             if (player.isGrounded && verticalSpeed < 0) verticalSpeed = -2f;
             verticalSpeed += Physics.gravity.y * dt;
             player.Move((velocity + Vector3.up * verticalSpeed) * dt);
-            transform.SetPositionAndRotation(player.transform.position + Vector3.up * eyeHeight, Quaternion.Euler(pitch, yaw, 0));
+            UpdateWalkingView();
         }
 
         static int Pressed(bool value) => value ? 1 : 0;
+
+        internal void SetSeated(bool seated)
+        {
+            sittingOffset = seated ? .49f : 0f;
+            UpdateWalkingView();
+        }
+
+        void UpdateWalkingView() => transform.SetPositionAndRotation(
+            player.transform.position + Vector3.up * (eyeHeight - sittingOffset), Quaternion.Euler(pitch, yaw, 0));
 
         public void EnterWalking(Transform spawn = null)
         {
@@ -107,9 +119,10 @@ namespace Puzzle.StarryNight
             yaw = player.transform.eulerAngles.y;
             pitch = -5f;
             verticalSpeed = 0;
+            sittingOffset = 0;
             player.enabled = true;
             view = View.Walking;
-            transform.SetPositionAndRotation(player.transform.position + Vector3.up * eyeHeight, Quaternion.Euler(pitch, yaw, 0));
+            UpdateWalkingView();
             Cursor.lockState = CursorLockMode.Locked;
         }
 
@@ -143,6 +156,40 @@ namespace Puzzle.StarryNight
         }
 
         void OnDisable() => Cursor.lockState = CursorLockMode.None;
+    }
+
+    internal sealed class WalkingTrail
+    {
+        readonly Queue<Vector3> points = new();
+        Vector3 lastPoint;
+
+        internal void StartAt(Vector3 position)
+        {
+            points.Clear();
+            lastPoint = position;
+            points.Enqueue(position);
+        }
+
+        internal void Follow(Transform actor, Vector3 player, Func<Vector3, Vector3> ground)
+        {
+            if (HorizontalDistance(lastPoint, player) >= .45f)
+            {
+                points.Enqueue(player);
+                lastPoint = player;
+            }
+            if (!points.TryPeek(out Vector3 target)) return;
+            if (points.Count < 4 && HorizontalDistance(actor.position, player) < 1.55f) return;
+            target.y = actor.position.y;
+            if (HorizontalDistance(actor.position, target) < .12f) points.Dequeue();
+            else actor.position = ground(Vector3.MoveTowards(actor.position, target, 5.5f * Time.deltaTime));
+        }
+
+        static float HorizontalDistance(Vector3 a, Vector3 b)
+        {
+            var offset = a - b;
+            offset.y = 0;
+            return offset.magnitude;
+        }
     }
 }
 

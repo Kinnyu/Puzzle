@@ -80,7 +80,7 @@ namespace Puzzle.Story
                 else if (!drawing && keys?.eKey.wasPressedThisFrame == true) StartDrawing();
 
                 if (drawing && mouse != null) UpdateStroke(mouse);
-                if (IsSeated && !drawing) hint = "E 畫畫   ·   F 拿起畫紙   ·   Esc 起身";
+                if (IsSeated && !drawing) hint = "按 E 在畫紙上作畫　　F 拿起畫紙　　Esc 起身";
                 return true;
             }
 
@@ -127,17 +127,17 @@ namespace Puzzle.Story
             var paper = target.GetComponent<GalleryPaper>();
             if (paper != null && paper.IsBall)
             {
-                hint = "E 撿起紙球";
+                hint = "按 E 撿起紙球";
                 if (keys?.eKey.wasPressedThisFrame == true) Hold(paper);
                 return true;
             }
 
             if (!target.transform.IsChildOf(furniture)) return false;
-            hint = "E 坐下";
+            hint = "按 E 坐到畫桌旁";
             if (keys?.eKey.wasPressedThisFrame == true)
             {
                 Sit();
-                hint = "E 畫畫   ·   F 拿起畫紙   ·   Esc 起身";
+                hint = "按 E 在畫紙上作畫　　F 拿起畫紙　　Esc 起身";
             }
             return true;
         }

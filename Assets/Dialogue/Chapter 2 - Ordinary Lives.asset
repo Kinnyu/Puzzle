@@ -135,8 +135,8 @@ MonoBehaviour:
       traditionalChinese: "農夫"
       japanese: "農夫"
     line:
-      traditionalChinese: "太好了！那就麻煩你了！"
-      japanese: "助かるよ、頼んだよ！"
+      traditionalChinese: "翻一壟就好。我在另一頭鬆土。看，乾的土挖開，下面的顏色深得多。"
+      japanese: "畝を一本だけ頼むよ。私は向こうをやる。ほら、乾いた土を掘ると、下はずっと濃い色だろう。"
     portrait: {fileID: 2800000, guid: 2d3b0e9bd5c1daf44848a7a59b231a42, type: 3}
     nextNodeId:
     choices: []
@@ -145,8 +145,8 @@ MonoBehaviour:
       traditionalChinese: "農夫"
       japanese: "農夫"
     line:
-      traditionalChinese: "真是太感謝你了！有你的幫忙，今天的工作輕鬆多了。"
-      japanese: "本当にありがとう。おかげで今日の仕事がずいぶん楽になったよ。"
+      traditionalChinese: "你那一壟翻得很好。看，手上的土一時半刻還洗不掉呢。"
+      japanese: "あの畝、よく掘れている。ほら、手についた土はなかなか落ちないだろう。"
     portrait: {fileID: 2800000, guid: 2d3b0e9bd5c1daf44848a7a59b231a42, type: 3}
     nextNodeId: reward-2
     choices: []
@@ -155,18 +155,8 @@ MonoBehaviour:
       traditionalChinese: "農夫"
       japanese: "農夫"
     line:
-      traditionalChinese: "這些是我們剛收成的馬鈴薯，雖然不是什麼貴重的東西，但都是我們辛苦種出來的。"
-      japanese: "これは採れたばかりのジャガイモ。高価なものではないけど、丹精を込めて育てたんだ。"
-    portrait: {fileID: 2800000, guid: 2d3b0e9bd5c1daf44848a7a59b231a42, type: 3}
-    nextNodeId: reward-3
-    choices: []
-  - id: reward-3
-    speaker:
-      traditionalChinese: "農夫"
-      japanese: "農夫"
-    line:
-      traditionalChinese: "就送給你當作謝禮吧！"
-      japanese: "お礼に受け取っておくれ！"
+      traditionalChinese: "帶這袋馬鈴薯去吧。我本來留了一半給晚飯，今天還能再挖一些。"
+      japanese: "この袋のジャガイモを持っていきな。半分は夕飯のつもりだったが、今日はまだ掘れそうだ。"
     portrait: {fileID: 2800000, guid: 2d3b0e9bd5c1daf44848a7a59b231a42, type: 3}
     nextNodeId:
     choices: []
@@ -175,8 +165,8 @@ MonoBehaviour:
       traditionalChinese: "礦工"
       japanese: "鉱夫"
     line:
-      traditionalChinese: "是你啊……找到食物了嗎？"
-      japanese: "君か……食べ物は見つかったかい？"
+      traditionalChinese: "你回來了。我還以為你有別的事要忙，正要走。"
+      japanese: "戻ってきてくれたのか。用事ができたのかと思って、帰るところだった。"
     portrait: {fileID: 2800000, guid: 88d41b9c621ec2844939e163eb704c85, type: 3}
     nextNodeId: potato
     choices: []
@@ -185,8 +175,8 @@ MonoBehaviour:
       traditionalChinese: "玩家"
       japanese: "あなた"
     line:
-      traditionalChinese: "我帶了一些馬鈴薯給你，希望能幫上忙。"
-      japanese: "ジャガイモを持ってきたよ。少しでも役に立てば。"
+      traditionalChinese: "農夫讓我把這袋帶來。還沾著土呢。"
+      japanese: "農夫がこの袋を持っていけって。まだ土がついてる。"
     nextNodeId: thanks
     choices: []
   - id: thanks
@@ -194,18 +184,26 @@ MonoBehaviour:
       traditionalChinese: "礦工"
       japanese: "鉱夫"
     line:
-      traditionalChinese: "真的嗎？太感謝你了！"
-      japanese: "本当かい？ ありがとう！"
+      traditionalChinese: "你可以在這兒坐一會兒嗎？我把它們洗一洗。"
+      japanese: "少し、ここに座っていかないか？ 洗ってくるから。"
     portrait: {fileID: 2800000, guid: 88d41b9c621ec2844939e163eb704c85, type: 3}
-    nextNodeId: thanks-2
-    choices: []
+    nextNodeId:
+    choices:
+    - text:
+        traditionalChinese: "留下來，幫他一起洗。"
+        japanese: "残って、一緒に洗う。"
+      nextNodeId: wash
+    - text:
+        traditionalChinese: "幫他把袋子拿到桌上。"
+        japanese: "袋を台まで運ぶ。"
+      nextNodeId: carry
   - id: thanks-2
     speaker:
       traditionalChinese: "礦工"
       japanese: "鉱夫"
     line:
-      traditionalChinese: "我們每天辛苦工作，只希望能讓家人過上安穩的生活。"
-      japanese: "家族に穏やかな暮らしをさせたくて、毎日必死に働いているんだ。"
+      traditionalChinese: "這顆先留著。我隔壁那位還沒下工，他回來向來比我晚。"
+      japanese: "これは取っておこう。隣のやつはまだ仕事中だ。いつも僕より帰りが遅いんだ。"
     portrait: {fileID: 2800000, guid: 88d41b9c621ec2844939e163eb704c85, type: 3}
     nextNodeId: thanks-3
     choices: []
@@ -214,18 +212,8 @@ MonoBehaviour:
       traditionalChinese: "礦工"
       japanese: "鉱夫"
     line:
-      traditionalChinese: "這些馬鈴薯對你來說或許很普通，但對現在的我來說，卻是非常珍貴的一餐。"
-      japanese: "君には普通のジャガイモかもしれないけど、今の僕にはかけがえのない一食だ。"
-    portrait: {fileID: 2800000, guid: 88d41b9c621ec2844939e163eb704c85, type: 3}
-    nextNodeId: thanks-4
-    choices: []
-  - id: thanks-4
-    speaker:
-      traditionalChinese: "礦工"
-      japanese: "鉱夫"
-    line:
-      traditionalChinese: "謝謝你願意幫助我。"
-      japanese: "手を差し伸べてくれて、本当にありがとう。"
+      traditionalChinese: "你明天要是經過這裡，可以再來坐坐。"
+      japanese: "明日この辺を通るなら、また座っていってくれ。"
     portrait: {fileID: 2800000, guid: 88d41b9c621ec2844939e163eb704c85, type: 3}
     nextNodeId:
     choices: []
@@ -321,8 +309,8 @@ MonoBehaviour:
       traditionalChinese: "玩家"
       japanese: "あなた"
     line:
-      traditionalChinese: "我遇到了一位飢餓的礦工，後來幫農夫耕地，獲得了一些馬鈴薯，再把它們送給了礦工。"
-      japanese: "空腹の鉱夫に会ったよ。農夫を手伝ってジャガイモをもらい、その鉱夫に届けたんだ。"
+      traditionalChinese: "他把一顆推到桌角，說要留給還沒下工的人。我想起了你在教堂留的外套。"
+      japanese: "まだ帰っていない人の分だと言って、一つを台の隅に寄せたんだ。教会に置いた上着のことを思い出した。"
     nextNodeId: reflect-with-letter
     choices: []
   - id: reflect-with-letter
@@ -330,8 +318,8 @@ MonoBehaviour:
       traditionalChinese: "梵谷"
       japanese: "ゴッホ"
     line:
-      traditionalChinese: "原來如此……那些人每天辛苦工作，只為了維持最基本的生活。"
-      japanese: "そうか……日々必死に働いて、やっと暮らしをつないでいるんだね。"
+      traditionalChinese: "那張桌子旁是什麼樣子？他把馬鈴薯推開的時候，手放在哪裡？"
+      japanese: "その台のまわりはどんなだった？ ジャガイモを寄せたとき、手はどこにあった？"
     portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
     nextNodeId: reflect-with-letter-2
     choices: []
@@ -340,8 +328,8 @@ MonoBehaviour:
       traditionalChinese: "梵谷"
       japanese: "ゴッホ"
     line:
-      traditionalChinese: "他們用自己的雙手努力活著，這樣平凡的生活，其實也充滿了值得被看見的價值。"
-      japanese: "自分の手で懸命に生きている。そんなありふれた暮らしにも、見つめる価値がある。"
+      traditionalChinese: "你等一下……如果燈放在近一點的地方，應該看得見他指節上的土。"
+      japanese: "ちょっと待って……灯りをもう少し近くに置けば、指の節についた土が見えるはずだ。"
     portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
     nextNodeId: reflect-with-letter-3
     choices: []
@@ -350,18 +338,8 @@ MonoBehaviour:
       traditionalChinese: "梵谷"
       japanese: "ゴッホ"
     line:
-      traditionalChinese: "我想……或許我能用畫筆，把他們真實的生活記錄下來。"
-      japanese: "僕は……絵筆で彼らのありのままの暮らしを描き残せるかもしれない。"
-    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
-    nextNodeId: reflect-with-letter-4
-    choices: []
-  - id: reflect-with-letter-4
-    speaker:
-      traditionalChinese: "梵谷"
-      japanese: "ゴッホ"
-    line:
-      traditionalChinese: "讓更多人看見，這些平凡生命中的辛勞與尊嚴。"
-      japanese: "その苦労と尊厳を、もっと多くの人に見てもらいたい。"
+      traditionalChinese: "我想先把那雙手畫下來。"
+      japanese: "まず、その手を描いておきたい。"
     portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
     nextNodeId: hand-over
     choices: []
@@ -370,8 +348,8 @@ MonoBehaviour:
       traditionalChinese: "梵谷"
       japanese: "ゴッホ"
     line:
-      traditionalChinese: "你回來了！怎麼樣？有遇到需要幫助的人嗎？"
-      japanese: "おかえり。どうだった？ 助けを必要としている人に会えたかい？"
+      traditionalChinese: "你回來啦。礦工吃到東西了嗎？"
+      japanese: "おかえり。鉱夫は何か食べられた？"
     portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
     nextNodeId: report-without-letter
     choices: []
@@ -380,8 +358,8 @@ MonoBehaviour:
       traditionalChinese: "玩家"
       japanese: "あなた"
     line:
-      traditionalChinese: "我遇到了一位飢餓的礦工，後來幫農夫耕地，獲得了一些馬鈴薯，再把它們送給了礦工。"
-      japanese: "空腹の鉱夫に会ったよ。農夫を手伝ってジャガイモをもらい、その鉱夫に届けたんだ。"
+      traditionalChinese: "嗯。他還留了一顆給隔壁沒下工的人。"
+      japanese: "うん。まだ帰っていない隣の人の分も取っておいてた。"
     nextNodeId: reflect-without-letter
     choices: []
   - id: reflect-without-letter
@@ -389,40 +367,10 @@ MonoBehaviour:
       traditionalChinese: "梵谷"
       japanese: "ゴッホ"
     line:
-      traditionalChinese: "原來如此……那些人每天辛苦工作，只為了維持最基本的生活。"
-      japanese: "そうか……日々必死に働いて、やっと暮らしをつないでいるんだね。"
+      traditionalChinese: "我剛才好像看見西奧在東邊那條路上。他常把信藏在外套內袋，怕弄濕了。可以去看看他是不是在等我嗎？"
+      japanese: "さっき東の道にテオがいた気がする。手紙が濡れないよう、いつも上着の内ポケットに入れるんだ。僕を待っているのか、見てきてもらえる？"
     portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
-    nextNodeId: reflect-without-letter-2
-    choices: []
-  - id: reflect-without-letter-2
-    speaker:
-      traditionalChinese: "梵谷"
-      japanese: "ゴッホ"
-    line:
-      traditionalChinese: "他們用自己的雙手努力活著，這樣平凡的生活，其實也充滿了值得被看見的價值。"
-      japanese: "自分の手で懸命に生きている。そんなありふれた暮らしにも、見つめる価値がある。"
-    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
-    nextNodeId: reflect-without-letter-3
-    choices: []
-  - id: reflect-without-letter-3
-    speaker:
-      traditionalChinese: "梵谷"
-      japanese: "ゴッホ"
-    line:
-      traditionalChinese: "我想……或許我能用畫筆，把他們真實的生活記錄下來。"
-      japanese: "僕は……絵筆で彼らのありのままの暮らしを描き残せるかもしれない。"
-    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
-    nextNodeId: reflect-without-letter-4
-    choices: []
-  - id: reflect-without-letter-4
-    speaker:
-      traditionalChinese: "梵谷"
-      japanese: "ゴッホ"
-    line:
-      traditionalChinese: "讓更多人看見，這些平凡生命中的辛勞與尊嚴。"
-      japanese: "その苦労と尊厳を、もっと多くの人に見てもらいたい。"
-    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
-    nextNodeId: fail-response
+    nextNodeId:
     choices: []
   - id: hand-over
     speaker:
@@ -513,36 +461,6 @@ MonoBehaviour:
     portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
     nextNodeId: success
     choices: []
-  - id: fail-response
-    speaker:
-      traditionalChinese: "梵谷"
-      japanese: "ゴッホ"
-    line:
-      traditionalChinese: "謝謝你願意幫助那些辛苦生活的人們。"
-      japanese: "懸命に生きる人たちを助けてくれて、ありがとう。"
-    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
-    nextNodeId: fail-response-2
-    choices: []
-  - id: fail-response-2
-    speaker:
-      traditionalChinese: "梵谷"
-      japanese: "ゴッホ"
-    line:
-      traditionalChinese: "你的行動讓我更加確定，我想透過繪畫，記錄這些不被注意的平凡生活。"
-      japanese: "君のおかげで、見過ごされてきた暮らしを絵に残したいという気持ちが強くなった。"
-    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
-    nextNodeId: fail-response-3
-    choices: []
-  - id: fail-response-3
-    speaker:
-      traditionalChinese: "梵谷"
-      japanese: "ゴッホ"
-    line:
-      traditionalChinese: "即使這條路並不容易，我也想繼續嘗試。"
-      japanese: "簡単な道ではなくても、挑んでみたい。"
-    portrait: {fileID: 2800000, guid: 54ee8aa8240009746935adc297842a37, type: 3}
-    nextNodeId: failure
-    choices: []
   - id: success
     speaker:
       traditionalChinese: "旁白"
@@ -597,48 +515,25 @@ MonoBehaviour:
       japanese: "弟に支えられ、ゴッホは自分の芸術の道を歩み続けた。"
     nextNodeId:
     choices: []
-  - id: failure
+  - id: wash
     speaker:
       traditionalChinese: "旁白"
-      japanese: "ナレーション"
+      japanese: "語り"
     line:
-      traditionalChinese: "經歷宗教工作的挫折後，梵谷逐漸找到了新的生命方向——繪畫。"
-      japanese: "宗教活動での挫折を経て、ゴッホは絵画という新しい道を見出していった。"
-    nextNodeId: failure-2
+      traditionalChinese: "水很冷。你把兩顆洗乾淨的馬鈴薯擱在一起，他又輕輕把它們分開。"
+      japanese: "水は冷たかった。洗った二つを並べると、鉱夫はそっと一つを取り分けた。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId: thanks-2
     choices: []
-  - id: failure-2
+  - id: carry
     speaker:
       traditionalChinese: "旁白"
-      japanese: "ナレーション"
+      japanese: "語り"
     line:
-      traditionalChinese: "他開始將目光投向平凡的勞動者，試圖透過畫筆，呈現他們辛勤生活的真實樣貌。"
-      japanese: "彼は働く人たちに目を向け、日々の営みをありのまま描こうとした。"
-    nextNodeId: failure-3
-    choices: []
-  - id: failure-3
-    speaker:
-      traditionalChinese: "旁白"
-      japanese: "ナレーション"
-    line:
-      traditionalChinese: "1885年，梵谷完成了著名作品《吃馬鈴薯的人》，描繪農民在昏暗燈光下，共享簡單晚餐的情景。"
-      japanese: "1885年、ゴッホは《ジャガイモを食べる人たち》を完成させた。薄暗い明かりの下で質素な夕食を囲む農民たちを描いた作品だ。"
-    nextNodeId: failure-4
-    choices: []
-  - id: failure-4
-    speaker:
-      traditionalChinese: "旁白"
-      japanese: "ナレーション"
-    line:
-      traditionalChinese: "然而，成為畫家的道路並不容易。他的作品尚未獲得廣泛認可，經濟上的困難也始終伴隨著他。"
-      japanese: "だが画家になる道は険しく、作品は広く認められず、生活の苦しさも続いた。"
-    nextNodeId: failure-5
-    choices: []
-  - id: failure-5
-    speaker:
-      traditionalChinese: "旁白"
-      japanese: "ナレーション"
-    line:
-      traditionalChinese: "在這段假設的命運分岔中，失去重要支持的梵谷，最終在貧病交迫中離開了人世……"
-      japanese: "この仮の未来では、大切な支えを得られなかったゴッホは、貧困と病のうちに世を去った……。"
-    nextNodeId:
+      traditionalChinese: "你把袋子擱到桌上。他掀開袋口，挑出兩顆，把其中一顆往桌角推了推。"
+      japanese: "袋を台に置くと、鉱夫は口を開き、二つ取り出して一つを台の隅に寄せた。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId: thanks-2
     choices: []

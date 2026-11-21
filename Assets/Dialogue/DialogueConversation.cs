@@ -12,6 +12,12 @@ namespace Puzzle.Dialogue
         [SerializeField, TextArea(2, 5)] string traditionalChinese;
         [SerializeField, TextArea(2, 5)] string japanese;
 
+        internal DialogueText(string chinese)
+        {
+            traditionalChinese = chinese;
+            japanese = null;
+        }
+
         public string Get(DialogueLanguage language, out DialogueLanguage resolvedLanguage)
         {
             string preferred = language == DialogueLanguage.Japanese ? japanese : traditionalChinese;
@@ -51,6 +57,8 @@ namespace Puzzle.Dialogue
 
         [SerializeField] string entryNodeId = "start";
         [SerializeField] Node[] nodes = { new Node { id = "start" } };
+
+        internal void SetRuntimeNodes(Node[] runtimeNodes) => nodes = runtimeNodes;
 
         internal bool TryBuildIndex(out Dictionary<string, Node> index, out Node entry, out string error)
         {

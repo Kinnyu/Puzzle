@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -11,6 +12,15 @@ namespace Puzzle.Story
         {
             public string checkpointId;
             public bool cleared;
+            public int cemeteryStudy;
+            public List<ChoiceRecord> choices = new();
+        }
+
+        [Serializable]
+        public sealed class ChoiceRecord
+        {
+            public string id;
+            public int value;
         }
 
         internal const string StartScene = "Assets/Scenes/Start.unity";
@@ -67,6 +77,26 @@ namespace Puzzle.Story
             var record = Read(story, chapter);
             if (record.cleared) return;
             record.cleared = true;
+            Write(story, chapter, record);
+        }
+
+        internal static void SaveChoice(StoryDefinition story, StoryDefinition.Chapter chapter, string id, int value)
+        {
+            var record = Read(story, chapter);
+            record.choices ??= new List<ChoiceRecord>();
+            var choice = record.choices.Find(item => item.id == id);
+            if (choice == null)
+                record.choices.Add(new ChoiceRecord { id = id, value = value });
+            else
+                choice.value = value;
+            Write(story, chapter, record);
+        }
+
+        internal static void SaveCemeteryStudy(StoryDefinition story, StoryDefinition.Chapter chapter, PaintingStudy study)
+        {
+            var record = Read(story, chapter);
+            if (record.cemeteryStudy == (int)study) return;
+            record.cemeteryStudy = (int)study;
             Write(story, chapter, record);
         }
 

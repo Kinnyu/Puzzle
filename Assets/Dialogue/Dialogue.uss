@@ -9,13 +9,17 @@
 .dialogue-prompt {
     display: none;
     position: absolute;
-    bottom: 8%;
-    align-self: center;
-    padding: 8px 20px;
-    background-color: rgba(17, 24, 40, 0.93);
+    bottom: 5%;
+    left: 5%;
+    right: 5%;
+    -unity-text-align: middle-center;
     color: #f6edd7;
-    font-size: 18px;
-    border-radius: 6px;
+    font-size: 20px;
+    -unity-font-style: bold;
+    -unity-text-outline-width: 1px;
+    -unity-text-outline-color: rgba(10, 14, 25, 0.95);
+    text-shadow: 0 2px 4px rgba(10, 14, 25, 0.95);
+    white-space: normal;
 }
 
 .dialogue-overlay {
@@ -136,6 +140,7 @@
 .dialogue-actions {
     height: 0;
     min-height: 0;
+    flex-shrink: 0;
 }
 
 .dialogue-actions-hidden {

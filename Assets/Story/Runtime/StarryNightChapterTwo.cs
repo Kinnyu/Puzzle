@@ -18,7 +18,6 @@ namespace Puzzle.Story
         [SerializeField] GameObject chapterOneVincent;
         [SerializeField] DialogueConversation script;
         [SerializeField] ChapterOpeningText opening;
-        [SerializeField] ChapterOpeningText retry;
         [SerializeField] Sprite vincentSprite;
         [SerializeField] Sprite minerSprite;
         [SerializeField] Sprite farmerSprite;
@@ -29,8 +28,14 @@ namespace Puzzle.Story
         [SerializeField] Vector3 road = new(21, 0, 0);
         [SerializeField] Collider[] groundSurfaces;
 
+        internal Vector3 Church => church;
+        internal Vector3 Mine => mine;
+        internal Vector3 Farm => farm;
+        internal Sprite VincentSprite => vincentSprite;
+        internal Sprite PeterSprite => minerSprite;
+        internal Sprite FarmerSprite => farmerSprite;
+
         readonly MeshRenderer[] rows = new MeshRenderer[3];
-        readonly bool[] tilled = new bool[3];
         StorySceneProgress progress;
         DialogueTrigger vincent;
         DialogueTrigger miner;
@@ -40,7 +45,7 @@ namespace Puzzle.Story
         Material tilledSoil;
         Stage stage;
         bool hasLetter;
-        int tilledCount;
+        bool vincentAskedForTheo;
 
         internal void Begin(StorySceneProgress scene, string checkpoint, bool continuing = false)
         {
@@ -96,10 +101,8 @@ namespace Puzzle.Story
             character.SetActive(false);
             character.transform.SetParent(transform);
             character.transform.position = Ground(position);
-            var renderer = character.AddComponent<SpriteRenderer>();
-            renderer.sprite = sprite;
+            var renderer = CharacterBillboard.AddSprite(character, sprite);
             renderer.color = new Color(0.86f, 0.88f, 0.97f);
-            character.AddComponent<CharacterBillboard>();
             var trigger = character.AddComponent<DialogueTrigger>();
             trigger.Initialize(dialogue, walk.Player, script);
             trigger.SetInteraction(null, null);
@@ -152,7 +155,6 @@ namespace Puzzle.Story
                 case Stage.FarmReward:
                     farmer.SetInteraction("reward", () =>
                     {
-                        progress.Notify(dialogue.Local("獲得　馬鈴薯 ×1", "入手　ジャガイモ ×1"), 2.5f);
                         SetStage(Stage.Deliver);
                     });
                     break;
@@ -161,18 +163,22 @@ namespace Puzzle.Story
                     {
                         SetStage(Stage.Return);
                         progress.SaveCheckpoint(ReturnCheckpoint);
-                        progress.Notify(dialogue.Local("伸出援手 — CLEAR · 已記錄", "救いの手 — CLEAR ・ セーブ済み"), 2.8f);
                     });
                     break;
                 case Stage.Return:
-                    vincent.SetInteraction(hasLetter ? "return-with-letter" : "return-without-letter",
-                        hasLetter ? Complete : Retry);
+                    if (hasLetter)
+                        vincent.SetInteraction("return-with-letter", Complete);
+                    else if (!vincentAskedForTheo)
+                        vincent.SetInteraction("return-without-letter", () =>
+                        {
+                            vincentAskedForTheo = true;
+                            vincent.SetInteraction(null, null);
+                        });
                     if (!hasLetter)
                         theo.SetInteraction("theo", () =>
                         {
                             hasLetter = true;
                             SetStage(Stage.Return);
-                            progress.Notify(dialogue.Local("獲得　西奧的信 ×1", "入手　テオの手紙 ×1"), 2.5f);
                         });
                     break;
             }
@@ -185,15 +191,13 @@ namespace Puzzle.Story
             int row = -1;
             if (stage == Stage.Till)
             {
-                row = ClosestUntilledRow(out float distance);
+                row = ClosestRow(out float distance);
                 if (row >= 0 && distance <= TillingReach &&
                     Mathf.Abs(walk.Player.transform.position.y - rows[row].transform.position.y) <= TillingVerticalReach &&
                     dialogue.TryConsumeGameplayInteraction())
                 {
-                    tilled[row] = true;
                     rows[row].sharedMaterial = tilledSoil;
-                    if (++tilledCount == rows.Length) SetStage(Stage.FarmReward);
-                    else row = ClosestUntilledRow(out _);
+                    SetStage(Stage.FarmReward);
                 }
             }
 
@@ -203,11 +207,13 @@ namespace Puzzle.Story
                 Stage.Miner => WithDistance("伸出援手　前往村莊東邊找礦工", "救いの手　村の東で鉱夫を探す", miner.transform.position),
                 Stage.Farmer => WithDistance("尋找食物　到附近農田問問", "食べ物を探す　近くの畑へ", farmer.transform.position),
                 Stage.Till when row >= 0 => WithDistance(
-                    $"農田小幫手　靠近田壟按 {dialogue.InteractionKeyLabel} 耕地（{tilledCount}/{rows.Length}）",
-                    $"畑仕事　畝のそばで {dialogue.InteractionKeyLabel}（{tilledCount}/{rows.Length}）", rows[row].transform.position),
-                Stage.FarmReward => WithDistance($"農田小幫手（{tilledCount}/{rows.Length}）　回去和農夫交談",
-                    $"畑仕事（{tilledCount}/{rows.Length}）　農夫のところへ戻る", farmer.transform.position),
+                    $"靠近田壟，按 {dialogue.InteractionKeyLabel} 幫農夫鬆土",
+                    $"畝のそばで {dialogue.InteractionKeyLabel} を押し、土をほぐす", rows[row].transform.position),
+                Stage.FarmReward => WithDistance("回去和農夫談談今天的收成",
+                    "農夫のところへ戻り、今日の収穫について聞く", farmer.transform.position),
                 Stage.Deliver => WithDistance("分享溫暖　把馬鈴薯交給礦工", "ジャガイモを鉱夫に渡す", miner.transform.position),
+                Stage.Return when vincentAskedForTheo && !hasLetter => WithDistance(
+                    "到路上找西奧", "道に出てテオに会う", theo.transform.position),
                 Stage.Return => WithDistance(hasLetter ? "回教堂找梵谷，轉交西奧的信" : "回教堂向梵谷分享經歷",
                     hasLetter ? "教会に戻ってテオの手紙を渡す" : "教会へ戻り、ゴッホに報告する", vincent.transform.position),
                 _ => (Text: "", Detail: "")
@@ -215,14 +221,13 @@ namespace Puzzle.Story
             progress.SetObjective(objective.Text, objective.Detail);
         }
 
-        int ClosestUntilledRow(out float distance)
+        int ClosestRow(out float distance)
         {
             float closest = float.PositiveInfinity;
             int index = -1;
             var playerPosition = walk.Player.transform.position;
             for (int i = 0; i < rows.Length; i++)
             {
-                if (tilled[i]) continue;
                 var bounds = rows[i].bounds;
                 var feet = new Vector3(playerPosition.x, bounds.center.y, playerPosition.z);
                 float distanceSquared = (bounds.ClosestPoint(feet) - feet).sqrMagnitude;
@@ -248,19 +253,9 @@ namespace Puzzle.Story
         void ReturnToRoad()
         {
             hasLetter = false;
-            tilledCount = rows.Length;
-            for (int i = 0; i < rows.Length; i++)
-            {
-                tilled[i] = true;
-                rows[i].sharedMaterial = tilledSoil;
-            }
+            rows[0].sharedMaterial = tilledSoil;
             MovePlayer(mine + Vector3.left * 3f, church);
             SetStage(Stage.Return);
-        }
-
-        void Retry()
-        {
-            dialogue.ShowOpening(retry, ReturnToRoad);
         }
 
         void Complete()

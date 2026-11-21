@@ -30,8 +30,8 @@ MonoBehaviour:
       traditionalChinese: "梵谷"
       japanese: "ゴッホ"
     line:
-      traditionalChinese: "那些星星讓我忍不住想把整個夜晚畫下來。你願意替我看看，還能把什麼留在畫裡嗎？"
-      japanese: "あの星を見ていると、夜を丸ごと描きたくなる。ほかに何を絵に残せそうか見てくれる？"
+      traditionalChinese: "還記得墓園那天，我們站在同一條路上，看到的東西卻不一樣嗎？這次，陪我看看窗外。"
+      japanese: "墓地で同じ道に立っても、見えるものが違ったのを覚えてる？ 今度は窓の外を一緒に見てほしい。"
     portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
     portraitOnRight: 0
     nextNodeId:
@@ -129,8 +129,8 @@ MonoBehaviour:
       traditionalChinese: "西奧"
       japanese: "テオ"
     line:
-      traditionalChinese: "畫都掛好了！現在需要觀眾。麻煩你到教堂前，在九十秒內邀請五位路人。"
-      japanese: "絵はそろった！ 次はお客さんだ。教会の前で、九十秒以内に五人を誘ってくれる？"
+      traditionalChinese: "畫已經掛好了。教堂前應該還有人在聊天，去問問他們晚上想不想來。"
+      japanese: "絵は掛け終わったよ。教会の前で話してる人がいるはずだ。よかったら今夜来ないか、聞いてみてくれる？"
     portrait: {fileID: 2800000, guid: 2e53c57501dbae04492237f3085a37e4, type: 3}
     portraitOnRight: 1
     nextNodeId:
@@ -278,24 +278,13 @@ MonoBehaviour:
     portraitOnRight: 0
     nextNodeId:
     choices: []
-  - id: invite-fail
-    speaker:
-      traditionalChinese: "旁白"
-      japanese: "語り"
-    line:
-      traditionalChinese: "畫館的燈亮著，來看畫的人卻比預想的少。再回到開幕前，請更多人走進畫館吧。"
-      japanese: "画廊には明かりがともったが、来場者は思ったより少なかった。開幕前に戻り、もう少し多くの人を誘ってみよう。"
-    portrait: {fileID: 0}
-    portraitOnRight: 0
-    nextNodeId:
-    choices: []
   - id: fame-brief
     speaker:
       traditionalChinese: "西奧"
       japanese: "テオ"
     line:
-      traditionalChinese: "觀眾到了！請在兩分鐘內和三位觀眾談談畫作，讓名聲至少達到八十分。"
-      japanese: "お客さんが来た！ 二分以内に三人と作品について話して、評判を八十点以上にしよう。"
+      traditionalChinese: "你請的人來了。有些站在自己喜歡的畫前，好像想問些什麼。你也去看看，我在這裡等文森特。"
+      japanese: "誘ってくれた人が来たよ。好きな絵の前で、何か聞きたそうにしてる。一緒に見ておいで。僕はここでフィンセントを待つから。"
     portrait: {fileID: 2800000, guid: 2e53c57501dbae04492237f3085a37e4, type: 3}
     portraitOnRight: 1
     nextNodeId:
@@ -305,8 +294,8 @@ MonoBehaviour:
       traditionalChinese: "村民"
       japanese: "村の人"
     line:
-      traditionalChinese: "原來如此。現在再看，我好像能感覺到他們一天的辛苦。"
-      japanese: "なるほど。見直すと、この人たちの一日の苦労が伝わってくるよ。"
+      traditionalChinese: "我父親下工後，指節也那樣。刷得再用力，指甲邊上還是有一圈黑的。"
+      japanese: "父も仕事帰りは指の節があんなふうだった。いくらこすっても爪のきわが黒くてね。"
     portrait: {fileID: 0}
     portraitOnRight: 0
     nextNodeId:
@@ -316,8 +305,8 @@ MonoBehaviour:
       traditionalChinese: "村民"
       japanese: "村の人"
     line:
-      traditionalChinese: "那我大概還是比較喜歡其他作品。"
-      japanese: "じゃあ、ほかの絵のほうが好きかもしれないな。"
+      traditionalChinese: "是啊。以前我們家只有一盞燈，父親總把它往坐得最遠的人那邊推。"
+      japanese: "そうだね。うちにも灯りは一つだけで、父はいつも一番遠くに座る人のほうへ寄せていた。"
     portrait: {fileID: 0}
     portraitOnRight: 0
     nextNodeId:
@@ -327,8 +316,8 @@ MonoBehaviour:
       traditionalChinese: "村民"
       japanese: "村の人"
     line:
-      traditionalChinese: "難怪！沿著畫裡的路看，真的有一種走進去的感覺。"
-      japanese: "なるほど！ 絵の中の道をたどると、本当に歩いて入っていけそうだ。"
+      traditionalChinese: "我以前總在那裡走得很快。下次我想走到遠處那道光裡。"
+      japanese: "いつも足早に通り過ぎてた。今度は奥のあの光まで歩いてみたいな。"
     portrait: {fileID: 0}
     portraitOnRight: 0
     nextNodeId:
@@ -338,8 +327,8 @@ MonoBehaviour:
       traditionalChinese: "村民"
       japanese: "村の人"
     line:
-      traditionalChinese: "我想再看看別的畫。"
-      japanese: "ほかの絵を見てみようかな。"
+      traditionalChinese: "我總抬頭看樹。原來低頭，也能看到一個完全不一樣的秋天。"
+      japanese: "いつも木を見上げてばかりだった。目を落とすと、違う秋が見えるんだね。"
     portrait: {fileID: 0}
     portraitOnRight: 0
     nextNodeId:
@@ -349,8 +338,8 @@ MonoBehaviour:
       traditionalChinese: "村民"
       japanese: "村の人"
     line:
-      traditionalChinese: "把看見的夜晚和感受到的夜晚一起畫進去，難怪它看起來這麼有生命力。"
-      japanese: "見た夜と感じた夜が一緒に描かれているから、こんなに生き生きしているんだね。"
+      traditionalChinese: "你的眼睛也會沿著光走嗎？我本來只盯著最亮的那一顆。"
+      japanese: "君の目も光をたどる？ 私は最初、いちばん明るい星しか見ていなかった。"
     portrait: {fileID: 0}
     portraitOnRight: 0
     nextNodeId:
@@ -360,19 +349,8 @@ MonoBehaviour:
       traditionalChinese: "村民"
       japanese: "村の人"
     line:
-      traditionalChinese: "這樣啊……那我可能還沒有看懂。"
-      japanese: "そうなのか……まだよく分からないな。"
-    portrait: {fileID: 0}
-    portraitOnRight: 0
-    nextNodeId:
-    choices: []
-  - id: fame-fail
-    speaker:
-      traditionalChinese: "旁白"
-      japanese: "語り"
-    line:
-      traditionalChinese: "參觀的人看見了這些畫，卻還沒聽懂它們背後的故事。再試一次，把你對作品的理解說給他們聽。"
-      japanese: "観客は絵を見たが、その背景までは伝わらなかった。もう一度、作品について分かったことを自分の言葉で伝えよう。"
+      traditionalChinese: "真的有一扇還亮著。謝謝，你剛才讓我看到這畫裡還住著人。"
+      japanese: "本当だ、まだ明るい窓がある。ありがとう。この絵には人が暮らしているんだね。"
     portrait: {fileID: 0}
     portraitOnRight: 0
     nextNodeId:
@@ -459,8 +437,8 @@ MonoBehaviour:
       traditionalChinese: "神職人員"
       japanese: "聖職者"
     line:
-      traditionalChinese: "文森特，好久不見。聽說很多人來看你的畫，我真替你高興。幫助別人的方式有很多種，你願意關心他們，就已經很有意義。"
-      japanese: "フィンセント、久しぶりだね。絵を見に大勢来たそうで、私もうれしいよ。人を助ける方法はいくつもある。誰かを気にかけることだけでも意味があるんだ。"
+      traditionalChinese: "你還記得小桌上那件外套嗎？隔天清早，我發現外套不見了，椅子倒是推得整整齊齊。"
+      japanese: "小さな台に置いた上着、覚えてる？ 翌朝にはなくなっていたよ。椅子はきちんと元の場所に戻っていた。"
     portrait: {fileID: 0}
     portraitOnRight: 0
     nextNodeId: walk-church-2
@@ -470,8 +448,8 @@ MonoBehaviour:
       traditionalChinese: "梵谷"
       japanese: "ゴッホ"
     line:
-      traditionalChinese: "以前我以為，得做很了不起的事，才能幫到別人。現在想想，在別人需要時留在他身邊，就已經很重要了。"
-      japanese: "昔は、人を助けるには立派なことをしなきゃと思っていた。今は、必要な時にそばにいるだけでも大切だと分かるよ。"
+      traditionalChinese: "他還是把椅子推回去了啊。……我到現在還不知道他的名字。"
+      japanese: "やっぱり椅子を戻していったんだ。……その人の名前、今でも知らないな。"
     portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
     portraitOnRight: 0
     nextNodeId:
@@ -481,19 +459,19 @@ MonoBehaviour:
       traditionalChinese: "礦工"
       japanese: "鉱夫"
     line:
-      traditionalChinese: "文森特，我還記得你們送來的馬鈴薯。現在收成有多，我們也分給需要的人。"
-      japanese: "フィンセント、あの時届けてくれたジャガイモを覚えているよ。今では、余った分を必要な人に分けているんだ。"
+      traditionalChinese: "還記得那天我把一顆馬鈴薯留在桌角嗎？現在有收成，我就留一袋在門邊。晚上下工的人會自己來拿。"
+      japanese: "あの日、台の隅にジャガイモを一つ取っておいたのを覚えてるか？ 今は採れた日に袋を戸口に置く。仕事帰りのやつが持っていくんだ。"
     portrait: {fileID: 2800000, guid: 88d41b9c621ec2844939e163eb704c85, type: 3}
     portraitOnRight: 0
-    nextNodeId: walk-farm-2
+    nextNodeId: walk-farm-pass
     choices: []
   - id: walk-farm-2
     speaker:
       traditionalChinese: "梵谷"
       japanese: "ゴッホ"
     line:
-      traditionalChinese: "原來那天做的小事，還有人記得。"
-      japanese: "あの日の小さなことを、覚えてくれていたんだね。"
+      traditionalChinese: "這樣回來的人就不用先解繩子了。"
+      japanese: "これなら、帰ってきた人が紐をほどかなくてもいいね。"
     portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
     portraitOnRight: 0
     nextNodeId:
@@ -536,8 +514,8 @@ MonoBehaviour:
       traditionalChinese: "梵谷"
       japanese: "ゴッホ"
     line:
-      traditionalChinese: "我想在杏樹旁畫一幅畫。可以幫我找畫布、畫筆、顏料和畫架嗎？"
-      japanese: "杏の木のそばで絵を描きたい。カンヴァス、筆、絵の具、イーゼルを探してくれる？"
+      traditionalChinese: "那棵杏樹開了。我想在那裡坐一會兒。可以把小屋裡的畫具一起帶來嗎？"
+      japanese: "あの杏の花が咲いたね。あそこで少し座っていたい。家にある画材も持ってきてくれる？"
     portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
     portraitOnRight: 0
     nextNodeId:
@@ -547,8 +525,8 @@ MonoBehaviour:
       traditionalChinese: "梵谷"
       japanese: "ゴッホ"
     line:
-      traditionalChinese: "謝謝你。這樣就準備好了。我想把今天的心情留在這幅畫裡。"
-      japanese: "ありがとう。これで用意できた。今日の気持ちをこの絵に残したいんだ。"
+      traditionalChinese: "你坐這裡好嗎？花枝一動，我就看不準了。……等風停一下。"
+      japanese: "ここに座ってくれる？ 枝が揺れるとよく見えなくて。……風がやむまで少し待とう。"
     portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
     portraitOnRight: 0
     nextNodeId: spring-2
@@ -558,12 +536,20 @@ MonoBehaviour:
       traditionalChinese: "旁白"
       japanese: "語り"
     line:
-      traditionalChinese: "那天下午，梵谷再度拿起畫筆。盛開的花朵成了他送給同伴的禮物。"
-      japanese: "その午後、ゴッホはまた筆を取った。咲き誇る花は、仲間への贈り物になった。"
+      traditionalChinese: "梵谷沾了一點顏料。你們等到枝頭不再搖晃，他才畫下第一筆。"
+      japanese: "ゴッホは筆に少し絵の具を取った。枝が揺れなくなるのを待って、最初の一筆を置いた。"
     portrait: {fileID: 0}
     portraitOnRight: 0
     nextNodeId:
-    choices: []
+    choices:
+    - text:
+        traditionalChinese: "靜靜陪他畫完。"
+        japanese: "静かに、描き終わるまでそばにいる。"
+      nextNodeId: spring-stay
+    - text:
+        traditionalChinese: "告訴他哪一枝花吸引了你的目光。"
+        japanese: "どの枝に目が留まったか伝える。"
+      nextNodeId: spring-look
   - id: thanks
     speaker:
       traditionalChinese: "梵谷"
@@ -635,8 +621,8 @@ MonoBehaviour:
       traditionalChinese: "旁白"
       japanese: "語り"
     line:
-      traditionalChinese: "在這個故事的結局裡，梵谷親眼看見了有人欣賞他的作品，也有機會繼續創作、繼續生活。"
-      japanese: "この物語の結末では、ゴッホは自分の絵を見つめる人たちをその目で見た。そして、描き続け、生き続ける機会を得た。"
+      traditionalChinese: "梵谷把昨天用過的筆放到水裡洗淨。窗邊還有一張空白的畫布。"
+      japanese: "ゴッホは昨日の筆を水で洗った。窓辺にはまだ一枚、まっさらな画布があった。"
     portrait: {fileID: 0}
     portraitOnRight: 0
     nextNodeId: morning-4
@@ -646,8 +632,8 @@ MonoBehaviour:
       traditionalChinese: "旁白"
       japanese: "語り"
     line:
-      traditionalChinese: "這一次，星光不再只照亮他的作品，也照亮了他的未來。"
-      japanese: "今度は星の光が、彼の作品だけでなく、彼の未来も照らした。"
+      traditionalChinese: "他把椅子挪到窗邊，留出旁邊的位置。"
+      japanese: "彼は椅子を窓辺に寄せ、その隣を空けておいた。"
     portrait: {fileID: 0}
     portraitOnRight: 0
     nextNodeId:
@@ -657,55 +643,103 @@ MonoBehaviour:
       traditionalChinese: "村民"
       japanese: "村の人"
     line:
-      traditionalChinese: "這幅畫好暗。為什麼他要畫一群農民吃飯？"
-      japanese: "暗い絵だね。なぜ農民の食事を描いたんだろう？"
+      traditionalChinese: "我在想，燈下那隻伸出去的手，像不像我父親的手。你第一眼看到了什麼？"
+      japanese: "灯りの下で伸びているあの手、父の手に似てる気がする。君は最初にどこを見た？"
     portrait: {fileID: 0}
     portraitOnRight: 0
     nextNodeId:
     choices:
     - text:
-        traditionalChinese: "他想呈現農民辛勤生活的樣貌。"
-        japanese: "農民の懸命な暮らしを描きたかったんだ。"
+        traditionalChinese: "我先注意到那雙沾過土的手。"
+        japanese: "土のついた手が先に目に入った。"
       nextNodeId: potato-good
     - text:
-        traditionalChinese: "他那時還不太會畫畫。"
-        japanese: "まだ絵がうまくなかったんだ。"
+        traditionalChinese: "燈光很小，可是每個人都坐得到光裡。"
+        japanese: "小さな灯りなのに、みんなその中に座ってる。"
       nextNodeId: potato-poor
   - id: cemetery
     speaker:
       traditionalChinese: "村民"
       japanese: "村の人"
     line:
-      traditionalChinese: "為什麼墓園的道路看起來一直延伸到遠方？"
-      japanese: "なぜ墓地の道は遠くまで続いているように見えるの？"
+      traditionalChinese: "我也走過這片墓園。可我記得的顏色跟這張不太一樣。你在那裡時，最想記住什麼？"
+      japanese: "私もあそこを歩いたけど、思い出す色はこの絵と少し違う。君はあそこにいたとき、何を覚えておきたかった？"
     portrait: {fileID: 0}
     portraitOnRight: 0
     nextNodeId:
     choices:
     - text:
-        traditionalChinese: "他用構圖表現道路的空間和深度。"
-        japanese: "構図で道の広がりと奥行きを表したんだ。"
+        traditionalChinese: "路越走越窄，光卻一直在。"
+        japanese: "道は細くなっていくのに、光はずっと残っていた。"
       nextNodeId: cemetery-good
     - text:
-        traditionalChinese: "他隨意畫的，沒有特別安排。"
-        japanese: "何も考えずに描いたんだ。"
+        traditionalChinese: "陰影下的顏色。靠近一點才發現。"
+        japanese: "影の中の色。近づいてやっと気づいた。"
       nextNodeId: cemetery-poor
   - id: night
     speaker:
       traditionalChinese: "村民"
       japanese: "村の人"
     line:
-      traditionalChinese: "天空像在旋轉。梵谷真的看到了一模一樣的天空嗎？"
-      japanese: "空が渦を巻いているね。見たままの空なの？"
+      traditionalChinese: "我站了一會兒，眼睛一直被天空拉走。你看最久的是哪裡？"
+      japanese: "しばらく立っていたら、何度も空に目を引かれた。君がいちばん長く見ていたのはどこ？"
     portrait: {fileID: 0}
     portraitOnRight: 0
     nextNodeId:
     choices:
     - text:
-        traditionalChinese: "他把觀察和想像畫在一起，用筆觸表達感受。"
-        japanese: "観察と想像を重ね、筆遣いで気持ちを表したんだ。"
+        traditionalChinese: "星星周圍那一圈一圈的光。"
+        japanese: "星のまわりを巡る光。"
       nextNodeId: night-good
     - text:
-        traditionalChinese: "他只是隨便畫成這樣。"
-        japanese: "ただ適当に描いたんだ。"
+        traditionalChinese: "底下村莊的小窗。好像有人還醒著。"
+        japanese: "村の小さな窓。まだ誰か起きているみたい。"
       nextNodeId: night-poor
+  - id: walk-farm-pass
+    speaker:
+      traditionalChinese: "礦工"
+      japanese: "鉱夫"
+    line:
+      traditionalChinese: "今天這袋有點重。你們可以幫我把它往門邊挪一點嗎？"
+      japanese: "今日の袋は少し重くてね。戸口のほうへ寄せるのを手伝ってくれるか？"
+    portrait: {fileID: 2800000, guid: 88d41b9c621ec2844939e163eb704c85, type: 3}
+    portraitOnRight: 0
+    nextNodeId:
+    choices:
+    - text:
+        traditionalChinese: "和梵谷一起把袋子移到門邊。"
+        japanese: "ゴッホと一緒に袋を戸口へ運ぶ。"
+      nextNodeId: walk-farm-action
+  - id: walk-farm-action
+    speaker:
+      traditionalChinese: "旁白"
+      japanese: "語り"
+    line:
+      traditionalChinese: "你提起袋子的一邊，梵谷握住另一邊。放下的時候，他把袋口敞開了一點。"
+      japanese: "あなたが袋の片側を持つと、ゴッホがもう片側を持った。降ろしたあと、彼は袋の口を少し開けておいた。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId: walk-farm-2
+    choices: []
+  - id: spring-stay
+    speaker:
+      traditionalChinese: "旁白"
+      japanese: "語り"
+    line:
+      traditionalChinese: "畫筆在布面上輕輕擦過。等他把畫轉向你時，外頭的光已經斜了。"
+      japanese: "筆が画布をかすかにこすった。彼が絵をあなたへ向けたときには、外の光はもう傾いていた。"
+    portrait: {fileID: 0}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
+  - id: spring-look
+    speaker:
+      traditionalChinese: "梵谷"
+      japanese: "ゴッホ"
+    line:
+      traditionalChinese: "是最靠近你那一枝嗎？我本來想讓它留在畫外。等一下……這樣你回去，也能從你坐的位置再看一眼。"
+      japanese: "君にいちばん近い枝かな？ 枠の外に置くつもりだったけど。少し待って……こうすれば、帰ってからも君の席から見た景色を思い出せる。"
+    portrait: {fileID: 2800000, guid: 1487b9a5e2268904683021a07391b96f, type: 3}
+    portraitOnRight: 0
+    nextNodeId:
+    choices: []
