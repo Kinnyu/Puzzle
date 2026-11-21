@@ -4,6 +4,12 @@
 
 ## 《劇本2》的城鎮
 
+Unity 選單使用 Dustyroom 的免費音效包。一般選取與翻對話使用 DM-CGS-21，開始遊戲、進入章節與選定答覆使用 DM-CGS-02，取消與返回使用 DM-CGS-32。音檔由作者官網下載，作者標示為 CC0。[Unity Asset Store](https://assetstore.unity.com/packages/audio/sound-fx/free-casual-game-sfx-pack-54116) · [Dustyroom 下載與授權](https://dustyroom.com/free-casual-game-sounds/)
+
+可從開始畫面依序試聽「開始遊戲」、展廳的章節選項和「取消」。`StoryMenu.Button` 在按鈕啟動時播放一次，預設焦點及停用的選項保持安靜。`DialoguePlayer` 只在玩家操作對話時發聲，自動顯字保持安靜。`MenuAudio` 保留單一音源，跨場景播放確認音。
+
+已在 Unity 6000.3.23f1 播放模式驗證三個 WAV 均可載入、初始焦點安靜，並以 UI Toolkit 提交事件操作開始、選章與取消。切入展廳後確認音源仍在，選章與取消切換到對應音檔，播放期間量到非零音訊輸出。
+
 在 Unity 開啟 `Assets/Scenes/Start.unity`，播放後選「開始遊戲」，從畫廊進入《星夜》。教堂、黃色小屋、礦工住家、農舍、療養院和展覽畫廊從第一幕起就能在同一張地圖找到。礦區與馬鈴薯田在教堂東側，畫廊在教堂與北方療養院之間。各幕控制人物、道具與任務進度。地點與年代依[四幕擴寫劇本](../../Assets/Story/劇本2)濃縮排列。
 
 從畫廊選擇第一幕的「章節開頭」，畫面會停在山坡上。點擊畫面後，鏡頭用 6.5 秒越過村落，在教堂廣場的推車前放低。抵達後才記錄第一個檢查點並開始瑪莉的對話。選擇「讀取記錄點」會直接回到該事件。

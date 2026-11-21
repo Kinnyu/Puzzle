@@ -174,13 +174,17 @@ namespace Puzzle.Story
             var keys = Keyboard.current;
             if (keys?.escapeKey.wasPressedThisFrame == true)
             {
+                MenuAudio.Play(historyOpen || modalOpen || expanded?.CanvasOpen == true ? MenuCue.Back : MenuCue.Select);
                 if (historyOpen) CloseHistory();
                 else if (modalOpen) CloseOverlay();
                 else if (expanded != null && expanded.CloseCanvas()) return;
                 else OpenOverlay(chapter.title, false);
             }
             else if (historyButton != null && keys?.hKey.wasPressedThisFrame == true && expanded?.CanvasOpen != true)
+            {
+                MenuAudio.Play(historyOpen ? MenuCue.Back : MenuCue.Select);
                 ToggleHistory();
+            }
         }
 
         // Connect scene triggers, puzzles or dialogue completion to this method in the Inspector.
@@ -346,9 +350,9 @@ namespace Puzzle.Story
             card.Clear();
             StoryMenu.Label(card, heading, "story-card-title");
             var actions = StoryMenu.Panel(card, "story-row");
-            var keepPlaying = StoryMenu.Button(actions, cleared ? "繼續探索" : "繼續遊戲", CloseOverlay);
+            var keepPlaying = StoryMenu.Button(actions, cleared ? "繼續探索" : "繼續遊戲", CloseOverlay, cue: MenuCue.Back);
             var gallery = StoryMenu.Button(actions, "回到故事展廳", () => StoryProgress.OpenMenu(StoryProgress.GalleryScene),
-                "story-primary");
+                "story-primary", MenuCue.Back);
             StoryMenu.Show(overlay, true);
             (cleared ? gallery : keepPlaying).Focus();
         }
@@ -371,7 +375,7 @@ namespace Puzzle.Story
             historyCard.AddToClassList("story-history-card");
             var header = StoryMenu.Panel(historyCard, "story-history-header");
             historyTitle = StoryMenu.Label(header, "", "story-card-title");
-            historyClose = StoryMenu.Button(header, "", CloseHistory);
+            historyClose = StoryMenu.Button(header, "", CloseHistory, cue: MenuCue.Back);
             historyScroll = new ScrollView { horizontalScrollerVisibility = ScrollerVisibility.Hidden };
             historyScroll.AddToClassList("story-history-scroll");
             historyCard.Add(historyScroll);

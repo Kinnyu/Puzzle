@@ -422,6 +422,7 @@ namespace Puzzle.Story
             if (CanvasOpen && keys?.bKey.wasPressedThisFrame == true)
             {
                 brushClosedFrame = Time.frameCount;
+                MenuAudio.Play(MenuCue.Back);
                 canvas.Hide();
             }
             if (CanvasOpen)

@@ -57,6 +57,7 @@ namespace Puzzle.StarryNight
             {
                 if (clicked)
                 {
+                    MenuAudio.Play(MenuCue.Confirm);
                     Cursor.lockState = CursorLockMode.Locked;
                     view = View.Approaching;
                 }

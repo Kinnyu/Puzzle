@@ -32,9 +32,14 @@ namespace Puzzle.Story
             return label;
         }
 
-        internal static Button Button(VisualElement parent, string text, Action click, string className = null)
+        internal static Button Button(VisualElement parent, string text, Action click, string className = null,
+            MenuCue cue = MenuCue.Select)
         {
-            var button = new Button(click) { text = text, enableRichText = false };
+            var button = new Button(() =>
+            {
+                MenuAudio.Play(cue);
+                click();
+            }) { text = text, enableRichText = false };
             button.AddToClassList("story-button");
             if (className != null) button.AddToClassList(className);
             parent.Add(button);

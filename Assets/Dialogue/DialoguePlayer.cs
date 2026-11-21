@@ -128,7 +128,7 @@ namespace Puzzle.Dialogue
             overlay.RegisterCallback<ClickEvent>(OnOverlayClick, TrickleDown.TrickleDown);
             overlay.RegisterCallback<NavigationSubmitEvent>(OnOverlaySubmit);
             languageButton.clicked += ToggleLanguage;
-            closeButton.clicked += Cancel;
+            closeButton.clicked += CloseFromButton;
             advanceButton.clicked += AdvanceLinearNode;
             SetLanguage(PlayerPrefs.GetInt(LanguagePreference) == (int)DialogueLanguage.Japanese
                 ? DialogueLanguage.Japanese : DialogueLanguage.TraditionalChinese);
@@ -141,7 +141,7 @@ namespace Puzzle.Dialogue
             SetPromptVisible(false);
             if (overlay == null) return;
             languageButton.clicked -= ToggleLanguage;
-            closeButton.clicked -= Cancel;
+            closeButton.clicked -= CloseFromButton;
             advanceButton.clicked -= AdvanceLinearNode;
             overlay.UnregisterCallback<ClickEvent>(OnOverlayClick, TrickleDown.TrickleDown);
             overlay.UnregisterCallback<NavigationSubmitEvent>(OnOverlaySubmit);
@@ -351,9 +351,17 @@ namespace Puzzle.Dialogue
             if (IsPlaying) Close();
         }
 
+        void CloseFromButton()
+        {
+            if (suspended || !IsPlaying) return;
+            MenuAudio.Play(MenuCue.Back);
+            Cancel();
+        }
+
         void ToggleLanguage()
         {
             if (suspended || !IsPlaying) return;
+            MenuAudio.Play(MenuCue.Select);
             var next = language == DialogueLanguage.Japanese
                 ? DialogueLanguage.TraditionalChinese : DialogueLanguage.Japanese;
             SetLanguage(next);
@@ -619,9 +627,10 @@ namespace Puzzle.Dialogue
         void AdvanceLinearNode()
         {
             if (!IsPlaying || suspended || renderedFrame == Time.frameCount || closedFrame == Time.frameCount) return;
+            if (lineReady && HasChoices) return;
+            MenuAudio.Play(MenuCue.Select);
             if (!lineReady) FinishLine();
-            else if (!HasChoices)
-                Advance(currentNode.nextNodeId);
+            else Advance(currentNode.nextNodeId);
         }
 
         bool CanInteract() => IsPlaying && !suspended && !preparingLine
@@ -630,6 +639,7 @@ namespace Puzzle.Dialogue
         void SelectChoice(DialogueConversation.Choice choice)
         {
             if (!CanInteract() || !lineReady) return;
+            MenuAudio.Play(MenuCue.Confirm);
             string text = choice.text.Get(language, out var textLanguage);
             RecordHistory(Local("已選選項", "選んだ返答"), text, textLanguage);
             RuntimeChoiceSelected?.Invoke(Array.IndexOf(currentNode.choices, choice));

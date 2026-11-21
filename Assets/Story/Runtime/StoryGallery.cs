@@ -54,6 +54,7 @@ namespace Puzzle.Story
             {
                 if (keys?.escapeKey.wasPressedThisFrame == true)
                 {
+                    MenuAudio.Play(MenuCue.Back);
                     if (confirmingDelete) Open(story, selected);
                     else Close();
                 }
@@ -79,6 +80,7 @@ namespace Puzzle.Story
 
             if (keys?.escapeKey.wasPressedThisFrame == true)
             {
+                MenuAudio.Play(MenuCue.Back);
                 StoryProgress.OpenMenu(StoryProgress.StartScene);
                 return;
             }
@@ -95,7 +97,10 @@ namespace Puzzle.Story
             {
                 prompt.text = $"按 E 查看《{painting.Story.Title}》";
                 if (keys?.eKey.wasPressedThisFrame == true || Mouse.current?.leftButton.wasPressedThisFrame == true)
+                {
+                    MenuAudio.Play(MenuCue.Select);
                     Open(painting.Story);
+                }
             }
         }
 
@@ -136,12 +141,12 @@ namespace Puzzle.Story
 
             detail = StoryMenu.Label(card, "", "story-detail");
             var actions = StoryMenu.Panel(card, "story-row");
-            StoryMenu.Button(actions, "取消", Close);
+            StoryMenu.Button(actions, "取消", Close, cue: MenuCue.Back);
             restart = StoryMenu.Button(actions, "從章首", () => ChooseCheckpoint(null));
             resume = StoryMenu.Button(actions, "讀取記錄點", () =>
                 ChooseCheckpoint(StoryProgress.Read(story, selected).checkpointId));
             deleteSave = StoryMenu.Button(actions, "刪除存檔", ShowDeleteConfirmation);
-            confirm = StoryMenu.Button(actions, "確認進入", Confirm, "story-primary");
+            confirm = StoryMenu.Button(actions, "確認進入", Confirm, "story-primary", MenuCue.Confirm);
             if (initial != null)
             {
                 Select(rows.Find(row => row.button == initial).chapter);
@@ -181,7 +186,7 @@ namespace Puzzle.Story
             StoryMenu.Label(card, $"刪除〈{chapter.title}〉的存檔？", "story-card-title");
             StoryMenu.Label(card, "記錄點與通關紀錄會永久移除，依賴此通關紀錄的章節也可能重新上鎖。", "story-detail");
             var actions = StoryMenu.Panel(card, "story-row");
-            var cancel = StoryMenu.Button(actions, "取消", () => Open(story, chapter));
+            var cancel = StoryMenu.Button(actions, "取消", () => Open(story, chapter), cue: MenuCue.Back);
             StoryMenu.Button(actions, "永久刪除", () =>
             {
                 StoryProgress.DeleteSave(story, chapter);

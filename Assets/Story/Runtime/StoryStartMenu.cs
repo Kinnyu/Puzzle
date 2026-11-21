@@ -20,7 +20,7 @@ namespace Puzzle.Story
             var card = StoryMenu.Panel(layout, "story-title-card");
             StoryMenu.Label(card, "畫中故事", "story-title");
             StoryMenu.Button(card, "開始遊戲   →", () => StoryProgress.OpenMenu(StoryProgress.GalleryScene),
-                "story-primary").Focus();
+                "story-primary", MenuCue.Confirm).Focus();
         }
     }
 }

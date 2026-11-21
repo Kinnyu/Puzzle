@@ -78,7 +78,7 @@ namespace Puzzle.Story
             surface = new Image { scaleMode = ScaleMode.ScaleToFit };
             surface.AddToClassList("brush-surface");
             card.Add(surface);
-            StoryMenu.Button(card, "繼續", () => Hide());
+            StoryMenu.Button(card, "繼續", () => Hide(), cue: MenuCue.Back);
 
             tools = StoryMenu.Panel(overlay, "world-brush-tools");
             var row = StoryMenu.Panel(tools, "brush-options");
@@ -152,6 +152,7 @@ namespace Puzzle.Story
         internal void Open(WorldBrushTarget focused = null)
         {
             if (IsOpen) return;
+            MenuAudio.Play(MenuCue.Select);
             review = false;
             Show();
             if (focused != null && CanSee(focused))
@@ -292,7 +293,12 @@ namespace Puzzle.Story
                 if (!mouse.rightButton.isPressed)
                 {
                     rightDown = false;
-                    if (!looking) { Hide(); return; }
+                    if (!looking)
+                    {
+                        MenuAudio.Play(MenuCue.Back);
+                        Hide();
+                        return;
+                    }
                     looking = false;
                     StoryMenu.SetCursor(false);
                 }
