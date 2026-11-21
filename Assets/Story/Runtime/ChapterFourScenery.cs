@@ -76,7 +76,7 @@ namespace Puzzle.Story
             models.Place(models.easel, root, Clinic + new Vector3(2.05f, 0, .31f));
             Box("Window sill", Clinic + new Vector3(-1.78f, 1.21f, -2.03f),
                 new Vector3(.83f, .09f, .16f), timber, false);
-            Box("Window interior", Clinic + new Vector3(-1.78f, 1.68f, -2.07f),
+            Box("Window interior", Clinic + new Vector3(-1.78f, 1.68f, -2.044f),
                 new Vector3(.66f, .8f, .025f), leaf, false);
             Plant(models.cypress, Cypress, .17f);
         }

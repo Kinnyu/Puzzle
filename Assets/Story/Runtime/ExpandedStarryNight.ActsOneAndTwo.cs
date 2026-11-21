@@ -496,7 +496,7 @@ namespace Puzzle.Story
             {
                 var table = Table(Meal);
                 var vincent = Vincent(Meal + new Vector3(.88f, 0, .42f));
-                FarmLamp(table.transform.position);
+                FarmLamp();
                 Seat(Meal + new Vector3(-.92f, 0, .04f));
                 Arrive(Meal + Vector3.back * 1.44f, mealCenter());
                 Answer(vincent, "請梵谷停下來休息", () =>
@@ -520,7 +520,7 @@ namespace Puzzle.Story
                 Vincent(Meal + new Vector3(1.06f, 0, .54f));
                 Ruth(Meal + new Vector3(-.82f, 0, .49f));
                 Actor("艾米爾", terrain.FarmerSprite, Meal + new Vector3(-1.07f, 0, -.06f));
-                FarmLamp(table.transform.position);
+                FarmLamp();
                 Period(terrain.Models.coffeePot, table.transform.position + new Vector3(.41f, .184f, .12f));
                 Dish(table.transform.position + new Vector3(-.20f, .09f, -.16f), 0);
                 var easel = EaselPicture("農家晚餐畫布", Meal + new Vector3(.65f, 1.13f, .32f));
@@ -598,12 +598,8 @@ namespace Puzzle.Story
                 Mathf.Sin(angle) * .15f), new Vector3(.17f, .12f, .14f), Gold, PrimitiveType.Sphere);
         }
 
-        void FarmLamp(Vector3 table)
-        {
-            var point = table + new Vector3(.03f, 1.08f, .04f);
-            Prop("懸燈的屋樑", point + Vector3.up * .74f, new Vector3(5.43f, .15f, .16f), Wood);
-            Lamp(point, terrain.Models.pendant);
-        }
+        // The chain terminates in the permanent crossbeam of the farmhouse.
+        void FarmLamp() => Lamp(Meal + new Vector3(.03f, 1.94f, .04f), terrain.Models.pendant);
 
         void PlaceSupport(Vector3 point, int choice) =>
             Period(choice == 0 ? terrain.Models.loaf : choice == 1 ? terrain.Models.stewPot : terrain.Models.cloth, point);
