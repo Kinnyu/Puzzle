@@ -26,9 +26,7 @@ namespace Puzzle.Story
             internal Vector3 Position => Object != null ? Object.position + Offset : Point;
         }
 
-        enum Location { Square, Church, Mine, WorkersHome, Farm, Farmhouse, Studio, Cemetery, Clinic, Gallery }
-
-        readonly List<(string id, Location location, Action open, string arrival)> scenes = new();
+        readonly List<(string id, Action open, string cut, (Vector3 point, string goal)? approach)> scenes = new();
         readonly List<Interaction> targets = new();
         readonly List<Texture2D> illustrations = new();
         readonly Collider[] footingHits = new Collider[16];
@@ -55,8 +53,11 @@ namespace Puzzle.Story
         Sprite youngVincent;
         Sprite chapterVincent;
         Interaction heldTarget;
+        Transform preferredStop;
         float heldSince;
-        bool keepNearbyPosition;
+        bool spawnAtEntry;
+        Vector3 walkPoint;
+        Action onWalkArrival;
         bool enteringFromPainting;
 
         Vector3 Church => terrain.Ground(terrain.Church);
@@ -135,17 +136,18 @@ namespace Puzzle.Story
             if (chapterId == "chapter-4" && sceneIndex >= scenes.FindIndex(entry => entry.id == "exhibition-ready"))
                 ShowExhibition(true);
             enteringFromPainting = scene == null && chapterId == "chapter-1" && string.IsNullOrEmpty(checkpoint);
-            OpenScene();
+            OpenScene(true);
         }
 
-        void Scene(string id, Location location, Action open, string arrival = null) =>
-            scenes.Add((id, location, open, arrival));
+        void Scene(string id, Action open, string cut = null, (Vector3 point, string goal)? approach = null) =>
+            scenes.Add((id, open, cut, approach));
 
-        void OpenScene()
+        void OpenScene(bool placePlayer)
         {
             ClearTargets();
             StopTimer();
             resumeDialogue = null;
+            onWalkArrival = null;
             if (scene != null)
             {
                 scene.SetActive(false);
@@ -157,26 +159,29 @@ namespace Puzzle.Story
             scene.transform.SetParent(transform);
             Physics.SyncTransforms();
             if (!enteringFromPainting) progress.SaveCheckpoint(entry.id);
-            entry.open();
+            spawnAtEntry = placePlayer;
+            try { entry.open(); }
+            finally { spawnAtEntry = false; }
         }
 
         void Next()
         {
-            if (progress.SceneTransitioning) return;
+            if (progress.SceneTransitioning || onWalkArrival != null) return;
             ClearTargets();
             StopTimer();
             extendedRetry = false;
-            int previous = sceneIndex++;
-            if (sceneIndex < scenes.Count)
+            int nextIndex = sceneIndex + 1;
+            if (nextIndex < scenes.Count)
             {
-                var next = scenes[sceneIndex];
-                bool distant = scenes[previous].location != next.location || next.arrival != null;
-                progress.TransitionScene(() =>
+                var next = scenes[nextIndex];
+                void Enter()
                 {
-                    keepNearbyPosition = !distant;
-                    OpenScene();
-                    keepNearbyPosition = false;
-                }, distant, caption: next.arrival);
+                    sceneIndex = nextIndex;
+                    if (next.cut == null) OpenScene(false);
+                    else progress.TransitionScene(() => OpenScene(!next.approach.HasValue), distant: true, caption: next.cut);
+                }
+                if (next.approach is { } route) WalkTo(route.point, route.goal, Enter);
+                else Enter();
             }
             else
             {
@@ -187,14 +192,10 @@ namespace Puzzle.Story
 
         void Arrive(Vector3 spot, Vector3? toward = null)
         {
+            if (!spawnAtEntry) return;
             Vector3 destination = FloorAndClearance(spot);
             Vector3 direction = toward.GetValueOrDefault(spot + Vector3.forward) - destination;
             direction.y = 0;
-            var playerPosition = walk.Player.transform.position;
-            if (keepNearbyPosition && (destination - playerPosition).sqrMagnitude < 1.45f * 1.45f &&
-                Vector3.Dot(Vector3.ProjectOnPlane(eyes.transform.forward, Vector3.up).normalized, direction.normalized) > .66f &&
-                CanStand(playerPosition, walk.Player.radius))
-                return;
             float pitch = 0;
             if (toward.HasValue && direction.sqrMagnitude > .0001f)
             {
@@ -208,13 +209,12 @@ namespace Puzzle.Story
                 Quaternion.LookRotation(direction.sqrMagnitude > .0001f ? direction : Vector3.forward), pitch);
         }
 
-        void Travel(Vector3 spot, Vector3 toward, Action onArrival = null, string caption = null)
+        void WalkTo(Vector3 foot, string instruction, Action onArrival)
         {
-            progress.TransitionScene(() =>
-            {
-                Arrive(spot, toward);
-                onArrival?.Invoke();
-            }, distant: true, caption: caption);
+            ClearTargets();
+            walkPoint = FloorAt(foot);
+            onWalkArrival = onArrival;
+            Goal(instruction);
         }
 
         Vector3 FloorAndClearance(Vector3 spot) =>
@@ -295,6 +295,7 @@ namespace Puzzle.Story
         void ClearTargets()
         {
             targets.Clear();
+            preferredStop = null;
             heldTarget = null;
         }
 
@@ -302,6 +303,20 @@ namespace Puzzle.Story
         {
             if (walk.InputSuppressed || CanvasOpen) return null;
             if (walk.WaitingAtPainting) return "點擊畫面，進入村落";
+            if (onWalkArrival != null)
+            {
+                Vector3 offset = walkPoint - walk.Player.transform.position;
+                float distance = new Vector2(offset.x, offset.z).magnitude;
+                if (distance <= 1.1f && Mathf.Abs(offset.y) < .65f &&
+                    !Obstructed(walkPoint + Vector3.up * .95f, null))
+                {
+                    var arrived = onWalkArrival;
+                    onWalkArrival = null;
+                    arrived();
+                }
+                else progress.SetObjective(goal, DirectionHint(walkPoint, distance));
+                return null;
+            }
             if (resumeDialogue != null)
             {
                 if (dialogue.TryConsumeGameplayInteraction())
@@ -334,13 +349,13 @@ namespace Puzzle.Story
             }
 
             string detail = deadline > 0 ? $"    {Mathf.CeilToInt(Mathf.Max(0, deadline - Time.time))} 秒" : "";
-            if (best == null && closest != null)
+            if (preferredStop != null)
             {
-                Vector3 heading = closest.Position - walk.transform.position;
-                float angle = Vector3.SignedAngle(Vector3.ProjectOnPlane(walk.transform.forward, Vector3.up),
-                    Vector3.ProjectOnPlane(heading, Vector3.up), Vector3.up);
-                string arrow = Mathf.Abs(angle) > 145 ? "↓" : angle < -35 ? "←" : angle > 35 ? "→" : "↑";
-                detail += $"    {arrow} {Mathf.RoundToInt(closestRange)} m";
+                detail += DirectionHint(preferredStop.position, Vector3.Distance(walk.Player.transform.position, preferredStop.position));
+            }
+            else if (best == null && closest != null)
+            {
+                detail += DirectionHint(closest.Position, closestRange);
             }
             progress.SetObjective(goal ?? "", detail);
             if (heldTarget != best || !dialogue.HoldingInteractionKey) heldTarget = null;
@@ -369,6 +384,14 @@ namespace Puzzle.Story
                 return null;
             }
             return $"按 {dialogue.InteractionKeyLabel} {best.Verb}";
+        }
+
+        string DirectionHint(Vector3 point, float distance)
+        {
+            float angle = Vector3.SignedAngle(Vector3.ProjectOnPlane(eyes.transform.forward, Vector3.up),
+                Vector3.ProjectOnPlane(point - eyes.transform.position, Vector3.up), Vector3.up);
+            string arrow = Mathf.Abs(angle) > 145 ? "↓" : angle < -35 ? "←" : angle > 35 ? "→" : "↑";
+            return $"    {arrow} {Mathf.RoundToInt(distance)} m";
         }
 
         bool Obstructed(Vector3 point, Transform target)
@@ -420,7 +443,7 @@ namespace Puzzle.Story
             Ask(actor, line, choice =>
             {
                 extendedRetry = choice == 1;
-                progress.TransitionScene(OpenScene, distant: false);
+                progress.TransitionScene(() => OpenScene(true), distant: false);
             }, "再試一次", "延長時間再試");
         }
 

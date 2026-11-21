@@ -18,17 +18,16 @@ namespace Puzzle.Story
             Visible(exhibition.Supplies, false);
             Visible(exhibition.Setup, false);
             ShowExhibition(false);
-            Scene("asylum-reunion", Location.Clinic, () =>
+            Scene("asylum-reunion", () =>
             {
                 var point = terrain.Ground(Clinic + Vector3.back * 3.0f);
                 var attendant = Actor("療養院工作人員", third.NeighborSprite, point + Vector3.right * .65f);
                 var vincent = Vincent(Clinic + new Vector3(-.84f, 0, .36f));
                 var guide = Actor("神職人員", third.NeighborSprite, Church + Vector3.right * .86f);
                 Arrive(Church + Vector3.back * 1.55f, guide.transform.position);
-                Answer(guide, "向神職人員詢問梵谷的近況", () => Speak(VisitClinic,
+                Answer(guide, "向神職人員詢問梵谷的近況", () => Speak(AskAttendant,
                     "神職人員|文森特在北方的療養院休養。先問問工作人員，今天方不方便探訪。"));
-                void VisitClinic() => Travel(terrain.Ground(point + Vector3.back * 1.5f), point, AskAttendant, "沿北路抵達療養院");
-                void AskAttendant() => Answer(attendant, "詢問今天是否方便探訪梵谷", () =>
+                void AskAttendant() => Answer(attendant, "沿北路走到療養院，詢問今天是否方便探訪梵谷", () =>
                     Speak(() => Answer(vincent, "到窗邊和梵谷談談", () =>
                     {
                         ClearTargets();
@@ -40,7 +39,7 @@ namespace Puzzle.Story
                     }), "工作人員|今天他願意見朋友。請先敲門，他在窗旁。"));
             });
 
-            Scene("starry-paint", Location.Clinic, () =>
+            Scene("starry-paint", () =>
             {
                 Vincent(Clinic + new Vector3(-.63f, 0, .88f));
                 var easel = CanvasAtLedge("《星夜》的畫布", exhibition.ClinicEasel, .90f, .68f);
@@ -88,9 +87,9 @@ namespace Puzzle.Story
                         new[] { new Ink("先安排星星的位置", Mask.Star, Gold), new Ink("先安排柏樹的位置", Mask.Branch, Green) },
                         Layer("沿著旋轉的夜空留下筆觸", Mask.Spiral, Gold));
                 }
-            }, "療養院　・　從窗邊走向畫架");
+            });
 
-            Scene("starry-night-painted", Location.Clinic, () =>
+            Scene("starry-night-painted", () =>
             {
                 var theo = Theo(Clinic + new Vector3(1.66f, 0, .05f));
                 Vincent(Clinic + new Vector3(-.86f, 0, .55f));
@@ -105,9 +104,9 @@ namespace Puzzle.Story
                     }, "西奧|文森特，我找到一個願意借我們場地的小畫廊。",
                         "梵谷|真的有人願意看嗎？我不想讓你再為我操心。",
                         "西奧|我只是希望作品有機會遇見觀眾。", "玩家|我們可以一起準備。"));
-            }, "稍後　・　西奧來看完成的《星夜》");
+            }, cut: "稍後　・　西奧來看完成的《星夜》");
 
-            Scene("gallery-hang", Location.Clinic, () =>
+            Scene("gallery-hang", () =>
             {
                 ShowExhibition(false);
                 Visible(exhibition.Copies, true);
@@ -120,7 +119,7 @@ namespace Puzzle.Story
                     var copy = exhibition.Copies[i];
                     items[i] = (copy, $"拿起{Works[i]}", () => copy.SetActive(false));
                 }
-                Collect("收集三幅要展出的畫", items, () =>
+                Collect("到療養院和黃色小屋收集三幅展畫", items, () =>
                 {
                     var plates = new GameObject[3];
                     int frames = 0;
@@ -165,20 +164,20 @@ namespace Puzzle.Story
                         }
                     }, "依人生的時間順序", "依色調由暗到亮");
                 }
-            }, "展前準備　・　先回療養院取畫");
+            });
 
-            Scene("exhibition-ready", Location.Square, () =>
+            Scene("exhibition-ready", () =>
             {
                 ShowExhibition(true);
                 StartInvites();
-            }, "畫展前　・　到教堂廣場邀請街坊");
-            Scene("exhibition-open", Location.Gallery, () =>
+            }, approach: (Church + Vector3.back * 1.75f, "走到教堂廣場，準備邀請街坊看畫展"));
+            Scene("exhibition-open", () =>
             {
                 ShowExhibition(true);
                 StartQuestions();
-            }, "開幕當天　・　畫廊裡的第一批觀眾");
+            }, cut: "開幕當天　・　畫廊裡的第一批觀眾");
 
-            Scene("a-quiet-day", Location.Gallery, () =>
+            Scene("a-quiet-day", () =>
             {
                 ShowExhibition(true);
                 var vincent = Vincent(terrain.Ground(Gallery + new Vector3(3.48f, 0, 1.03f)));
@@ -188,21 +187,21 @@ namespace Puzzle.Story
                     Ask("梵谷", "今天很美好。我卻還是擔心明天會不會再變得難熬。", _ =>
                         Speak(Next, "梵谷|好。我希望畫畫能繼續，也希望自己能平安地生活。"),
                         "我們可以把今天記下來。不用逼自己每天都一樣好。", "一起去找醫師，談談接下來的照顧。"));
-            }, "散場後　・　畫廊側門外");
+            }, cut: "散場後　・　畫廊側門外");
 
-            Scene("doctor", Location.Clinic, () =>
+            Scene("doctor", () =>
             {
                 var physician = Actor("醫師", fourth.DoctorSprite, Clinic + new Vector3(1.56f, 0, .40f));
                 Vincent(Clinic + new Vector3(-.55f, 0, .75f));
                 Theo(Clinic + new Vector3(-.96f, 0, .11f));
                 Arrive(terrain.Ground(Clinic + Vector3.back * 3.7f), Clinic);
-                Answer(physician, "和醫師討論接下來的照顧", () =>
+                Answer(physician, "回北方療養院，和醫師討論接下來的照顧", () =>
                     Speak(Next, "醫師|我們從規律的作息、休息和定期見面開始。遇到困難時，請繼續告訴我們。",
                         "醫師|藝術可以留在你的生活裡，照護也會繼續。",
                         "西奧|明天我們陪你過一天，不用急著完成任何大事。"));
-            }, "離開畫廊　・　回療養院與醫師會面");
+            });
 
-            Scene("day-breakfast", Location.Studio, () =>
+            Scene("day-breakfast", () =>
             {
                 var table = Table(House + Vector3.forward * .34f);
                 Theo(House + new Vector3(.88f, 0, .66f));
@@ -218,16 +217,17 @@ namespace Puzzle.Story
                         card.SetActive(false);
                         Dish(table, .34f, -.05f, option);
                         Ask("梵谷", "今天好像不用趕著做什麼。", _ =>
-                            Speak(Next, "梵谷|以前我總想抓住重要的日子。現在我想試試看，把普通的一天也過好。"),
+                            Speak(() => { Save("walk-stops", 0); Next(); }, "梵谷|以前我總想抓住重要的日子。現在我想試試看，把普通的一天也過好。"),
                             "昨晚睡得如何？", "還記得昨晚觀眾問你的話嗎？");
                     }, false, new Ink("餐盤", Mask.Circle, Linen), new Ink("茶杯", Mask.Pot, Blue));
                 }, "西奧|先吃飯，今天沒有畫展要趕。", "梵谷|聽起來竟然有點奢侈。");
-            }, "翌日早晨　・　黃色小屋");
+            }, cut: "翌日早晨　・　黃色小屋");
 
-            Scene("day-walk", Location.Studio, DayWalk, "早餐後　・　到小屋門外，商量散步路線");
+            Scene("day-walk", DayWalk);
 
-            Scene("day-lunch", Location.Studio, () =>
+            Scene("day-lunch", () =>
             {
+                Save("walk-stops", 0);
                 var table = Table(House + Vector3.forward * .28f);
                 Vincent(House + new Vector3(-.92f, 0, .62f));
                 Theo(House + new Vector3(.88f, 0, .59f));
@@ -243,11 +243,11 @@ namespace Puzzle.Story
                             "午後的光落在院裡的杏花樹上。"),
                         "那些地方一直在，只是我們又回來看了。", "我們也一起走過了很多事。");
                 });
-            }, "中午　・　散步後回小屋用餐");
+            }, approach: (House + Vector3.back * .70f, "散步結束，回黃色小屋吃午餐"));
 
-            Scene("gift-of-spring", Location.Studio, PaintGift, "午後　・　為院子裡的杏花備畫具");
+            Scene("gift-of-spring", PaintGift, cut: "午後　・　為院子裡的杏花備畫具");
 
-            Scene("day-dinner", Location.Studio, () =>
+            Scene("day-dinner", () =>
             {
                 var table = Table(House + Vector3.forward * .29f);
                 Vincent(House + new Vector3(-.91f, 0, .63f));
@@ -264,9 +264,9 @@ namespace Puzzle.Story
                         "梵谷|那我可以只說一句：湯很好喝。",
                         "晚飯後，梵谷按醫師建議休息。家人的支持和持續的照護，仍是明天的一部分。");
                 });
-            }, "傍晚　・　收起畫具，回屋吃晚餐");
+            }, approach: (House + Vector3.back * .70f, "收起畫具，走回屋裡吃晚餐"));
 
-            Scene("ending", Location.Studio, () =>
+            Scene("ending", () =>
             {
                 var vincent = Vincent(House + new Vector3(.94f, 0, .47f));
                 Theo(House + new Vector3(-.93f, 0, .50f));
@@ -284,7 +284,7 @@ namespace Puzzle.Story
                             "在這個想像的故事裡，他仍有明天，能繼續生活、接受支持，再畫一幅畫。");
                     }, FreeLayer()), "西奧|早安，文森特。今天想做什麼？", "梵谷|或許……再畫一幅畫吧。");
                 });
-            }, "次日清晨　・　黃色小屋的畫室");
+            }, cut: "次日清晨　・　黃色小屋的畫室");
         }
 
         void StartInvites()
@@ -295,7 +295,7 @@ namespace Puzzle.Story
             var lines = new[] { "訪客|是畫那位農家的畫家嗎？我想看看。", "訪客|我聽過他的名字，但沒看過作品。",
                 "訪客|有人會解釋畫的故事嗎？", "訪客|我看到告示了。我可以帶朋友一起來嗎？",
                 "訪客|原來入口就在這條路上。" };
-            var theo = Theo(terrain.Ground(Gallery + Vector3.back * 3.23f + Vector3.left * .79f));
+            var theo = Theo(terrain.Ground(Church + new Vector3(-.85f, 0, -1.15f)));
             var sign = PostedSign("空白展覽告示", terrain.Ground(spots[3] + new Vector3(.72f, 0, -.42f)) + Vector3.up * 1.18f);
             var arrow = PostedSign("空白的指路牌", terrain.Ground(spots[4] + new Vector3(-.81f, 0, -.32f)) + Vector3.up * 1.11f);
             var visitors = Array.ConvertAll(spots, _ => (GameObject)null);
@@ -342,7 +342,7 @@ namespace Puzzle.Story
                     {
                         actor.SetActive(false);
                         if (invited == 5)
-                            Answer(theo, "告訴西奧五位訪客都會來", Next);
+                            Answer(theo, "回教堂廣場告訴西奧五位訪客都會來", Next);
                     }, lines[index]);
                 }, actor.transform);
             }
@@ -422,7 +422,6 @@ namespace Puzzle.Story
             var peter = Peter(Farm + new Vector3(.93f, 0, .55f));
             var vincent = Vincent(terrain.Ground(Cemetery + new Vector3(.86f, 0, .19f)));
             int visited = Recall(4, "walk-stops");
-            if (visited == 7) visited = 0;
             Arrive(terrain.Ground(village.Door + Vector3.back * 2.1f), theo.transform.position);
             RouteOptions();
 
@@ -431,25 +430,30 @@ namespace Puzzle.Story
                 ClearTargets();
                 if (visited == 7)
                 {
-                    Next();
+                    progress.AfterReveal(Next);
                     return;
                 }
-                Goal($"和梵谷重訪走過的地方  {((visited & 1) != 0 ? 1 : 0) + ((visited & 2) != 0 ? 1 : 0) + ((visited & 4) != 0 ? 1 : 0)}/3");
+                Goal($"到教堂、農田和墓園重訪舊地  {((visited & 1) != 0 ? 1 : 0) + ((visited & 2) != 0 ? 1 : 0) + ((visited & 4) != 0 ? 1 : 0)}/3");
                 if ((visited & 1) == 0) ActorAction(clergyman, "問問教堂那張長椅", VisitChurch);
                 if ((visited & 2) == 0) ActorAction(peter, "和彼得談談那次農家的晚餐", VisitFarm);
                 if ((visited & 4) == 0) ActorAction(vincent, "和梵谷聊聊墓園裡的畫", VisitCemetery);
                 ActorAction(theo, "和西奧商量接下來去哪裡", () =>
                 {
-                    var routes = new System.Collections.Generic.List<(string name, Action go)>();
+                    var routes = new System.Collections.Generic.List<(string name, GameObject actor, string goal)>();
                     if ((visited & 1) == 0)
-                        routes.Add(("去教堂看看", () => Travel(BenchApproach, Bench)));
+                        routes.Add(("去教堂看看", clergyman, "走到教堂門旁的長椅，和神職人員交談"));
                     if ((visited & 2) == 0)
-                        routes.Add(("去農田看看彼得", () => Travel(Farm + Vector3.back * 2.1f, Farm)));
+                        routes.Add(("去農田看看彼得", peter, "沿小路走到農田，和彼得談談"));
                     if ((visited & 4) == 0)
-                        routes.Add(("去阿里斯康墓園", () => Travel(Cemetery + Vector3.forward * 1.8f, Cemetery)));
+                        routes.Add(("去阿里斯康墓園", vincent, "走到阿里斯康墓園，和梵谷談談"));
                     var names = routes.ConvertAll(route => route.name);
                     names.Add("再走一會兒");
-                    Ask("西奧", "你想沿哪條路走？", pick => { if (pick < routes.Count) routes[pick].go(); }, names.ToArray());
+                    Ask("西奧", "你想沿哪條路走？", pick =>
+                    {
+                        if (pick == routes.Count) { RouteOptions(); return; }
+                        preferredStop = routes[pick].actor.transform;
+                        Goal(routes[pick].goal);
+                    }, names.ToArray());
                 });
             }
 
@@ -458,9 +462,7 @@ namespace Puzzle.Story
                 vincent.transform.position = FindClearFooting(Cemetery + new Vector3(.86f, 0, .19f), .25f, 1.5f);
                 visited |= bit;
                 Save("walk-stops", visited);
-                if (visited != 7)
-                    Travel(village.Door + Vector3.back * 2.1f, theo.transform.position, RouteOptions);
-                else RouteOptions();
+                RouteOptions();
             }
 
             void VisitChurch()

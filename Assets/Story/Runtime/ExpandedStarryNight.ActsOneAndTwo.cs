@@ -19,7 +19,7 @@ namespace Puzzle.Story
 
         void ChurchStory()
         {
-            Scene("church-meet", Location.Square, () =>
+            Scene("church-meet", () =>
             {
                 var spot = terrain.Ground(Church + Vector3.back * .62f);
                 var vincent = Vincent(spot + new Vector3(-1.2f, 0, .55f));
@@ -100,7 +100,7 @@ namespace Puzzle.Story
                 }, "畫布上的顏料裂開。你落進村莊，遠處傳來鐘聲。", "瑪莉|糟了，今天偏偏又卡住！");
             }
 
-            Scene("church-help", Location.Church, () =>
+            Scene("church-help", () =>
             {
                 var (table, linenTable) = DeliveryTables();
                 Vincent(Side + new Vector3(.92f, 0, .72f));
@@ -171,9 +171,9 @@ namespace Puzzle.Story
                         Speak(null, "梵谷|你連袖子都收得很整齊。晚上來的人應該用得上。");
                     });
                 }, "瑪莉|布料送到側廊，書放小桌，麵包留給晚間來訪的人。");
-            }, "教堂內　・　整理送來的物資");
+            }, approach: (terrain.ChapelPoint(-1.74f, 0, -1.66f), "走進教堂，到左側的物資桌旁"));
 
-            Scene("church-window", Location.Church, () =>
+            Scene("church-window", () =>
             {
                 var window = FurnishSideAisle();
                 var vincent = Vincent(terrain.ChapelPoint(-.30f, 0, 2.25f));
@@ -191,9 +191,9 @@ namespace Puzzle.Story
                             option == 0 ? "約瑟|尺寸剛剛好，這下省事了。" : "約瑟|能先擋一晚，明天我再修窗。");
                     }, false, new Ink("補上窗板", Mask.Panel, Gold), new Ink("畫出厚窗簾", Mask.Cloth, Linen));
                 }, "約瑟|今晚有人會在這裡休息，窗不能一直漏風。我去找合適的木框。", "梵谷|我可以幫忙，但我不知道怎麼修。");
-            }, "穿過清出的側廊　・　教堂後窗");
+            }, approach: (terrain.ChapelPoint(-1.53f, 0, 1.48f), "穿過清出的側廊，到教堂後窗找約瑟"));
 
-            Scene("church-anna", Location.Church, () =>
+            Scene("church-anna", () =>
             {
                 FitWindowCover(FurnishSideAisle(), Recall(1, "church-window"));
                 Seat(Bench, true);
@@ -246,9 +246,10 @@ namespace Puzzle.Story
                 }, "梵谷|我原本想說點漂亮的話，結果一句也說不出來。",
                     "安娜向你們道別。梵谷從口袋裡摸出兩張紙。",
                     "梵谷|你看，畫架旁還有位置。我想趁著還記得，把今天留下來。");
-            }, "傍晚　・　安娜來到教堂門旁的長椅");
+            }, cut: "傍晚　・　安娜來到教堂門旁的長椅",
+                approach: (BenchApproach, "走回教堂門旁的長椅，看看安娜"));
 
-            Scene("church-sketch", Location.Church, () =>
+            Scene("church-sketch", () =>
             {
                 FitWindowCover(FurnishSideAisle(), Recall(1, "church-window"));
                 Seat(Bench, true);
@@ -270,7 +271,7 @@ namespace Puzzle.Story
                     "梵谷|如果要把今天留在紙上，你會畫什麼？是教堂本身，還是坐在裡面的人？");
             });
 
-            Scene("church-value", Location.Church, () =>
+            Scene("church-value", () =>
             {
                 FitWindowCover(FurnishSideAisle(), Recall(1, "church-window"));
                 var sketch = BenchDrawing("完成的教堂速寫");
@@ -305,7 +306,7 @@ namespace Puzzle.Story
                         "梵谷|我在畫商那裡看見很多人追逐名聲，也有人一輩子只想做好手上的工作。",
                         "梵谷|今天幫忙推車時，我只想把車推出來。陪安娜坐著時，我卻開始想，她每天是不是都這樣一個人。");
                 });
-            }, "入夜　・　回到長椅");
+            }, cut: "入夜　・　回到長椅");
         }
 
         IEnumerator BringCartToDoor(Transform cart, Transform vincent, Action arrived)
@@ -440,7 +441,7 @@ namespace Puzzle.Story
 
         void MineStory()
         {
-            Scene("mine-reunion", Location.Mine, () =>
+            Scene("mine-reunion", () =>
             {
                 Vincent(Mine + Vector3.left * .93f);
                 Peter(Mine + Vector3.right * .88f);
@@ -459,7 +460,7 @@ namespace Puzzle.Story
                     "梵谷|如果我只站在乾淨的地方說話，怎麼知道你們每天有多辛苦？");
             });
 
-            Scene("mine-work", Location.Mine, () =>
+            Scene("mine-work", () =>
             {
                 Peter(Mine + new Vector3(1.15f, 0, .64f));
                 Vincent(Mine + new Vector3(-1.15f, 0, .6f));
@@ -505,9 +506,9 @@ namespace Puzzle.Story
                             "梵谷|我原以為帶著熱情就夠了。原來還得學會聽。");
                     }, false, new Ink("提燈", Mask.Lantern, Gold), new Ink("反光標記", Mask.Arrow, Linen));
                 }
-            }, "礦口旁　・　和彼得收拾散煤");
+            });
 
-            Scene("mine-family", Location.WorkersHome, () =>
+            Scene("mine-family", () =>
             {
                 var table = Table(Family);
                 var spot = table.transform.position;
@@ -577,9 +578,9 @@ namespace Puzzle.Story
                         Recall(1, "help") == 1 ? "梵谷|你在教堂說過的話，我現在才慢慢懂。"
                             : "露絲|我們也希望有人把我們當成能做決定的人。");
                 }
-            }, "收工後　・　工人住所");
+            }, approach: (Family + Vector3.back * .9f, "走進工人住所，探望露絲和莉娜"));
 
-            Scene("farm-harvest", Location.Farm, () =>
+            Scene("farm-harvest", () =>
             {
                 Actor("艾米爾", terrain.FarmerSprite, Farm + new Vector3(-1.22f, 0, .64f));
                 Vincent(Farm + new Vector3(1.48f, 0, .15f));
@@ -640,12 +641,12 @@ namespace Puzzle.Story
                     RestOnTable(offering, supplies, 0, 0);
                     Speak(Next, new[] { "彼得|麵包還有一些。艾米爾，來分一塊吧。",
                         "露絲|鍋裡還有熱湯。我帶了一些來田裡。",
-                        "莉娜|昨晚暖和多了。今天換我替你們送水。" }[supply],
+                        "莉娜|毯子我收好了。這回換我替你們送水。" }[supply],
                         "梵谷|先問哪一株可以收，比急著動手重要。");
                 }
-            }, "田裡　・　趁雨勢轉大前收成");
+            }, approach: (Farm + Vector3.back * 1.40f, "沿小路到馬鈴薯田找艾米爾"));
 
-            Scene("farm-meal", Location.Farmhouse, () =>
+            Scene("farm-meal", () =>
             {
                 var table = Table(Meal);
                 var doorstep = terrain.Ground(Meal + new Vector3(.81f, 0, -2.61f));
@@ -655,13 +656,14 @@ namespace Puzzle.Story
                 Arrive(terrain.Ground(Meal + new Vector3(.15f, 0, -3.85f)), doorstep);
                 Answer(vincent, "請梵谷停下來休息", () =>
                     Ask("梵谷", "可我總覺得一停下來，就像放棄了他們。", _ =>
-                        Travel(Meal + Vector3.back * 1.44f, table.transform.position, JoinTable, "進到農舍　・　請梵谷一起坐下用餐"),
+                        WalkTo(Meal + Vector3.back * .90f, "走進農舍，到餐桌旁和梵谷一起坐下", JoinTable),
                         "先坐下吃一點。", "你不能一個人扛下所有人的生活。"));
                 void JoinTable()
                 {
                     vincent.transform.position = FindClearFooting(Meal + new Vector3(.88f, 0, .42f), .25f, 1.5f);
                     var card = TableSketch("餐桌上的畫片", table, .52f, .35f);
                     ClearTargets();
+                    Goal("在餐桌旁畫一件餐具給梵谷");
                     BrushAt(card, "畫一件餐具給梵谷", option =>
                     {
                         card.SetActive(false);
@@ -670,9 +672,9 @@ namespace Puzzle.Story
                         PauseTogether(4f, () => Speak(Next, "梵谷|謝謝你提醒我。我希望明天還能有力氣站在這裡。"));
                     }, false, new Ink("餐盤", Mask.Circle, Linen), new Ink("水杯", Mask.Pot, Blue));
                 }
-            }, "雨後　・　回農舍歇腳");
+            }, approach: (Meal + Vector3.back * 3.65f, "離開農田，到農舍門前找梵谷歇腳"));
 
-            Scene("potato-painting", Location.Farmhouse, () =>
+            Scene("potato-painting", () =>
             {
                 var table = Table(Meal);
                 Vincent(Meal + new Vector3(1.06f, 0, .54f));
@@ -695,9 +697,9 @@ namespace Puzzle.Story
                     FreeLayer()),
                     "梵谷|我想記下這一幕。每個人都用自己的雙手換來這頓飯。",
                     "露絲|你要畫得像我們。別把我們畫成只會低頭的人。");
-            }, "晚餐時分　・　移到畫架旁，看向燈下的餐桌");
+            }, cut: "晚餐時分　・　燈下的農家餐桌");
 
-            Scene("miner-helped", Location.Mine, () =>
+            Scene("miner-helped", () =>
             {
                 var vincent = Vincent(Mine + new Vector3(.57f, 0, .19f));
                 var card = EaselPicture("礦區的記憶畫片", Mine + new Vector3(-.62f, 0, .11f));
@@ -719,7 +721,7 @@ namespace Puzzle.Story
                     }, "別人的否定，不會抹掉你做過的事。", "也許你可以換一種方式留下他們的故事。"),
                         "一封關於傳教工作的信到了礦區。梵谷讀完，久久沒有說話。");
                 });
-            }, "入夜　・　礦口收到一封信");
+            }, cut: "入夜　・　礦口收到一封信");
         }
 
         GameObject Sack(Vector3 spot, string name)

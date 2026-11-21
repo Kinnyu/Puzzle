@@ -11,7 +11,7 @@ namespace Puzzle.Story
 
         void YellowHouseStory()
         {
-            Scene("yellow-reunion", Location.Studio, () =>
+            Scene("yellow-reunion", () =>
             {
                 Vincent(House + new Vector3(.95f, 0, -.05f));
                 var postman = Actor("郵差", third.NeighborSprite,
@@ -66,7 +66,7 @@ namespace Puzzle.Story
                 });
             });
 
-            Scene("yellow-arrange", Location.Studio, () =>
+            Scene("yellow-arrange", () =>
             {
                 var guest = Gauguin(House + new Vector3(-.78f, 0, .6f));
                 Vincent(House + new Vector3(.94f, 0, .66f));
@@ -96,9 +96,9 @@ namespace Puzzle.Story
                         "梵谷|我希望我們能一起畫出新的東西。",
                         "高更|一起工作可以，但不代表我們要用同一種方法。");
                 });
-            }, "稍後　・　高更抵達黃色小屋");
+            }, cut: "稍後　・　高更抵達黃色小屋");
 
-            Scene("alyscamps", Location.Cemetery, () =>
+            Scene("alyscamps", () =>
             {
                 Vincent(terrain.Ground(Cemetery + new Vector3(-.91f, 0, .27f)));
                 Gauguin(terrain.Ground(Cemetery + new Vector3(1.01f, 0, .26f)));
@@ -125,9 +125,9 @@ namespace Puzzle.Story
                     FreeLayer()),
                     "梵谷|我想畫出這條路上的光。你看樹幹旁那一片顏色。",
                     "高更|我想讓畫面更像記憶，而不是眼睛的紀錄。");
-            }, "外出寫生　・　阿里斯康墓園");
+            }, approach: (Cemetery + Vector3.forward * 2.06f, "沿小路前往阿里斯康墓園，和兩位畫家寫生"));
 
-            Scene("yellow-house-debate", Location.Studio, () =>
+            Scene("yellow-house-debate", () =>
             {
                 var vincent = Vincent(House + new Vector3(-.88f, 0, .55f));
                 var guest = Gauguin(House + new Vector3(.91f, 0, .55f));
@@ -156,9 +156,9 @@ namespace Puzzle.Story
                                 : "梵谷|先停一下吧。我剛剛說話太急了。");
                     }, false, new Ink("第二張畫架", Mask.Frame, Wood), new Ink("窗邊休息椅", Mask.Seat, Linen));
                 }, "高更|你太依賴眼前看見的東西。", "梵谷|而你總想把眼前的東西改成自己的想像！");
-            }, "寫生回來　・　黃色小屋的畫室");
+            }, approach: (House + Vector3.back * .70f, "寫生結束，回黃色小屋的畫室找梵谷和高更"));
 
-            Scene("yellow-understanding", Location.Studio, () =>
+            Scene("yellow-understanding", () =>
             {
                 Vincent(House + new Vector3(-1.06f, 0, .74f));
                 Gauguin(House + new Vector3(1.03f, 0, .74f));
@@ -182,9 +182,9 @@ namespace Puzzle.Story
                 }, Layer("塗出對照板左側的現場景物", Mask.Road, Green),
                     Layer("塗出對照板右側的想像色塊", Mask.Cloth, Gold)),
                     "高更|我批評的是方法，不是說你沒有價值。");
-            }, "稍後　・　轉到側牆前並看兩種畫法");
+            }, approach: (House + new Vector3(1.46f, 0, -.27f), "到畫室右牆前，看看兩人的畫法"));
 
-            Scene("yellow-house-retry", Location.Studio, () =>
+            Scene("yellow-house-retry", () =>
             {
                 Vincent(House + new Vector3(.85f, 0, .36f));
                 var neighbor = Actor("鄰居", third.NeighborSprite,
@@ -222,9 +222,9 @@ namespace Puzzle.Story
                     }, true, new Ink("畫室工具", Mask.Board, Linen));
                 }, "夜深了。高更決定先離開黃色小屋。",
                     "梵谷|我以為這個家會讓我們都留下來。是不是我又把一切搞砸了？");
-            }, "深夜　・　高更離開後的黃色小屋");
+            }, cut: "深夜　・　高更離開後的黃色小屋");
 
-            Scene("yellow-goodbye", Location.Studio, () =>
+            Scene("yellow-goodbye", () =>
             {
                 var doorstep = terrain.Ground(village.Door + new Vector3(1.32f, 0, -.85f));
                 var vincent = Vincent(doorstep);
@@ -249,7 +249,7 @@ namespace Puzzle.Story
                             "1888 年，梵谷與高更在亞爾共同生活與創作。梵谷經歷精神危機後接受照護，此後仍持續作畫。");
                     }, false, new Ink("並排的兩幅畫框", Mask.Frame, Wood), new Ink("一張空白畫布", Mask.Panel, Linen));
                 }, "梵谷|我想念一起畫畫的日子，也知道我們可能不適合住在一起。");
-            }, "次日上午　・　高更離去後，小屋門前");
+            }, cut: "次日上午　・　高更離去後，小屋門前");
         }
 
         GameObject StudioWallPicture(string name, float z, Texture2D art, float width = .80f, float height = .62f)
