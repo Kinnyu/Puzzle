@@ -70,12 +70,9 @@ namespace Puzzle.Story
 
         internal ChapterFourScenery CreateExpandedScenery(ChapterThreeScenery village, Transform parent)
         {
-            var result = new ChapterFourScenery(parent, terrain.Ground, clinicLot.transform.position,
+            return new ChapterFourScenery(parent, terrain.Ground, clinicLot.transform.position,
                 galleryLot.transform.position, village.House,
-                new[] { starryNight, potatoEaters, village.Study(PaintingStudy.All) });
-            clinicLot.SetActive(false);
-            galleryLot.SetActive(false);
-            return result;
+                new[] { starryNight, potatoEaters, village.Study(PaintingStudy.All) }, terrain.PaintedProps, terrain.Models);
         }
 
         readonly List<Interaction> interactions = new();
@@ -111,9 +108,7 @@ namespace Puzzle.Story
             oldVillage = previous.GetVillageScenery();
             exhibitArt = new[] { starryNight, potatoEaters, oldVillage.Study(progress.LoadCemeteryStudy()) };
             scenery = new ChapterFourScenery(transform, terrain.Ground, clinicLot.transform.position, galleryLot.transform.position,
-                oldVillage.House, exhibitArt);
-            clinicLot.SetActive(false);
-            galleryLot.SetActive(false);
+                oldVillage.House, exhibitArt, terrain.PaintedProps, terrain.Models);
             vincent = Actor("Vincent - Chapter 4", vincentSprite);
             theo = Actor("Theo - Chapter 4", theoSprite);
             doctor = Actor("Saint-Rémy physician", doctorSprite);

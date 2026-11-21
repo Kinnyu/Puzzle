@@ -1,6 +1,10 @@
 Shader "Starry Night/Metre Scale Oil"
 {
-    Properties { _Paint ("Bristle and pigment tile", 2D) = "white" {} }
+    Properties
+    {
+        _Paint ("Bristle and pigment tile", 2D) = "white" {}
+        [MainColor] _Color ("Pigment tint", Color) = (1,1,1,1)
+    }
     SubShader
     {
         Tags { "RenderPipeline"="UniversalPipeline" "RenderType"="Opaque" }
@@ -13,6 +17,9 @@ Shader "Starry Night/Metre Scale Oil"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl"
             #include "OilPigment.hlsl"
+            CBUFFER_START(UnityPerMaterial)
+                half4 _Color;
+            CBUFFER_END
             struct Input { float4 position : POSITION; float3 normal : NORMAL; float2 metres : TEXCOORD0; float4 base : COLOR; float3 accent : TEXCOORD1; float3 edge : TEXCOORD2; };
             struct Output { float4 clip : SV_POSITION; float2 metres : TEXCOORD0; float3 pos : TEXCOORD1; float4 base : COLOR; float3 accent : TEXCOORD2; float3 edge : TEXCOORD3; float3 normal : TEXCOORD4; };
             Output Vert(Input v)
@@ -30,8 +37,10 @@ Shader "Starry Night/Metre Scale Oil"
             half4 Frag(Output i) : SV_Target
             {
                 float family = i.base.a*255.;
-                float3 imp = SurfacePaint(i.metres, family > 2.5 && family < 3.5);
-                float3 pigment = OilColour(i.metres, i.pos, i.base.rgb, i.accent, i.base.a*255., imp, imp.b, distance(_WorldSpaceCameraPos, i.pos));
+                float eyeDistance = distance(_WorldSpaceCameraPos, i.pos);
+                float closeWidth = family < .5 ? NearWallWidth(eyeDistance) : 1.;
+                float3 imp = SurfacePaint(i.metres, family > 2.5 && family < 3.5, closeWidth);
+                float3 pigment = OilColour(i.metres, i.pos, i.base.rgb, i.accent, i.base.a*255., imp, imp.b, eyeDistance);
                 // Only authored contour edges carry a finite metric distance. Quad diagonals stay clear.
                 float3 pixel = max(fwidth(i.edge), .0001);
                 float width = (family < .5 ? .056 : .090) * (.84 + .32*imp.r);
@@ -49,7 +58,7 @@ Shader "Starry Night/Metre Scale Oil"
                 #ifndef UNITY_COLORSPACE_GAMMA
                     pigment = SRGBToLinear(saturate(pigment));
                 #endif
-                return half4(pigment,1);
+                return half4(pigment * _Color.rgb,1);
             }
             ENDHLSL
         }

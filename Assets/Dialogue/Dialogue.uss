@@ -1,3 +1,5 @@
+@import url("../Story/UI/PaintedTown.uss");
+
 .dialogue-root {
     position: absolute;
     left: 0;
@@ -174,11 +176,11 @@
 }
 
 .dialogue-control, .dialogue-action {
-    background-color: #24334c;
+    background-color: #2d405d;
     color: #f6edd7;
     border-width: 1px;
-    border-color: #526483;
-    border-radius: 6px;
+    border-color: #7f8ba1;
+    border-radius: 2px;
     padding: 6px 12px;
     font-size: 16px;
 }

@@ -14,6 +14,8 @@ namespace Puzzle.Story
         readonly Transform root;
         readonly List<Material> materials = new();
         readonly Texture2D[] studies = new Texture2D[8];
+        readonly Material paintedProps;
+        readonly PeriodModels models;
         Material vincentCanvas;
         internal Vector3 House { get; }
         internal Vector3 Door => House + new Vector3(0f, 0f, -2.05f);
@@ -23,53 +25,30 @@ namespace Puzzle.Story
         internal Vector3 Stone { get; }
 
         internal ChapterThreeScenery(Transform parent, Func<Vector3, Vector3> ground, Vector3 house,
-            Vector3 cemetery, Texture2D gauguin)
+            Vector3 cemetery, Texture2D gauguin, Material paintedProps, PeriodModels models)
         {
+            this.paintedProps = paintedProps;
+            this.models = models;
             this.ground = ground;
             root = new GameObject("Chapter 3 scenery").transform;
             root.SetParent(parent);
-            House = ground(house) + Vector3.up * .12f;
+            House = house;
             Cemetery = ground(cemetery);
             Leaves = ground(Cemetery + new Vector3(1.15f, 0f, -3f));
             Stone = ground(Cemetery + new Vector3(-.65f, 0f, -6f));
-            BuildHouse(gauguin);
+            FurnishStudio(gauguin);
             BuildCemetery();
         }
 
-        void BuildHouse(Texture2D gauguin)
+        void FurnishStudio(Texture2D gauguin)
         {
-            var plaster = Surface("Ochre plaster", new Color(.78f, .55f, .24f));
-            var tiles = Surface("Terracotta", new Color(.37f, .15f, .11f));
             var walnut = Surface("Walnut", new Color(.26f, .16f, .13f));
             var trim = Surface("Shutter green", new Color(.16f, .29f, .24f));
-            var interior = Surface("Amber window", new Color(.92f, .72f, .36f), true);
-            var wallStone = Surface("Foundation", new Color(.43f, .38f, .31f));
-            Box("Yellow House floor", House + Vector3.down * .07f, new Vector3(5.25f, .14f, 3.95f), wallStone);
-            HouseBox("Rear wall", 0, 1.48f, 1.98f, 5.25f, 2.96f, .16f, plaster);
-            HouseBox("West wall", -2.55f, 1.48f, 0, .16f, 2.96f, 3.95f, plaster);
-            HouseBox("East wall", 2.55f, 1.48f, 0, .16f, 2.96f, 3.95f, plaster);
-            for (int side = -1; side <= 1; side += 2)
-            {
-                HouseBox("Door side", side * 1.66f, 1.48f, -1.98f, 1.82f, 2.96f, .16f, plaster);
-                HouseBox("Window frame", side * 1.71f, 1.75f, -2.075f, .87f, .99f, .07f, trim, false);
-                HouseBox("Lit window", side * 1.71f, 1.75f, -2.119f, .67f, .77f, .015f, interior, false);
-                HouseBox("Window mullion", side * 1.71f, 1.75f, -2.134f, .044f, .77f, .019f, trim, false);
-                HouseBox("Window transom", side * 1.71f, 1.75f, -2.134f, .67f, .045f, .019f, trim, false);
-                var roof = HouseBox("Roof tiles", 0, 3.42f, side * .97f, 5.62f, .19f, 2.25f, tiles, false);
-                roof.transform.rotation = Quaternion.Euler(side * 24f, 0f, 0f);
-            }
-            HouseBox("Roof ridge", 0, 3.87f, 0, 5.6f, .14f, .22f, tiles, false);
-            HouseBox("Lintel", 0, 2.61f, -1.98f, 1.51f, .70f, .16f, plaster);
+            var interior = Surface("Drawing paper", new Color(.92f, .82f, .63f));
             HouseBox("Welcome mat", 0, .012f, -1.58f, 1.03f, .02f, .59f, trim, false);
             HouseBox("Writing desk", -1.76f, .42f, -.92f, .92f, .84f, .63f, walnut);
             HouseBox("Desk top", -1.76f, .86f, -.92f, 1.04f, .08f, .76f, walnut, false);
-            HouseBox("Chair seat", -1.71f, .46f, -.3f, .43f, .10f, .43f, trim, false);
-            HouseBox("Chair back", -1.71f, .69f, -.1f, .43f, .45f, .08f, trim, false);
-            for (int side = -1; side <= 1; side += 2)
-            {
-                HouseBox("Chair leg", -1.71f + side * .16f, .22f, -.46f, .06f, .44f, .06f, trim, false);
-                HouseBox("Chair leg", -1.71f + side * .16f, .22f, -.14f, .06f, .44f, .06f, trim, false);
-            }
+            models.Place(models.chair, root, House + new Vector3(-1.71f, 0, -.30f));
             HouseBox("Stack of papers", -1.76f, .914f, -.96f, .24f, .027f, .33f, interior, false);
             var lamp = new GameObject("Studio light").AddComponent<Light>();
             lamp.transform.SetParent(root);
@@ -98,47 +77,77 @@ namespace Puzzle.Story
             return material;
         }
 
-        Material gravel, stone, copper, gold, leaf;
+        Material gravel, stone, poplar, leaf;
+        Mesh cemeteryLane;
+
+        void LayAvenue()
+        {
+            // Sample both verges and the centre so the autumn walk follows the existing ground.
+            const int strips = 24;
+            var vertices = new Vector3[(strips + 1) * 3];
+            var uv = new Vector2[vertices.Length];
+            var indices = new int[strips * 12];
+            for (int row = 0; row <= strips; row++)
+            {
+                float z = 2.55f - row * .62f;
+                for (int col = 0; col < 3; col++)
+                {
+                    float x = (col - 1) * 1.22f;
+                    int k = row * 3 + col;
+                    vertices[k] = ground(Cemetery + new Vector3(x, 0, z)) - Cemetery + Vector3.up * .02f;
+                    uv[k] = new Vector2(x, z);
+                    if (row == strips || col == 2) continue;
+                    int t = (row * 2 + col) * 6;
+                    indices[t] = k; indices[t + 1] = k + 1; indices[t + 2] = k + 3;
+                    indices[t + 3] = k + 1; indices[t + 4] = k + 4; indices[t + 5] = k + 3;
+                }
+            }
+            cemeteryLane = new Mesh { name = "Alyscamps avenue", vertices = vertices, uv = uv, triangles = indices };
+            cemeteryLane.RecalculateNormals();
+            models.Place(cemeteryLane, root, Cemetery, material: gravel);
+
+            for (int row = 0; row < strips; row += 2)
+            {
+                int k = row * 3;
+                Vector3 across = vertices[k + 2] - vertices[k];
+                Vector3 along = vertices[k + 7] - vertices[k + 1];
+                var leaves = models.Place(models.leafLitter, root, Cemetery + vertices[k + 4] + Vector3.up * .012f, material: leaf);
+                leaves.transform.rotation = Quaternion.FromToRotation(Vector3.up, Vector3.Cross(across, along).normalized)
+                    * Quaternion.Euler(0, row % 4 == 0 ? 0 : 180, 0);
+            }
+        }
 
         void BuildCemetery()
         {
             gravel = Surface("Alyscamps gravel", new Color(.49f, .37f, .25f));
-            stone = Surface("Weathered limestone", new Color(.47f, .45f, .40f));
-            var bark = Surface("Poplar bark", new Color(.26f, .17f, .12f));
-            copper = Surface("Copper leaves", new Color(.73f, .36f, .09f));
-            gold = Surface("Golden leaves", new Color(.91f, .60f, .17f));
-            leaf = Surface("Fallen leaves", new Color(.91f, .56f, .16f));
-            for (int i = 0; i < 8; i++)
-            {
-                var path = ground(Cemetery + Vector3.back * (i - 1) * 1.28f);
-                Box("Gravel lane", path + Vector3.up * .018f, new Vector3(2.4f, .024f, 1.30f), gravel, false);
-            }
+            stone = new Material(models.pigment);
+            poplar = new Material(models.pigment);
+            materials.Add(stone);
+            materials.Add(poplar);
+            leaf = new Material(models.pigment);
+            materials.Add(leaf);
+            LayAvenue();
             for (int side = -1; side <= 1; side += 2)
             {
                 for (int i = 0; i < 4; i++)
                 {
                     var tree = ground(Cemetery + new Vector3(side * (1.87f + (i % 2) * .25f), 0, -.7f - i * 2.33f));
-                    Primitive(PrimitiveType.Cylinder, "Poplar trunk", tree + Vector3.up * 1.40f,
-                        new Vector3(.33f, 1.4f, .33f), bark, true);
-                    Primitive(PrimitiveType.Sphere, "Autumn crown", tree + new Vector3(0, 3.6f, 0),
-                        new Vector3(1.13f, 3.05f, 1.29f), copper, false);
-                    Primitive(PrimitiveType.Sphere, "Golden crown", tree + new Vector3(side * -.24f, 3.5f, -.12f),
-                        new Vector3(.99f, 2.55f, 1.16f), gold, false);
+                    var poplarTree = models.Place(models.poplar, root, tree, "Alyscamps poplar", poplar);
+                    poplarTree.transform.rotation = Quaternion.Euler(0, (side * 41 + i * 73), 0);
+                    poplarTree.transform.localScale = Vector3.one * (1f + .04f * ((i + side + 1) % 3));
+                    var trunk = poplarTree.AddComponent<CapsuleCollider>();
+                    trunk.center = Vector3.up * 1.35f;
+                    trunk.height = 2.7f;
+                    trunk.radius = .17f;
                 }
             }
             for (int i = 0; i < 3; i++)
             {
-                var tomb = ground(Cemetery + new Vector3(-1.88f, 0f, -3.5f - 2.31f * i));
-                Box("Sarcophagus", tomb + Vector3.up * .30f, new Vector3(.76f, .61f, 1.62f), stone);
-                Box("Stone lid", tomb + Vector3.up * .64f, new Vector3(.86f, .16f, 1.73f), stone, false);
-            }
-            var scatter = new System.Random(1888);
-            for (int i = 0; i < 30; i++)
-            {
-                var point = ground(Cemetery + new Vector3((float)scatter.NextDouble() * 3.3f - 1.65f, 0,
-                    -(float)scatter.NextDouble() * 8.4f));
-                var fallen = Box("Fallen leaf", point + Vector3.up * .036f, new Vector3(.11f, .012f, .19f), leaf, false);
-                fallen.transform.rotation = Quaternion.Euler(0, scatter.Next(180), 0);
+                var tomb = ground(Cemetery + new Vector3(-2.70f, 0f, -1.84f - 2.33f * i));
+                var trough = models.Place(models.sarcophagus, root, tomb, material: stone);
+                var body = trough.AddComponent<BoxCollider>();
+                body.center = Vector3.up * .25f;
+                body.size = new Vector3(.76f, .50f, 1.66f);
             }
         }
 
@@ -147,12 +156,11 @@ namespace Puzzle.Story
             if ((elements & PaintingStudy.Perspective) != 0)
                 EaseColor(gravel, new Color(.70f, .47f, .24f), blend);
             if ((elements & PaintingStudy.Stone) != 0)
-                EaseColor(stone, new Color(.60f, .52f, .73f), blend);
+                EaseColor(stone, new Color(.93f, .85f, 1f), blend);
             if ((elements & PaintingStudy.Leaves) != 0)
             {
-                EaseColor(copper, new Color(.94f, .34f, .12f), blend);
-                EaseColor(gold, new Color(1f, .78f, .22f), blend);
-                EaseColor(leaf, new Color(1f, .74f, .23f), blend);
+                EaseColor(poplar, new Color(1f, .86f, .65f), blend);
+                EaseColor(leaf, new Color(1f, .88f, .64f), blend);
             }
         }
 
@@ -180,10 +188,9 @@ namespace Puzzle.Story
 
         Material Surface(string name, Color color, bool unlit = false)
         {
-            var shader = Shader.Find(unlit ? "Universal Render Pipeline/Unlit" : "Universal Render Pipeline/Lit");
-            var material = new Material(shader) { name = name };
+            var material = unlit ? new Material(Shader.Find("Universal Render Pipeline/Unlit")) : new Material(paintedProps);
+            material.name = name;
             material.SetColor("_BaseColor", color);
-            if (!unlit) material.SetFloat("_Smoothness", .11f);
             materials.Add(material);
             return material;
         }
@@ -277,6 +284,7 @@ namespace Puzzle.Story
         public void Dispose()
         {
             foreach (Material material in materials) Object.Destroy(material);
+            if (cemeteryLane != null) Object.Destroy(cemeteryLane);
             foreach (Texture2D study in studies) if (study != null) Object.Destroy(study);
             if (root != null) Object.Destroy(root.gameObject);
         }

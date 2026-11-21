@@ -7,7 +7,14 @@ float3 SamplePaintLevel(float2 uv, float2 dx, float2 dy, float2 scale)
     return SAMPLE_TEXTURE2D_GRAD(_Paint, sampler_Paint, uv*scale, dx*scale, dy*scale).rgb;
 }
 
-float3 SurfacePaint(float2 metres, bool lane)
+// Gradually widen wall dabs across their short axis all the way to player clearance.
+float NearWallWidth(float distanceMetres)
+{
+    float proximity = saturate(1.0 - distanceMetres / 2.0);
+    return 1.0 + 1.7 * proximity * proximity;
+}
+
+float3 SurfacePaint(float2 metres, bool lane, float closeWidth)
 {
     float2 uv = metres + .12*sin(metres.yx*.72 + .42*sin(metres*.91));
     float2 dx = ddx(uv), dy = ddy(uv);
@@ -21,6 +28,7 @@ float3 SurfacePaint(float2 metres, bool lane)
     float2 metresPerPixel = float2(along, across);
     // The street's long, receding marks need a wider footprint at walking height.
     float2 tileSpanInScreenHeights = lane ? float2(.85, 1.32) : float2(.76, 1.08);
+    tileSpanInScreenHeights *= float2(sqrt(closeWidth), closeWidth);
     float2 lod = log2(max(metresPerPixel * GetScaledScreenParams().y * tileSpanInScreenHeights, .00001));
     float2 fine = exp2(-floor(lod));
     float2 blend = frac(lod);

@@ -113,8 +113,7 @@ namespace Puzzle.Story
         {
             if (scenery != null) return scenery;
             scenery = new ChapterThreeScenery(transform, previousChapter.Ground, cottage.transform.position,
-                cemetery, gauguinPainting);
-            cottage.SetActive(false);
+                cemetery, gauguinPainting, previousChapter.PaintedProps, previousChapter.Models);
             return scenery;
         }
 

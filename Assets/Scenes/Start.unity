@@ -150,7 +150,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Puzzle.Story.StoryStartMenu
   font: {fileID: 12800000, guid: cafdc8ada718a6243a4caed82d90c1a7, type: 3}
-  cover: {fileID: 2800000, guid: 6d73ea4782e89d047a734bdc3bf7f3b9, type: 3}
+  cover: {fileID: 2800000, guid: 6aa54bedc73a4bb6be174381123cd7a4, type: 3}
 --- !u!114 &285149646
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -28,6 +28,16 @@ namespace Puzzle.Story
         [SerializeField] Vector3 road = new(21, 0, 0);
         [SerializeField] Collider[] groundSurfaces;
 
+        [SerializeField] Transform churchInterior, workersHome, farmhouse;
+        [SerializeField] Material paintedProps;
+        [SerializeField] Texture2D canvasGrain;
+        [SerializeField] PeriodModels periodModels;
+        internal PeriodModels Models => periodModels;
+        internal Texture2D CanvasGrain => canvasGrain;
+        internal Material PaintedProps => paintedProps;
+        internal Vector3 SideAisle => churchInterior.position + Vector3.left * .8f;
+        internal Vector3 WorkersHome => workersHome.position;
+        internal Vector3 Farmhouse => farmhouse.position;
         internal Vector3 Church => church;
         internal Vector3 Mine => mine;
         internal Vector3 Farm => farm;
@@ -78,9 +88,8 @@ namespace Puzzle.Story
             farmer = SpawnActor("Farmer", farmerSprite, farm);
             theo = SpawnActor("Theo", theoSprite, road);
 
-            var shader = Shader.Find("Universal Render Pipeline/Lit");
-            drySoil = new Material(shader) { color = new Color(0.46f, 0.28f, 0.14f) };
-            tilledSoil = new Material(shader) { color = new Color(0.20f, 0.11f, 0.07f) };
+            drySoil = new Material(paintedProps) { color = new Color(0.46f, 0.28f, 0.14f) };
+            tilledSoil = new Material(paintedProps) { color = new Color(0.20f, 0.11f, 0.07f) };
             for (int i = 0; i < rows.Length; i++)
             {
                 var row = GameObject.CreatePrimitive(PrimitiveType.Cube);

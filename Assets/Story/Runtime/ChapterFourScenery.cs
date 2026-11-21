@@ -10,7 +10,9 @@ namespace Puzzle.Story
         readonly Transform root;
         readonly Func<Vector3, Vector3> ground;
         readonly List<Material> materials = new();
-        readonly Material timber, linen, brass, leaf;
+        readonly Material paintedProps;
+        readonly PeriodModels models;
+        readonly Material timber, linen, leaf;
         internal readonly Vector3 Clinic, Gallery, House, Cypress, Gift;
         internal readonly Vector3[] Inspiration, Paintings, Display, Tools;
         internal readonly GameObject[] Copies = new GameObject[3], Exhibits = new GameObject[3],
@@ -19,22 +21,21 @@ namespace Puzzle.Story
         internal Texture2D GiftPainting { get; }
 
         internal ChapterFourScenery(Transform parent, Func<Vector3, Vector3> ground, Vector3 clinicLot, Vector3 galleryLot,
-            Vector3 house, Texture2D[] art)
+            Vector3 house, Texture2D[] art, Material paintedProps, PeriodModels models)
         {
+            this.paintedProps = paintedProps;
+            this.models = models;
             this.ground = ground;
             root = new GameObject("Chapter 4 scenery").transform;
             root.SetParent(parent);
             House = house;
-            Clinic = ground(clinicLot) + Vector3.up * .11f;
-            Gallery = ground(galleryLot) + Vector3.up * .11f;
+            Clinic = clinicLot;
+            Gallery = galleryLot;
             Cypress = ground(Clinic + new Vector3(-2.85f, 0f, -3.7f));
             Gift = ground(new Vector3(House.x + 1.9f, 0f, House.z - 3.05f));
             timber = Material("Dark oak", new Color(.27f, .18f, .14f));
-            linen = Material("Canvas linen", new Color(.87f, .80f, .64f), true);
-            brass = Material("Old brass", new Color(.76f, .50f, .21f));
+            linen = Material("Canvas linen", new Color(.87f, .80f, .64f));
             leaf = Material("Cypress green", new Color(.12f, .25f, .21f));
-            Room("Clinic", Clinic, new Color(.54f, .65f, .63f));
-            Room("Gallery", Gallery, new Color(.74f, .57f, .34f));
             ClinicDetails();
             SpringTree();
             GiftPainting = PaintBlossoms();
@@ -57,42 +58,13 @@ namespace Puzzle.Story
             Tools = new[] { House + new Vector3(1.80f, 0, .78f), House + new Vector3(-.94f, 0, -.98f),
                 House + new Vector3(1.77f, 0, -.95f), House + new Vector3(-1.50f, 0, .90f) };
             Supplies[0] = Box("Blank canvas", Tools[0] + Vector3.up * .54f, new Vector3(.59f, .69f, .10f), linen, false);
-            Supplies[1] = Box("Brushes", Tools[1] + new Vector3(-.79f, .918f, .06f), new Vector3(.23f, .036f, .17f), brass, false);
-            Supplies[2] = Box("Paint box", Tools[2] + Vector3.up * .24f, new Vector3(.4f, .3f, .29f), brass, false);
-            Supplies[3] = Easel(Tools[3] + Vector3.left * .32f);
+            Supplies[1] = models.Place(models.brushes, root, House + new Vector3(-1.70f, .922f, -.93f));
+            Supplies[2] = models.Place(models.paints, root, Tools[2] + Vector3.up * .025f);
+            Supplies[3] = models.Place(models.easel, root, Tools[3] + Vector3.left * .32f);
             Vector3 stand = ground(Gift + new Vector3(.76f, 0, .38f));
-            Setup[0] = Easel(stand);
+            Setup[0] = models.Place(models.easel, root, stand);
             Setup[1] = Canvas("Spring canvas", stand + new Vector3(0f, 1.16f, -.19f), null, .69f, .53f);
-            Setup[2] = Box("Painting palette", stand + new Vector3(-.37f, .63f, -.22f),
-                new Vector3(.22f, .048f, .15f), brass, false);
-        }
-
-        void Room(string name, Vector3 center, Color color)
-        {
-            var wall = Material(name + " walls", color);
-            var floor = Material(name + " flooring", new Color(.36f, .28f, .22f));
-            var roof = Material(name + " roof", new Color(.22f, .27f, .29f));
-            Box(name + " floor", center + Vector3.down * .08f, new Vector3(5.5f, .16f, 4.4f), floor);
-            Box(name + " rear wall", center + new Vector3(0, 1.40f, 2.16f), new Vector3(5.5f, 2.8f, .16f), wall);
-            for (int sign = -1; sign <= 1; sign += 2)
-            {
-                Box(name + " side wall", center + new Vector3(sign * 2.67f, 1.4f, 0),
-                    new Vector3(.16f, 2.8f, 4.4f), wall);
-                Box(name + " facade", center + new Vector3(sign * 1.78f, 1.4f, -2.16f),
-                    new Vector3(1.94f, 2.8f, .16f), wall);
-                Box(name + " window", center + new Vector3(sign * 1.78f, 1.66f, -2.26f),
-                    new Vector3(.70f, .81f, .033f), linen, false);
-            }
-            Box(name + " lintel", center + new Vector3(0, 2.53f, -2.16f), new Vector3(1.65f, .54f, .16f), wall);
-            Box(name + " roof", center + new Vector3(0, 2.85f, 0), new Vector3(5.72f, .16f, 4.58f), roof, false);
-            Box(name + " threshold", center + new Vector3(0, -.06f, -2.25f), new Vector3(1.64f, .12f, .32f), floor);
-            var lamp = new GameObject(name + " light").AddComponent<Light>();
-            lamp.transform.SetParent(root);
-            lamp.transform.position = center + new Vector3(0, 2.48f, .05f);
-            lamp.type = LightType.Point;
-            lamp.color = new Color(1f, .82f, .58f);
-            lamp.range = 5.1f;
-            lamp.intensity = 1.8f;
+            Setup[2] = models.Place(models.palette, root, stand + new Vector3(-.15f, .824f, -.047f));
         }
 
         void ClinicDetails()
@@ -101,57 +73,23 @@ namespace Puzzle.Story
                 new Vector3(1.16f, .5f, .82f), timber);
             Box("Clinic blanket", Clinic + new Vector3(-1.85f, .55f, 1.22f),
                 new Vector3(1.16f, .10f, .82f), linen, false);
-            Easel(Clinic + new Vector3(2.05f, 0, .31f));
+            models.Place(models.easel, root, Clinic + new Vector3(2.05f, 0, .31f));
             Box("Window sill", Clinic + new Vector3(-1.78f, 1.21f, -2.03f),
                 new Vector3(.83f, .09f, .16f), timber, false);
             Box("Window interior", Clinic + new Vector3(-1.78f, 1.68f, -2.07f),
                 new Vector3(.66f, .8f, .025f), leaf, false);
-            TreeTrunk("Clinic cypress", Cypress, 2.8f, .35f);
-            Part(PrimitiveType.Sphere, "Cypress crown", Cypress + Vector3.up * 2.32f,
-                new Vector3(1.1f, 4.55f, 1.05f), leaf, false);
+            Plant(models.cypress, Cypress, .17f);
         }
 
-        void SpringTree()
-        {
-            var blossom = Material("Almond bloom", new Color(.91f, .66f, .65f));
-            var pearl = Material("Almond petal", new Color(.95f, .84f, .77f));
-            Vector3 tree = ground(Gift + new Vector3(.97f, 0, .96f));
-            TreeTrunk("Almond tree trunk", tree, 2.2f, .34f);
-            var random = new System.Random(1890);
-            for (int i = 0; i < 14; i++)
-            {
-                float angle = i * 2.39996f;
-                float r = .30f + (float)random.NextDouble() * .74f;
-                Vector3 point = tree + new Vector3(Mathf.Cos(angle) * r, 2.17f + (float)random.NextDouble() * .77f,
-                    Mathf.Sin(angle) * r);
-                var branch = Box("Almond branch", (point + tree + Vector3.up * 1.65f) / 2f,
-                    new Vector3(.11f, Vector3.Distance(point, tree + Vector3.up * 1.65f), .09f), timber, false);
-                branch.transform.up = point - tree - Vector3.up * 1.65f;
-                Part(PrimitiveType.Sphere, "Almond blossoms", point, new Vector3(.72f, .43f, .66f),
-                    i % 3 == 0 ? pearl : blossom, false);
-            }
-        }
+        void SpringTree() => Plant(models.almond, ground(Gift + new Vector3(.97f, 0, .96f)), .13f);
 
-        void TreeTrunk(string name, Vector3 foot, float height, float diameter) =>
-            Part(PrimitiveType.Cylinder, name, foot + Vector3.up * height / 2f,
-                new Vector3(diameter, height / 2f, diameter), timber, true);
-
-        GameObject Easel(Vector3 foot)
+        void Plant(Mesh mesh, Vector3 foot, float radius)
         {
-            var stand = new GameObject("Easel");
-            stand.transform.SetParent(root);
-            stand.transform.position = foot;
-            for (int side = -1; side <= 1; side += 2)
-            {
-                GameObject leg = Box("Easel leg", foot + new Vector3(side * .20f, .71f, 0),
-                    new Vector3(.065f, 1.5f, .07f), timber, false);
-                leg.transform.SetParent(stand.transform, true);
-                leg.transform.rotation = Quaternion.Euler(-4, 0, side * 10);
-            }
-            GameObject support = Box("Easel ledge", foot + new Vector3(0, .88f, -.07f),
-                new Vector3(.65f, .065f, .14f), timber, false);
-            support.transform.SetParent(stand.transform, true);
-            return stand;
+            var tree = models.Place(mesh, root, foot);
+            var trunk = tree.AddComponent<CapsuleCollider>();
+            trunk.center = Vector3.up * .83f;
+            trunk.height = 1.66f;
+            trunk.radius = radius;
         }
 
         internal void FinishCanvas() => Setup[1].GetComponent<Renderer>().sharedMaterial.SetTexture("_BaseMap", GiftPainting);
@@ -194,8 +132,8 @@ namespace Puzzle.Story
 
         Material Material(string name, Color color, bool unlit = false)
         {
-            var shader = Shader.Find(unlit ? "Universal Render Pipeline/Unlit" : "Universal Render Pipeline/Lit");
-            var material = new Material(shader) { name = name };
+            var material = unlit ? new Material(Shader.Find("Universal Render Pipeline/Unlit")) : new Material(paintedProps);
+            material.name = name;
             material.SetColor("_BaseColor", color);
             materials.Add(material);
             return material;

@@ -5888,7 +5888,7 @@ MonoBehaviour:
   oak: {fileID: 2100000, guid: b945d998fa73ad54d862153a1428ee4e, type: 2}
   brass: {fileID: 2100000, guid: 129e6ad352062ad4babf248d2f956c4b, type: 2}
   teal: {fileID: 2100000, guid: 4ef200bcaf2f3ee4f989df2517e6a8c9, type: 2}
-  paperMaterial: {fileID: 2100000, guid: 5e038453226d5e143b36406a828ed63c, type: 2}
+  paperMaterial: {fileID: 2100000, guid: db69a2e1442a43158aee2a3f696d3795, type: 2}
   playerBody: {fileID: 1736826081}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

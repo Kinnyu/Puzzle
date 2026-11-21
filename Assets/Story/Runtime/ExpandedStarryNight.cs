@@ -58,12 +58,11 @@ namespace Puzzle.Story
         bool keepNearbyPosition;
 
         Vector3 Church => terrain.Ground(terrain.Church);
-        Vector3 Side => terrain.Ground(oldVincent + new Vector3(-.65f, 0, -1.25f));
-        Vector3 Mine => terrain.Ground(terrain.Mine + new Vector3(1.18f, 0, .03f));
-        Vector3 Farm => terrain.Ground(terrain.Farm + Vector3.forward * 3.2f);
+        Vector3 Side => terrain.SideAisle;
+        Vector3 Mine => terrain.Ground(terrain.Mine);
+        Vector3 Farm => terrain.Ground(terrain.Farm);
         Vector3 House => village.House;
         Vector3 Cemetery => terrain.Ground(village.Cemetery + Vector3.back * .66f);
-        Vector3 oldVincent;
         static readonly Color Wood = new(.47f, .29f, .15f);
         static readonly Color Linen = new(.83f, .73f, .53f);
         static readonly Color Gold = new(.97f, .69f, .24f);
@@ -84,15 +83,19 @@ namespace Puzzle.Story
             terrain = land;
             third = yellowHouse;
             fourth = gallery;
-            oldVincent = originalVincent.transform.position;
             youngVincent = originalVincent.GetComponentInChildren<SpriteRenderer>()?.sprite;
             originalVincent.gameObject.SetActive(false);
             dialogue.SceneInteractionPrompt = Interact;
             conversation = ScriptableObject.CreateInstance<DialogueConversation>();
             conversation.name = "星夜：劇本2";
-            var shader = Shader.Find("Universal Render Pipeline/Lit");
-            propMaterial = new Material(shader);
-            canvas = new StoryBrush(progress);
+            propMaterial = terrain.PaintedProps;
+            village = third.GetVillageScenery();
+            exhibition = fourth.CreateExpandedScenery(village, transform);
+            Visible(exhibition.Copies, false);
+            Visible(exhibition.Supplies, false);
+            Visible(exhibition.Setup, false);
+            ShowExhibition(false);
+            canvas = new StoryBrush(progress, terrain.CanvasGrain);
         }
 
         internal void Begin(string chapterId, string checkpoint)
@@ -116,13 +119,10 @@ namespace Puzzle.Story
                     break;
                 case "chapter-3":
                     chapterVincent = third.VincentSprite;
-                    village = third.GetVillageScenery();
                     YellowHouseStory();
                     break;
                 case "chapter-4":
                     chapterVincent = fourth.VincentSprite;
-                    village = third.GetVillageScenery();
-                    exhibition ??= fourth.CreateExpandedScenery(village, transform);
                     ExhibitionStory();
                     break;
             }
@@ -583,10 +583,23 @@ namespace Puzzle.Story
             return frame;
         }
 
+        GameObject Period(Mesh mesh, Vector3 point, string name = null) =>
+            terrain.Models.Place(mesh, scene.transform, point, name);
+
+        GameObject EaselPicture(string name, Vector3 center, float width = .80f, float height = .62f)
+        {
+            var frame = ImageProp(name, center, null, width, height);
+            var foot = center + new Vector3(0, -height * .5f - .815f, .07f);
+            var stand = Period(terrain.Models.easel, foot);
+            stand.transform.SetParent(frame.transform, true);
+            return frame;
+        }
+
         GameObject Seat(Vector3 foot, bool bench = false)
         {
-            float width = bench ? 1.55f : .48f;
-            var seat = Prop(bench ? "長椅" : "椅子", foot + Vector3.up * .45f,
+            if (!bench) return Period(terrain.Models.chair, foot, "草編椅");
+            const float width = 1.55f;
+            var seat = Prop("長椅", foot + Vector3.up * .45f,
                 new Vector3(width, .09f, .48f), Wood);
             var back = Prop("椅背", foot + new Vector3(0, .71f, .20f), new Vector3(width, .39f, .07f), Wood);
             back.transform.SetParent(seat.transform, true);
@@ -604,9 +617,9 @@ namespace Puzzle.Story
             return table;
         }
 
-        void Lamp(Vector3 point)
+        void Lamp(Vector3 point, Mesh model = null)
         {
-            var lamp = Prop("燈", point, new Vector3(.24f, .39f, .24f), Gold, PrimitiveType.Sphere);
+            var lamp = Period(model != null ? model : terrain.Models.oilLamp, point);
             var light = lamp.AddComponent<Light>();
             light.type = LightType.Point;
             light.color = new Color(1f, .74f, .40f);
@@ -618,11 +631,13 @@ namespace Puzzle.Story
         {
             const int width = 240, height = 150;
             var pixels = new Color32[width * height];
+            var grainTile = terrain.CanvasGrain;
+            var relief = grainTile.GetPixels32();
             for (int y = 0; y < height; y++)
             for (int x = 0; x < width; x++)
             {
                 Color color = draw(x / (float)width, y / (float)height);
-                float grain = ((x * 19 + y * 31) % 16 - 8) * .0035f;
+                float grain = (relief[(y % grainTile.height) * grainTile.width + x % grainTile.width].r / 255f - .5f) * .18f;
                 pixels[y * width + x] = color + new Color(grain, grain, grain, 0);
             }
             var texture = new Texture2D(width, height, TextureFormat.RGBA32, false) { name = title };
@@ -678,7 +693,6 @@ namespace Puzzle.Story
             canvas?.Dispose();
             exhibition?.Dispose();
             if (conversation != null) Destroy(conversation);
-            if (propMaterial != null) Destroy(propMaterial);
             foreach (var texture in illustrations) Destroy(texture);
         }
     }

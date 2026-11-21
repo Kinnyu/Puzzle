@@ -10,9 +10,9 @@ namespace Puzzle.Story
         GameObject Mary(Vector3 spot) => Actor("瑪莉", fourth.VisitorSprite(0), spot);
         GameObject Anna(Vector3 spot) => Actor("安娜", fourth.VisitorSprite(2), spot, Linen);
         GameObject Ruth(Vector3 spot) => Actor("露絲", fourth.VisitorSprite(1), spot);
-        Vector3 Bench => terrain.Ground(Side + new Vector3(.42f, 0, 1.05f));
-        Vector3 Family => terrain.Ground(Mine + new Vector3(1.08f, 0, .44f));
-        Vector3 Meal => terrain.Ground(Farm + new Vector3(-2.47f, 0, .42f));
+        Vector3 Bench => Side + new Vector3(.42f, 0, 1.05f);
+        Vector3 Family => terrain.WorkersHome;
+        Vector3 Meal => terrain.Farmhouse;
         Vector3 MineExit => terrain.Ground(Mine + new Vector3(1.65f, 0, .70f));
 
         void ChurchStory()
@@ -25,12 +25,19 @@ namespace Puzzle.Story
                 var cart = Prop("卡住的手推車", spot + Vector3.up * .51f, new Vector3(1.1f, .36f, .74f), Wood);
                 for (int side = -1; side <= 1; side += 2)
                 {
-                    var wheel = Prop("車輪", spot + new Vector3(side * .55f, .24f, 0),
-                        new Vector3(.50f, .07f, .50f), Wood, PrimitiveType.Cylinder);
-                    wheel.transform.rotation = Quaternion.Euler(0, 0, 90);
+                    var wheel = Period(terrain.Models.cartWheel, spot + new Vector3(side * .55f, .24f, 0), "車輪");
                     wheel.transform.SetParent(cart.transform, true);
                 }
-                Prop("車上的布料", spot + Vector3.up * .78f, new Vector3(.50f, .17f, .35f), Blue)
+                for (int side = -1; side <= 1; side += 2)
+                {
+                    Prop("車側木欄", spot + new Vector3(side * .51f, .77f, 0),
+                        new Vector3(.07f, .16f, .78f), Wood).transform.SetParent(cart.transform, true);
+                    Prop("推車握柄", spot + new Vector3(side * .41f, .58f, -.66f),
+                        new Vector3(.065f, .085f, .66f), Wood).transform.SetParent(cart.transform, true);
+                }
+                Period(terrain.Models.loaf, spot + new Vector3(-.28f, .74f, -.18f)).transform.SetParent(cart.transform, true);
+                Period(terrain.Models.book, spot + new Vector3(.28f, .71f, .14f)).transform.SetParent(cart.transform, true);
+                Period(terrain.Models.cloth, spot + Vector3.up * .75f, "車上的布料")
                     .transform.SetParent(cart.transform, true);
                 Arrive(spot + Vector3.back * 1.82f, spot);
                 Goal("看看廣場上卡住的推車");
@@ -92,8 +99,8 @@ namespace Puzzle.Story
                 for (int i = 0; i < supplies.Length; i++)
                 {
                     int index = i;
-                    var parcel = Prop(names[i], table.transform.position + new Vector3((i - 1) * .42f, .13f, 0),
-                        new Vector3(.31f, .15f, .24f), i == 0 ? Green : i == 1 ? Blue : Gold);
+                    var parcel = Period(i == 0 ? terrain.Models.book : i == 1 ? terrain.Models.cloth : terrain.Models.loaf,
+                        table.transform.position + new Vector3((i - 1) * .42f, .11f, 0), names[i]);
                     supplies[i] = (parcel, $"拿起{names[i]}並放到指定位置", () =>
                     {
                         if (first < 0) first = index;
@@ -342,7 +349,7 @@ namespace Puzzle.Story
                     BrushAt(sign, "畫出礦口照明或標記", option =>
                     {
                         Save("mine-light", option);
-                        if (option == 0) Lamp(sign.transform.position + Vector3.up * .4f);
+                        if (option == 0) Lamp(sign.transform.position + Vector3.up * .4f, terrain.Models.mineLamp);
                         else TurnSign(sign, Gold, "安全出口　→");
                         Speak(Next, "彼得|這樣好多了。進礦坑要聽熟手的，不要自己冒險。",
                             "梵谷|我原以為帶著熱情就夠了。原來還得學會聽。");
@@ -489,6 +496,7 @@ namespace Puzzle.Story
             {
                 var table = Table(Meal);
                 var vincent = Vincent(Meal + new Vector3(.88f, 0, .42f));
+                FarmLamp(table.transform.position);
                 Seat(Meal + new Vector3(-.92f, 0, .04f));
                 Arrive(Meal + Vector3.back * 1.44f, mealCenter());
                 Answer(vincent, "請梵谷停下來休息", () =>
@@ -512,9 +520,10 @@ namespace Puzzle.Story
                 Vincent(Meal + new Vector3(1.06f, 0, .54f));
                 Ruth(Meal + new Vector3(-.82f, 0, .49f));
                 Actor("艾米爾", terrain.FarmerSprite, Meal + new Vector3(-1.07f, 0, -.06f));
-                Lamp(table.transform.position + new Vector3(.13f, .48f, .04f));
+                FarmLamp(table.transform.position);
+                Period(terrain.Models.coffeePot, table.transform.position + new Vector3(.41f, .184f, .12f));
                 Dish(table.transform.position + new Vector3(-.20f, .09f, -.16f), 0);
-                var easel = ImageProp("農家晚餐畫布", Meal + new Vector3(.65f, 1.25f, .32f), null);
+                var easel = EaselPicture("農家晚餐畫布", Meal + new Vector3(.65f, 1.13f, .32f));
                 Arrive(Meal + Vector3.back * 1.44f, easel.transform.position);
                 Speak(() => Layers(easel, "和梵谷描畫農家的晚餐", choice =>
                 {
@@ -554,16 +563,26 @@ namespace Puzzle.Story
             });
         }
 
-        GameObject Sack(Vector3 spot, string name) => Prop(name, spot + Vector3.up * .31f,
-            new Vector3(.72f, .68f, .53f), new Color(.59f, .48f, .34f), PrimitiveType.Sphere);
+        GameObject Sack(Vector3 spot, string name)
+        {
+            var bag = Prop(name, spot + Vector3.up * .31f,
+                new Vector3(.72f, .62f, .53f), new Color(.59f, .48f, .34f), PrimitiveType.Sphere);
+            Prop("束起的袋口", spot + Vector3.up * .61f, new Vector3(.20f, .13f, .17f), Linen, PrimitiveType.Sphere)
+                .transform.SetParent(bag.transform, true);
+            Prop("麻繩", spot + Vector3.up * .57f, new Vector3(.18f, .017f, .16f), Wood, PrimitiveType.Cylinder)
+                .transform.SetParent(bag.transform, true);
+            return bag;
+        }
 
-        GameObject Basket(Vector3 spot) => Prop("收成籃", spot + Vector3.up * .17f,
-            new Vector3(.66f, .28f, .55f), Wood, PrimitiveType.Cylinder);
+        GameObject Basket(Vector3 spot)
+        {
+            return Period(terrain.Models.basket, spot + Vector3.up * .14f, "收成籃");
+        }
 
         GameObject Crop(Vector3 spot, bool ripe)
         {
-            var plant = Prop(ripe ? "成熟馬鈴薯" : "未成熟馬鈴薯", spot + Vector3.up * .24f,
-                new Vector3(.44f, .42f, .43f), ripe ? Green : new Color(.17f, .37f, .26f), PrimitiveType.Sphere);
+            var plant = Period(terrain.Models.crop, spot, ripe ? "成熟馬鈴薯" : "未成熟馬鈴薯");
+            if (!ripe) plant.transform.localScale = Vector3.one * .73f;
             if (ripe)
                 Prop("成熟標記", spot + new Vector3(.12f, .15f, -.23f), new Vector3(.08f, .28f, .045f), Linen)
                     .transform.SetParent(plant.transform, true);
@@ -575,18 +594,21 @@ namespace Puzzle.Story
             Pigment(plant.transform.position, basket.transform.position + Vector3.up * .22f, Gold);
             plant.SetActive(false);
             float angle = count * 2.4f;
-            Prop("收進籃子的馬鈴薯", basket.transform.position + new Vector3(Mathf.Cos(angle) * .19f, .29f,
+            Prop("收進籃子的馬鈴薯", basket.transform.position + new Vector3(Mathf.Cos(angle) * .14f, .07f + .014f * count,
                 Mathf.Sin(angle) * .15f), new Vector3(.17f, .12f, .14f), Gold, PrimitiveType.Sphere);
         }
 
-        void PlaceSupport(Vector3 point, int choice) => Prop(new[] { "麵包", "鍋子", "厚毯" }[choice], point,
-            choice == 2 ? new Vector3(.42f, .10f, .30f) : new Vector3(.34f, .19f, .26f),
-            choice == 0 ? Gold : choice == 1 ? Blue : Linen,
-            choice == 2 ? PrimitiveType.Cube : PrimitiveType.Sphere);
+        void FarmLamp(Vector3 table)
+        {
+            var point = table + new Vector3(.03f, 1.08f, .04f);
+            Prop("懸燈的屋樑", point + Vector3.up * .74f, new Vector3(5.43f, .15f, .16f), Wood);
+            Lamp(point, terrain.Models.pendant);
+        }
 
-        void Dish(Vector3 point, int choice) => Prop(choice == 0 ? "餐盤" : "杯子", point,
-            choice == 0 ? new Vector3(.36f, .025f, .36f) : new Vector3(.14f, .09f, .14f),
-            choice == 0 ? Linen : Blue, PrimitiveType.Cylinder);
+        void PlaceSupport(Vector3 point, int choice) =>
+            Period(choice == 0 ? terrain.Models.loaf : choice == 1 ? terrain.Models.stewPot : terrain.Models.cloth, point);
+
+        void Dish(Vector3 point, int choice) => Period(choice == 0 ? terrain.Models.platter : terrain.Models.coffeeCup, point);
 
         Texture2D ChurchArt(int choice) => MakeSketch("教堂速寫", (x, y) =>
         {

@@ -37,6 +37,7 @@ namespace Puzzle.Story
         readonly Image surface;
         readonly Button help;
         readonly Texture2D texture;
+        readonly float[] pigmentRelief = new float[Width * Height];
         readonly Color32[] pixels = new Color32[Width * Height];
         readonly bool[] mask = new bool[Width * Height];
         readonly bool[] visited = new bool[Width * Height];
@@ -60,8 +61,13 @@ namespace Puzzle.Story
         internal bool IsReview => IsOpen && review;
         internal Texture2D LastImage => texture;
 
-        internal StoryBrush(StorySceneProgress progress)
+        internal StoryBrush(StorySceneProgress progress, Texture2D canvasGrain)
         {
+            // Cache one canvas of the town's pigment tile. Drawing and assists sample the same dry brush.
+            var grain = canvasGrain.GetPixels32();
+            for (int y = 0; y < Height; y++)
+            for (int x = 0; x < Width; x++)
+                pigmentRelief[y * Width + x] = grain[(y % canvasGrain.height) * canvasGrain.width + x % canvasGrain.width].r / 255f;
             this.progress = progress;
             walk = progress.Walker;
             overlay = new VisualElement();
@@ -206,9 +212,9 @@ namespace Puzzle.Story
                 float nx = (x + .5f) / Width, ny = (y + .5f) / Height;
                 mask[i] = InMask(option.Mask, nx, ny);
                 if (mask[i]) total++;
-                Color32 ground = PaperPixel(i, x, y);
+                Color32 ground = PaperPixel(i);
                 pixels[i] = mask[i] && option.Mask != Shape.Free
-                    ? (erase ? option.Color : Color.Lerp(ground, new Color(.96f, .91f, .77f), .57f))
+                    ? (erase ? InkPixel(i) : Color.Lerp(ground, new Color(.96f, .91f, .77f), .57f))
                     : ground;
             }
             surface.scaleMode = ScaleMode.StretchToFill;
@@ -217,10 +223,13 @@ namespace Puzzle.Story
             RefreshLabels();
         }
 
-        static Color32 BasePixel(int x, int y)
+        Color32 InkPixel(int index)
         {
-            byte shade = (byte)((x * 17 + y * 31) % 11);
-            return new Color32((byte)(170 + shade), (byte)(150 + shade), (byte)(117 + shade), 255);
+            Color color = choices[selected].Color;
+            float relief = pigmentRelief[index];
+            Color ink = Color.Lerp(color * (.70f + .40f * relief), new Color(.96f, .86f, .61f), relief * relief * .24f);
+            ink.a = color.a;
+            return ink;
         }
 
         void MarkChoice()
@@ -229,13 +238,14 @@ namespace Puzzle.Story
                 palette[i].EnableInClassList("brush-choice-selected", i == selected);
         }
 
-        Color32 PaperPixel(int index, int x, int y) => underpaint?[index] ?? BasePixel(x, y);
+        Color32 PaperPixel(int index) => underpaint?[index] ?? (Color32)Color.Lerp(
+            new Color(.59f, .50f, .36f), new Color(.84f, .76f, .59f), pigmentRelief[index]);
 
         internal Color32[] CopyPaintedLayers()
         {
             var layers = new Color32[pixels.Length];
             for (int i = 0; i < layers.Length; i++)
-                layers[i] = visited[i] ? pixels[i] : PaperPixel(i, i % Width, i / Width);
+                layers[i] = visited[i] ? pixels[i] : PaperPixel(i);
             return layers;
         }
 
@@ -314,7 +324,7 @@ namespace Puzzle.Story
                 if (!mask[i] || dx * dx + dy * dy > radius * radius) continue;
                 if (!visited[i]) filled++;
                 visited[i] = true;
-                pixels[i] = erase ? PaperPixel(i, x, y) : choices[selected].Color;
+                pixels[i] = erase ? PaperPixel(i) : InkPixel(i);
                 painted = true;
             }
             return painted;
@@ -367,7 +377,7 @@ namespace Puzzle.Story
                 {
                     if (!mask[i]) continue;
                     visited[i] = true;
-                    pixels[i] = erase ? PaperPixel(i, i % Width, i / Width) : choices[selected].Color;
+                    pixels[i] = erase ? PaperPixel(i) : InkPixel(i);
                 }
             }
             PaintTexture();

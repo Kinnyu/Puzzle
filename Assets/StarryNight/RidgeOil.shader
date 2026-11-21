@@ -24,7 +24,7 @@ Shader "Starry Night/Painted ridge" {
                 return o;
             }
             half4 Frag(Varyings i) : SV_Target {
-                half3 stroke = SurfacePaint(i.metres, false);
+                half3 stroke = SurfacePaint(i.metres, false, 1.);
                 half3 pigment = SAMPLE_TEXTURE2D(_Landscape,sampler_Landscape,i.pigment).rgb;
                 half furrow = .5+.5*sin(i.metres.y*2.7+.68*sin(i.metres.x*.32)+stroke.g);
                 half3 field = lerp(half3(.016,.026,.036),half3(.080,.098,.067),furrow);

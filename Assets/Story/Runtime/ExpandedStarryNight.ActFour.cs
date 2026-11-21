@@ -177,9 +177,9 @@ namespace Puzzle.Story
             Scene("a-quiet-day", Location.Gallery, () =>
             {
                 ShowExhibition(true);
-                var vincent = Vincent(terrain.Ground(Gallery + Vector3.back * 3.15f + Vector3.right * 1.01f));
+                var vincent = Vincent(terrain.Ground(Gallery + new Vector3(3.48f, 0, 1.03f)));
                 Theo(vincent.transform.position + Vector3.right * 1.05f);
-                Arrive(terrain.Ground(Gallery + Vector3.back * 4.85f), vincent.transform.position);
+                Arrive(terrain.Ground(Gallery + new Vector3(4.37f, 0, -.78f)), vincent.transform.position);
                 Answer(vincent, "聽梵谷說說畫展之後的感受", () =>
                     Ask("梵谷", "今天很美好。我卻還是擔心明天會不會再變得難熬。", _ =>
                         Speak(Next, "梵谷|好。我希望畫畫能繼續，也希望自己能平安地生活。"),
@@ -284,8 +284,8 @@ namespace Puzzle.Story
 
         void StartInvites()
         {
-            var spots = new[] { Church + new Vector3(-1.38f, 0, -.51f), Church + new Vector3(.40f, 0, -.59f),
-                Church + new Vector3(2.42f, 0, -.70f), Church + new Vector3(4.23f, 0, -.55f),
+            var spots = new[] { Church + new Vector3(.15f, 0, -.48f), Church + new Vector3(-5.1f, 0, -.58f),
+                Church + new Vector3(2.85f, 0, .52f), Church + new Vector3(-1.93f, 0, .68f),
                 terrain.Ground(Gallery + Vector3.back * 3.65f + Vector3.right * 1.08f) };
             var lines = new[] { "訪客|是畫那位農家的畫家嗎？我想看看。", "訪客|我聽過他的名字，但沒看過作品。",
                 "訪客|有人會解釋畫的故事嗎？", "訪客|我看到告示了。我可以帶朋友一起來嗎？",
@@ -441,7 +441,7 @@ namespace Puzzle.Story
                     if ((visited & 2) == 0)
                         routes.Add(("去農田看看彼得", () => Travel(Farm + Vector3.back * 2.1f, Farm)));
                     if ((visited & 4) == 0)
-                        routes.Add(("去阿里斯康墓園", () => Travel(Cemetery + Vector3.back * 1.8f, Cemetery)));
+                        routes.Add(("去阿里斯康墓園", () => Travel(Cemetery + Vector3.forward * 1.8f, Cemetery)));
                     var names = routes.ConvertAll(route => route.name);
                     names.Add("再走一會兒");
                     Ask("西奧", "你想沿哪條路走？", pick => { if (pick < routes.Count) routes[pick].go(); }, names.ToArray());

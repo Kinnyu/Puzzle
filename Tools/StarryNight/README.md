@@ -2,11 +2,38 @@
 
 打开 `Assets/Scenes/StarryNight.unity`。地形、住宅、教堂与植栽都保存在场景内。展开层级后可单独选择、移动、复制房屋或树木。网格与材质保存在 `Assets/StarryNight/Scenery`。房屋和树木的碰撞体随物件移动，编辑摆位后直接保存场景即可。
 
-## 开场与行走
+## 《劇本2》的城鎮
+
+在 Unity 開啟 `Assets/Scenes/Start.unity`，播放後選「開始遊戲」，從畫廊進入《星夜》。教堂、黃色小屋、礦工住家、農舍、療養院和展覽畫廊從第一幕起就能在同一張地圖找到。礦區與馬鈴薯田在教堂東側，畫廊在教堂與北方療養院之間。各幕控制人物、道具與任務進度。地點與年代依[四幕擴寫劇本](../../Assets/Story/劇本2)濃縮排列。
+
+### 建築、植栽與物件的取材
+
+| 遊戲位置 | 原作或實物中可辨認的特徵 | 依據 |
+| --- | --- | --- |
+| 黃色小屋、教堂、農舍 | 黃牆和成對綠窗板、紐南教堂的窄長拱窗與小鐘樓、紐南茅舍的低牆與厚屋頂 | [《黃房子》](https://www.vangoghmuseum.nl/en/collection/s0032V1962) · [紐南教堂](https://www.vangoghmuseum.nl/en/collection/s0003V1962) · [《茅舍》](https://www.vangoghmuseum.nl/en/collection/s0087V1962) |
+| 亞爾阿里斯康墓園 | 成排白楊、秋葉覆路、路側石棺，以及步道盡頭聖奧諾拉教堂的兩層八角鐘樓 | [梵谷《阿里斯康墓園》，1888](https://goulandris.gr/en/artwork/vincent-van-gogh-les-alyscamps) · [亞爾市建築檔案](https://www.patrimoine.ville-arles.fr/index.php?action=edifice&id=1) |
+| 聖雷米療養院與杏花院子 | 療養院的窗格及院牆、柏樹往上收尖的不對稱樹冠、杏花著生在屈折枝條上。杏樹在黃色小屋院子的位置與贈畫情節出自劇本 | [療養院](https://www.vangoghmuseum.nl/en/art-and-stories/vincents-life-1853-1890/hospitalization) · [《柏樹》，1889](https://www.metmuseum.org/art/collection/search/437980) · [《盛開的杏花》，1890](https://www.vangoghmuseum.nl/en/collection/s0176V1962) |
+| 農家晚餐、黃色小屋畫室 | 桌上方的吊掛油燈、共食馬鈴薯的淺盤和咖啡壺；直背草編木椅、木調色盤與長柄筆 | [《吃馬鈴薯的人》，1885](https://www.vangoghmuseum.nl/en/collection/s0005V1962) · [《梵谷的椅子》，1888](https://www.nationalgallery.org.uk/paintings/vincent-van-gogh-van-gogh-s-chair) · [《畫家自畫像》](https://www.vangoghmuseum.nl/en/collection/s0022V1962) |
+| 礦工住家與礦口 | 工人住區取材自梵谷在瓦姆的書信。任務提燈參考同時代館藏的黃銅筒身、護網和提環；館藏為英國製同類器物 | [梵谷第 151 封信](https://vangoghletters.org/vg/letters/let151/letter.html) · [科學博物館藏安全燈](https://collection.sciencemuseumgroup.org.uk/objects/co43267/safety-lamp) |
+
+梵谷博物館所藏參考作品：Van Gogh Museum, Amsterdam (Vincent van Gogh Foundation)。展覽畫廊依第四幕虛構展覽所需設計。館藏支持的是可見的形制、材質與構圖；原作視野以外的尺寸、街廓與每棵樹的位置依可行走地圖配置。
+
+### 場景與互動驗收
+
+| 規則 | 實作位置 | 播放或幾何檢查 |
+| --- | --- | --- |
+| 四幕共用城鎮，街道避開屋基 | `StarryNight.unity` 保存六處劇情建築及門檻。墓園步道採樣路緣與中線的地面高度 | 六個門口均有玩家通行空間。115 棟建築的屋基與 5,295 個路面三角形的水平投影無重疊 |
+| 路人沿街往返 | 場景中的四位 `StreetWalker` 沿各自路線移動；十盞路燈編入場景 | 四條路線均沿路面，已檢查玩家寬度的淨空、路人實際移動及對話觸發器 |
+| 場景與任務共用油畫筆觸 | `Period studies.asset` 與城鎮模型使用同一套筆觸及描邊。各幕從 `PeriodModels` 取得道具。選單、對話與任務畫布取用場景顏料紋理 | 在四幕載入十個任務檢查點，確認墓園、畫具與農家晚餐模型載入，開啟任務畫布並完成輔助繪畫 |
+| 貼近屋牆時筆觸持續變粗 | `OilPigment.hlsl` 在兩公尺內依距離連續調整筆觸 | 在同一面黃牆距離 2、1、0.55、0.32 公尺實拍比對 |
+
+本版使用 Unity 6000.6.0f1 的獨立副本做播放驗收。專案指定版本為 6000.3.23f1。[Unity 實拍：城鎮、墓園、杏花與農舍](../../StarryNight-story-town-preview.jpg)
+
+## 原有遠景與行走設計
 
 相机的编辑位置决定开场远景。`Approach guide` 标记控制进镇的镜头弧线，`Player at village entrance` 的位置与朝向决定落点。播放后远景保持静止，点击游戏画面开始推进。到达镇口后，WASD 行走、滑鼠环视、Shift 快走，Esc 释放滑鼠。镜头推进期间使用固定视角宽度，由相机与村落之间的实际距离形成近大远小的变化。地形与场景中的碰撞体共同约束玩家移动。
 
-## 视觉验收
+## 早期村落版本的視覺驗收紀錄
 
 - 展开 `Landscape` 可分别选取远山与前方的蓝色山坡。在开场机位对照原画，山线从左侧低地经过中央山头，再向画面右侧抬升。进镇时，两层山坡应与近处的橄榄树产生视差。
 - 展开 `Vegetation` 可找到山脚、田界和村内庭园的树群，每棵树都可单独移动。当前场景有 821 棵阔叶树、10 棵柏树及 112 栋住宅，另有教堂。`Buildings` 保存房屋和碰撞体，`Landscape/Village lanes` 的可见路面与地面碰撞使用同一网格。入口主街约宽 2.1 米，镇内两侧纵巷约宽 1.6 米。已在 Unity 播放模式验证远景停驻、点击推进、镇口交接及向前行走约 6.6 米，并沿主街和横巷检查玩家宽度的通行空间。

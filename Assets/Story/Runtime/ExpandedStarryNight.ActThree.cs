@@ -98,8 +98,9 @@ namespace Puzzle.Story
             {
                 Vincent(terrain.Ground(Cemetery + new Vector3(-.91f, 0, .27f)));
                 Gauguin(terrain.Ground(Cemetery + new Vector3(1.01f, 0, .26f)));
-                var art = ImageProp("墓園的雙視角畫布", Cemetery + new Vector3(0, 1.20f, .18f), null);
-                Arrive(terrain.Ground(Cemetery + Vector3.back * 2.06f), art.transform.position);
+                var art = EaselPicture("墓園的雙視角畫布", Cemetery + new Vector3(0, 1.20f, .18f));
+                art.transform.rotation = Quaternion.Euler(0, 180, 0);
+                Arrive(terrain.Ground(Cemetery + Vector3.forward * 2.06f), art.transform.position);
                 Speak(() => Layers(art, "在同一條路上試兩種畫法", perspective =>
                 {
                     Save("cemetery-view", perspective);
@@ -245,15 +246,8 @@ namespace Puzzle.Story
 
         void DrawTool(int tool, Vector3 point)
         {
-            if (tool == 0)
-            {
-                for (int side = -1; side <= 1; side += 2)
-                    Prop("畫架腳", point + new Vector3(side * .17f, .64f, 0), new Vector3(.063f, 1.25f, .06f), Wood)
-                        .transform.rotation = Quaternion.Euler(0, 0, -side * 13);
-                Prop("畫架托板", point + Vector3.up * .64f, new Vector3(.61f, .055f, .13f), Wood);
-            }
-            else if (tool == 1)
-                Prop("調色盤", point + Vector3.up * .44f, new Vector3(.33f, .034f, .22f), Gold, PrimitiveType.Cylinder);
+            if (tool == 0) Period(terrain.Models.easel, point);
+            else if (tool == 1) Period(terrain.Models.palette, point + Vector3.up * .44f);
             else ImageProp("乾淨的畫布", point + Vector3.up * .58f, null, .51f, .47f);
         }
     }
