@@ -22,11 +22,13 @@ namespace Puzzle.StarryNight
         Quaternion openingRotation;
         float elapsed, yaw, pitch, verticalSpeed;
         float sittingOffset;
+        Action onApproachFinished;
 
         public bool InputSuppressed { get; set; }
         internal bool EscapeHandledExternally { get; set; }
         internal Func<Vector2, bool> PointerOverMenu { get; set; }
         internal CharacterController Player => player;
+        internal bool WaitingAtPainting => view == View.Overlook && onApproachFinished != null;
 
         void Start()
         {
@@ -112,12 +114,30 @@ namespace Puzzle.StarryNight
             EnterWalkingAt(player.transform.position, player.transform.rotation);
         }
 
-        internal void EnterWalkingAt(Vector3 position, Quaternion rotation)
+        internal void ApproachSquare(Vector3 feet, Quaternion facing, Action onArrival)
+        {
+            if (approachGuide == null)
+            {
+                EnterWalkingAt(feet, facing);
+                onArrival();
+                return;
+            }
+            player.enabled = false;
+            player.transform.SetPositionAndRotation(feet, facing);
+            transform.SetPositionAndRotation(overlook, openingRotation);
+            elapsed = 0;
+            view = View.Overlook;
+            onApproachFinished = onArrival;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+
+        internal void EnterWalkingAt(Vector3 position, Quaternion rotation, float viewPitch = -5f)
         {
             player.enabled = false;
             player.transform.SetPositionAndRotation(position, rotation);
             yaw = player.transform.eulerAngles.y;
-            pitch = -5f;
+            pitch = viewPitch;
             verticalSpeed = 0;
             sittingOffset = 0;
             player.enabled = true;
@@ -131,21 +151,35 @@ namespace Puzzle.StarryNight
             elapsed += Time.deltaTime;
             float t = Mathf.SmoothStep(0, 1, Mathf.Clamp01(elapsed / approachSeconds));
             Vector3 end = player.transform.position + Vector3.up * eyeHeight;
-            Vector3 a = Vector3.Lerp(overlook, approachGuide.position, t);
-            Vector3 b = Vector3.Lerp(approachGuide.position, end, t);
-            var arrivalRotation = Quaternion.Euler(-5f, player.transform.eulerAngles.y, 0);
-            transform.SetPositionAndRotation(Vector3.Lerp(a, b, t), Quaternion.Slerp(openingRotation, arrivalRotation, t));
+            var a = Vector3.Lerp(overlook, approachGuide.position, t);
+            Vector3 cameraPosition;
+            float arrivalPitch = -5f;
+            if (onApproachFinished != null)
+            {
+                // Stay above the cemetery and roofs, then descend into the open square.
+                Vector3 aboveSquare = end + Vector3.up * 16f + Vector3.back * 8f;
+                var b = Vector3.Lerp(approachGuide.position, aboveSquare, t);
+                Vector3 c = Vector3.Lerp(aboveSquare, end, t);
+                cameraPosition = Vector3.Lerp(Vector3.Lerp(a, b, t), Vector3.Lerp(b, c, t), t);
+                arrivalPitch = 10f;
+            }
+            else cameraPosition = Vector3.Lerp(a, Vector3.Lerp(approachGuide.position, end, t), t);
+            var arrivalRotation = Quaternion.Euler(arrivalPitch, player.transform.eulerAngles.y, 0);
+            transform.SetPositionAndRotation(cameraPosition, Quaternion.Slerp(openingRotation, arrivalRotation, t));
             if (elapsed < approachSeconds) return;
             bool captured = Cursor.lockState == CursorLockMode.Locked;
-            EnterWalking();
+            EnterWalkingAt(player.transform.position, player.transform.rotation, arrivalPitch);
             if (!captured) Cursor.lockState = CursorLockMode.None;
-            if (dialoguePlayer != null)
+            var arrived = onApproachFinished;
+            onApproachFinished = null;
+            if (arrived != null) arrived();
+            else if (dialoguePlayer != null)
                 dialoguePlayer.ShowOpening(chapterOpening);
         }
 
         void OnGUI()
         {
-            if (view != View.Overlook || InputSuppressed) return;
+            if (view != View.Overlook || WaitingAtPainting || InputSuppressed) return;
             var rect = new Rect((Screen.width-164)*.5f, Screen.height-62, 164, 34);
             GUI.Box(rect, "点击进入村落");
         }

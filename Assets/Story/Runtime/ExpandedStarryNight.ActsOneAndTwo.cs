@@ -39,7 +39,25 @@ namespace Puzzle.Story
                 Period(terrain.Models.book, spot + new Vector3(.28f, .71f, .14f)).transform.SetParent(cart.transform, true);
                 Period(terrain.Models.cloth, spot + Vector3.up * .75f, "車上的布料")
                     .transform.SetParent(cart.transform, true);
-                Arrive(spot + Vector3.back * 1.82f, spot);
+                var landing = spot + Vector3.back * 1.82f;
+                if (enteringFromPainting)
+                {
+                    walk.ApproachSquare(FloorAndClearance(landing), Quaternion.identity, () =>
+                    {
+                        enteringFromPainting = false;
+                        progress.SaveCheckpoint(scenes[sceneIndex].id);
+                        MeetAtCart(cart);
+                    });
+                }
+                else
+                {
+                    Arrive(landing, spot);
+                    MeetAtCart(cart);
+                }
+            });
+
+            void MeetAtCart(GameObject cart)
+            {
                 Goal("看看廣場上卡住的推車");
                 Speak(() =>
                 {
@@ -70,7 +88,7 @@ namespace Puzzle.Story
                         }, "梵谷|等一下，我來扶另一邊。你幫我看著輪子，好嗎？");
                     });
                 }, "畫布上的顏料裂開。你落進村莊，遠處傳來鐘聲。", "瑪莉|糟了，今天偏偏又卡住！");
-            });
+            }
 
             Scene("church-help", Location.Church, () =>
             {

@@ -83,13 +83,13 @@ namespace Puzzle.Story
         void LayAvenue()
         {
             // Sample both verges and the centre so the autumn walk follows the existing ground.
-            const int strips = 24;
+            const int strips = 30;
             var vertices = new Vector3[(strips + 1) * 3];
             var uv = new Vector2[vertices.Length];
             var indices = new int[strips * 12];
             for (int row = 0; row <= strips; row++)
             {
-                float z = 2.55f - row * .62f;
+                float z = 3.19f - row * .62f;
                 for (int col = 0; col < 3; col++)
                 {
                     float x = (col - 1) * 1.22f;

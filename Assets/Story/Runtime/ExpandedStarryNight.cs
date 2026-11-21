@@ -56,6 +56,7 @@ namespace Puzzle.Story
         Interaction heldTarget;
         float heldSince;
         bool keepNearbyPosition;
+        bool enteringFromPainting;
 
         Vector3 Church => terrain.Ground(terrain.Church);
         Vector3 Side => terrain.SideAisle;
@@ -127,6 +128,7 @@ namespace Puzzle.Story
                     break;
             }
             sceneIndex = Mathf.Max(0, scenes.FindIndex(item => item.id == checkpoint));
+            enteringFromPainting = scene == null && chapterId == "chapter-1" && string.IsNullOrEmpty(checkpoint);
             OpenScene();
         }
 
@@ -146,7 +148,7 @@ namespace Puzzle.Story
             scene = new GameObject(entry.id);
             scene.transform.SetParent(transform);
             Physics.SyncTransforms();
-            progress.SaveCheckpoint(entry.id);
+            if (!enteringFromPainting) progress.SaveCheckpoint(entry.id);
             entry.open();
         }
 
@@ -279,6 +281,7 @@ namespace Puzzle.Story
         string Interact()
         {
             if (walk.InputSuppressed || CanvasOpen) return null;
+            if (walk.WaitingAtPainting) return "點擊畫面，進入村落";
             if (resumeDialogue != null)
             {
                 if (dialogue.TryConsumeGameplayInteraction())
