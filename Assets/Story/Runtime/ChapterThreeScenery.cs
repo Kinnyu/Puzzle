@@ -17,6 +17,7 @@ namespace Puzzle.Story
         readonly Material paintedProps;
         readonly PeriodModels models;
         Material vincentCanvas;
+        internal GameObject DeskTop { get; private set; }
         internal Vector3 House { get; }
         internal Vector3 Door => House + new Vector3(0f, 0f, -2.05f);
         internal Vector3 Cemetery { get; }
@@ -47,7 +48,7 @@ namespace Puzzle.Story
             var interior = Surface("Drawing paper", new Color(.92f, .82f, .63f));
             HouseBox("Welcome mat", 0, .012f, -1.58f, 1.03f, .02f, .59f, trim, false);
             HouseBox("Writing desk", -1.76f, .42f, -.92f, .92f, .84f, .63f, walnut);
-            HouseBox("Desk top", -1.76f, .86f, -.92f, 1.04f, .08f, .76f, walnut, false);
+            DeskTop = HouseBox("Desk top", -1.76f, .86f, -.92f, 1.04f, .08f, .76f, walnut, false);
             models.Place(models.chair, root, House + new Vector3(-1.71f, 0, -.30f));
             HouseBox("Stack of papers", -1.76f, .914f, -.96f, .24f, .027f, .33f, interior, false);
             var lamp = new GameObject("Studio light").AddComponent<Light>();
@@ -73,7 +74,7 @@ namespace Puzzle.Story
             canvas.transform.position = House + new Vector3(x, 1.79f, 1.828f);
             canvas.transform.localScale = new Vector3(width, height, 1f);
             canvas.GetComponent<Collider>().enabled = false;
-            canvas.GetComponent<Renderer>().sharedMaterial = material;
+            StoryPropInk.SetSurface(canvas, material);
             return material;
         }
 
@@ -104,14 +105,15 @@ namespace Puzzle.Story
             }
             cemeteryLane = new Mesh { name = "Alyscamps avenue", vertices = vertices, uv = uv, triangles = indices };
             cemeteryLane.RecalculateNormals();
-            models.Place(cemeteryLane, root, Cemetery, material: gravel);
+            models.Place(cemeteryLane, root, Cemetery, material: gravel, outline: false);
 
             for (int row = 0; row < strips; row += 2)
             {
                 int k = row * 3;
                 Vector3 across = vertices[k + 2] - vertices[k];
                 Vector3 along = vertices[k + 7] - vertices[k + 1];
-                var leaves = models.Place(models.leafLitter, root, Cemetery + vertices[k + 4] + Vector3.up * .012f, material: leaf);
+                var leaves = models.Place(models.leafLitter, root, Cemetery + vertices[k + 4] + Vector3.up * .012f,
+                    material: leaf, outline: false);
                 leaves.transform.rotation = Quaternion.FromToRotation(Vector3.up, Vector3.Cross(across, along).normalized)
                     * Quaternion.Euler(0, row % 4 == 0 ? 0 : 180, 0);
             }
@@ -181,7 +183,7 @@ namespace Puzzle.Story
             item.transform.SetParent(root);
             item.transform.position = position;
             item.transform.localScale = size;
-            item.GetComponent<Renderer>().sharedMaterial = material;
+            StoryPropInk.SetSurface(item, material);
             if (!solid) item.GetComponent<Collider>().enabled = false;
             return item;
         }

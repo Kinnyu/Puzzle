@@ -36,6 +36,16 @@ namespace Puzzle.Story
         internal Texture2D CanvasGrain => canvasGrain;
         internal Material PaintedProps => paintedProps;
         internal Vector3 SideAisle => churchInterior.position + Vector3.left * .8f;
+        internal Vector3 ChapelPoint(float x, float y, float z) =>
+            churchInterior.TransformPoint(new Vector3(x, y, z));
+
+        internal RaycastHit ChapelWindowWall()
+        {
+            var ray = new Ray(ChapelPoint(-1.55f, 1.47f, 0), churchInterior.forward);
+            foreach (var wall in churchInterior.GetComponents<BoxCollider>())
+                if (wall.Raycast(ray, out var hit, 12f)) return hit;
+            throw new System.InvalidOperationException("The chapel repair window needs its rear wall collider.");
+        }
         internal Vector3 WorkersHome => workersHome.position;
         internal Vector3 Farmhouse => farmhouse.position;
         internal Vector3 Church => church;
@@ -100,7 +110,7 @@ namespace Puzzle.Story
                 row.transform.localScale = new Vector3(1.1f, 0.09f, 2.2f);
                 row.GetComponent<Collider>().enabled = false;
                 rows[i] = row.GetComponent<MeshRenderer>();
-                rows[i].sharedMaterial = drySoil;
+                StoryPropInk.SetSurface(row, drySoil);
             }
         }
 
@@ -205,7 +215,7 @@ namespace Puzzle.Story
                     Mathf.Abs(walk.Player.transform.position.y - rows[row].transform.position.y) <= TillingVerticalReach &&
                     dialogue.TryConsumeGameplayInteraction())
                 {
-                    rows[row].sharedMaterial = tilledSoil;
+                    StoryPropInk.SetSurface(rows[row].gameObject, tilledSoil);
                     SetStage(Stage.FarmReward);
                 }
             }
@@ -262,7 +272,7 @@ namespace Puzzle.Story
         void ReturnToRoad()
         {
             hasLetter = false;
-            rows[0].sharedMaterial = tilledSoil;
+            StoryPropInk.SetSurface(rows[0].gameObject, tilledSoil);
             MovePlayer(mine + Vector3.left * 3f, church);
             SetStage(Stage.Return);
         }

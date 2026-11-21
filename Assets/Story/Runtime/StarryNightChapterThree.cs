@@ -109,6 +109,14 @@ namespace Puzzle.Story
             }
         }
 
+        internal RaycastHit StudioWall(Vector3 point)
+        {
+            var ray = new Ray(point, cottage.transform.right);
+            foreach (var wall in cottage.GetComponents<BoxCollider>())
+                if (wall.Raycast(ray, out var hit, 6f)) return hit;
+            throw new System.InvalidOperationException("The studio needs its right wall to hang artwork.");
+        }
+
         internal ChapterThreeScenery GetVillageScenery()
         {
             if (scenery != null) return scenery;

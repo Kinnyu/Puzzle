@@ -19,6 +19,7 @@ namespace Puzzle.Story
             Supplies = new GameObject[4], Setup = new GameObject[3];
         internal readonly GameObject[] Frames = new GameObject[3], Backings = new GameObject[3];
         internal Texture2D GiftPainting { get; }
+        internal GameObject ClinicEasel { get; private set; }
 
         internal ChapterFourScenery(Transform parent, Func<Vector3, Vector3> ground, Vector3 clinicLot, Vector3 galleryLot,
             Vector3 house, Texture2D[] art, Material paintedProps, PeriodModels models)
@@ -32,7 +33,7 @@ namespace Puzzle.Story
             Clinic = clinicLot;
             Gallery = galleryLot;
             Cypress = ground(Clinic + new Vector3(-2.85f, 0f, -3.7f));
-            Gift = ground(new Vector3(House.x + 1.9f, 0f, House.z - 3.05f));
+            Gift = ground(new Vector3(House.x + 2.20f, 0f, House.z - 4.35f));
             timber = Material("Dark oak", new Color(.27f, .18f, .14f));
             linen = Material("Canvas linen", new Color(.87f, .80f, .64f));
             leaf = Material("Cypress green", new Color(.12f, .25f, .21f));
@@ -42,29 +43,41 @@ namespace Puzzle.Story
 
             Inspiration = new[] { Clinic + new Vector3(-1.45f, 0, -1.24f),
                 ground(Cypress + Vector3.right * .7f), Clinic + new Vector3(1.51f, 0, .22f) };
-            Paintings = new[] { Clinic + new Vector3(1.73f, 0, 1.12f),
-                House + new Vector3(-1.38f, 0, 1.05f), House + new Vector3(1.36f, 0, 1.05f) };
+            Paintings = new[] { Clinic + new Vector3(1.32f, 0, 2.049f),
+                House + new Vector3(-2.459f, 0, .80f), House + new Vector3(2.459f, 0, .72f) };
             Display = new[] { Gallery + new Vector3(0f, 0, 1.0f),
                 Gallery + new Vector3(-1.65f, 0, 1.0f), Gallery + new Vector3(1.65f, 0, 1.0f) };
             for (int i = 0; i < art.Length; i++)
             {
                 Copies[i] = Canvas("Collectible canvas", Paintings[i] + Vector3.up * 1.20f, art[i], .95f, .72f);
-                var wall = new Vector3(Display[i].x, Gallery.y + 1.61f, Gallery.z + 1.94f);
+                if (i > 0) Copies[i].transform.rotation = Quaternion.Euler(0, i == 1 ? -90 : 90, 0);
+                var wall = new Vector3(Display[i].x, Gallery.y + 1.61f, Gallery.z + 1.99f);
                 Frames[i] = Box("Exhibit frame", wall + Vector3.forward * .03f, new Vector3(1.50f, 1.12f, .07f), timber, false);
                 Backings[i] = Box("Empty exhibit", wall, new Vector3(1.38f, 1.00f, .022f), linen, false);
                 Exhibits[i] = Canvas("Exhibited canvas", wall - Vector3.forward * .02f, art[i], 1.36f, .98f);
             }
 
-            Tools = new[] { House + new Vector3(1.80f, 0, .78f), House + new Vector3(-.94f, 0, -.98f),
+            Tools = new[] { House + new Vector3(1.80f, 0, 1.75f), House + new Vector3(-.94f, 0, -.98f),
                 House + new Vector3(1.77f, 0, -.95f), House + new Vector3(-1.50f, 0, .90f) };
-            Supplies[0] = Box("Blank canvas", Tools[0] + Vector3.up * .54f, new Vector3(.59f, .69f, .10f), linen, false);
-            Supplies[1] = models.Place(models.brushes, root, House + new Vector3(-1.70f, .922f, -.93f));
+            Supplies[0] = Box("Blank canvas", Tools[0] + Vector3.up * .345f, new Vector3(.59f, .69f, .10f), linen, false);
+            Supplies[0].transform.rotation = Quaternion.Euler(9, 0, 0);
+            PeriodModels.RestOnSurface(Supplies[0], House.y);
+            Supplies[1] = models.Place(models.brushes, root, House + new Vector3(-1.99f, .90f, -.83f));
             Supplies[2] = models.Place(models.paints, root, Tools[2] + Vector3.up * .025f);
+            PeriodModels.RestOnSurface(Supplies[1], House.y + .90f);
+            PeriodModels.RestOnSurface(Supplies[2], House.y);
             Supplies[3] = models.Place(models.easel, root, Tools[3] + Vector3.left * .32f);
+            PeriodModels.RestOnSurface(Supplies[3], House.y);
             Vector3 stand = ground(Gift + new Vector3(.76f, 0, .38f));
             Setup[0] = models.Place(models.easel, root, stand);
-            Setup[1] = Canvas("Spring canvas", stand + new Vector3(0f, 1.16f, -.19f), null, .69f, .53f);
-            Setup[2] = models.Place(models.palette, root, stand + new Vector3(-.15f, .824f, -.047f));
+            PeriodModels.RestOnSurface(Setup[0], stand.y);
+            var ledge = Setup[0].transform.position + new Vector3(0, PeriodModels.EaselLedge, -.065f);
+            Setup[1] = Canvas("Spring canvas", ledge + Vector3.up * (.53f * .5f), null, .69f, .53f);
+            var boxFoot = ground(stand + Vector3.left * .62f);
+            var box = Box("Paint box", boxFoot + Vector3.up * .18f, new Vector3(.50f, .36f, .35f), timber, false);
+            Setup[2] = models.Place(models.palette, root, box.transform.position);
+            PeriodModels.RestOnSurface(Setup[2], boxFoot.y + .36f);
+            box.transform.SetParent(Setup[2].transform, true);
         }
 
         void ClinicDetails()
@@ -73,7 +86,8 @@ namespace Puzzle.Story
                 new Vector3(1.16f, .5f, .82f), timber);
             Box("Clinic blanket", Clinic + new Vector3(-1.85f, .55f, 1.22f),
                 new Vector3(1.16f, .10f, .82f), linen, false);
-            models.Place(models.easel, root, Clinic + new Vector3(2.05f, 0, .31f));
+            ClinicEasel = models.Place(models.easel, root, Clinic + new Vector3(.60f, 0, .53f));
+            PeriodModels.RestOnSurface(ClinicEasel, Clinic.y);
             Box("Window sill", Clinic + new Vector3(-1.78f, 1.21f, -2.03f),
                 new Vector3(.83f, .09f, .16f), timber, false);
             Box("Window interior", Clinic + new Vector3(-1.78f, 1.68f, -2.044f),
@@ -81,7 +95,7 @@ namespace Puzzle.Story
             Plant(models.cypress, Cypress, .17f);
         }
 
-        void SpringTree() => Plant(models.almond, ground(Gift + new Vector3(.97f, 0, .96f)), .13f);
+        void SpringTree() => Plant(models.almond, ground(Gift + new Vector3(1.60f, 0, .30f)), .13f);
 
         void Plant(Mesh mesh, Vector3 foot, float radius)
         {
@@ -125,7 +139,7 @@ namespace Puzzle.Story
             piece.transform.SetParent(root);
             piece.transform.position = position;
             piece.transform.localScale = scale;
-            piece.GetComponent<Renderer>().sharedMaterial = material;
+            StoryPropInk.SetSurface(piece, material);
             if (!solid) piece.GetComponent<Collider>().enabled = false;
             return piece;
         }

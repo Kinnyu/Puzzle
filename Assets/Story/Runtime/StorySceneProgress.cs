@@ -58,6 +58,7 @@ namespace Puzzle.Story
         bool transitioning;
         bool inputBeforeFade;
         VisualElement sceneFade;
+        Label sceneCaption;
         Action afterReveal;
         ExpandedStarryNight expanded;
         internal bool SceneTransitioning { get; private set; }
@@ -81,6 +82,7 @@ namespace Puzzle.Story
             card = StoryMenu.Panel(overlay, "story-card");
             if (dialoguePlayer != null) CreateHistoryUI(screen);
             sceneFade = StoryMenu.Panel(screen, "story-scene-fade");
+            sceneCaption = StoryMenu.Label(sceneFade, "", "story-transition-caption");
             StoryMenu.Show(sceneFade, false);
             StoryMenu.Show(toast, false);
             StoryMenu.Show(objective, false);
@@ -253,16 +255,17 @@ namespace Puzzle.Story
             else action();
         }
 
-        internal void TransitionScene(Action change, bool distant, bool opening = false)
+        internal void TransitionScene(Action change, bool distant, bool opening = false, string caption = null)
         {
-            if (!SceneTransitioning) StartCoroutine(FadeScene(change, distant, opening));
+            if (!SceneTransitioning) StartCoroutine(FadeScene(change, distant, opening, caption));
         }
 
-        IEnumerator FadeScene(Action change, bool distant, bool opening)
+        IEnumerator FadeScene(Action change, bool distant, bool opening, string caption)
         {
             SceneTransitioning = true;
             inputBeforeFade = walk.InputSuppressed;
             walk.InputSuppressed = true;
+            sceneCaption.text = "";
             sceneFade.style.opacity = opening ? 1f : 0f;
             StoryMenu.Show(sceneFade, true);
             Action revealed = null;
@@ -270,9 +273,11 @@ namespace Puzzle.Story
             {
                 if (!opening) yield return FadeOpacity(0f, 1f, distant ? .42f : .17f);
                 change();
+                sceneCaption.text = caption ?? "";
                 // Give the renderer and the new scene's layouts a frame while the screen is covered.
                 yield return null;
-                if (distant) yield return new WaitForSecondsRealtime(.12f);
+                if (caption != null) yield return new WaitForSecondsRealtime(1.35f);
+                else if (distant) yield return new WaitForSecondsRealtime(.12f);
                 yield return FadeOpacity(1f, 0f, distant ? .48f : .24f);
                 revealed = afterReveal;
             }

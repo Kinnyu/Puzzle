@@ -16,8 +16,10 @@ namespace Puzzle.Story
                 Vincent(House + new Vector3(.95f, 0, -.05f));
                 var postman = Actor("郵差", third.NeighborSprite,
                     terrain.Ground(village.Door + new Vector3(-.76f, 0, -.58f)));
-                var frame = ImageProp("待搬的畫框", House + new Vector3(-.55f, .84f, -.40f), null);
-                var wall = ImageProp("待補色的牆面", House + new Vector3(-1.04f, 1.39f, 1.36f), null, 1.08f, .86f);
+                var frame = ImageProp("待搬的畫框", House + new Vector3(-.99f, 0, -1.775f), null);
+                frame.transform.rotation = Quaternion.Euler(-9, 0, 0);
+                PeriodModels.RestOnSurface(frame, FloorAt(frame.transform.position).y);
+                var wall = StudioWallPicture("待補色的牆面", .44f, null, 1.08f, .86f);
                 var tins = Prop("通道裡的顏料桶", House + new Vector3(.51f, .16f, -.37f),
                     new Vector3(.32f, .17f, .33f), Blue, PrimitiveType.Cylinder);
                 Arrive(terrain.Ground(village.Door + Vector3.back * 1.75f), House);
@@ -30,7 +32,9 @@ namespace Puzzle.Story
                         ObjectAction(frame, "搬開畫室入口的畫框", () =>
                         {
                             ClearTargets();
-                            frame.transform.position = House + new Vector3(1.62f, .93f, .96f);
+                            frame.transform.position = House + new Vector3(1.60f, 0, 1.775f);
+                            frame.transform.rotation = Quaternion.Euler(9, 0, 0);
+                            PeriodModels.RestOnSurface(frame, FloorAt(frame.transform.position).y);
                             Goal("補色並清出畫室通道　〔B 畫筆〕");
                             int finished = 0;
                             BrushAt(wall, "替黃色牆面補色", __ =>
@@ -66,7 +70,7 @@ namespace Puzzle.Story
             {
                 var guest = Gauguin(House + new Vector3(-.78f, 0, .6f));
                 Vincent(House + new Vector3(.94f, 0, .66f));
-                var card = ImageProp("畫室的畫材草圖", House + new Vector3(.02f, 1.03f, .41f), null);
+                var card = EaselPicture("畫室的畫材草圖", House + new Vector3(.02f, 0, .41f));
                 Arrive(InHouse, card.transform.position);
                 Answer(guest, "和高更打招呼", () =>
                 {
@@ -92,7 +96,7 @@ namespace Puzzle.Story
                         "梵谷|我希望我們能一起畫出新的東西。",
                         "高更|一起工作可以，但不代表我們要用同一種方法。");
                 });
-            });
+            }, "稍後　・　高更抵達黃色小屋");
 
             Scene("alyscamps", Location.Cemetery, () =>
             {
@@ -121,13 +125,13 @@ namespace Puzzle.Story
                     FreeLayer()),
                     "梵谷|我想畫出這條路上的光。你看樹幹旁那一片顏色。",
                     "高更|我想讓畫面更像記憶，而不是眼睛的紀錄。");
-            });
+            }, "外出寫生　・　阿里斯康墓園");
 
             Scene("yellow-house-debate", Location.Studio, () =>
             {
                 var vincent = Vincent(House + new Vector3(-.88f, 0, .55f));
                 var guest = Gauguin(House + new Vector3(.91f, 0, .55f));
-                var plan = ImageProp("畫室配置草圖", House + new Vector3(-.04f, 1.12f, .58f), null);
+                var plan = EaselPicture("畫室配置草圖", House + new Vector3(-.04f, 0, .58f));
                 Arrive(InHouse, plan.transform.position);
                 Speak(() =>
                 {
@@ -152,14 +156,16 @@ namespace Puzzle.Story
                                 : "梵谷|先停一下吧。我剛剛說話太急了。");
                     }, false, new Ink("第二張畫架", Mask.Frame, Wood), new Ink("窗邊休息椅", Mask.Seat, Linen));
                 }, "高更|你太依賴眼前看見的東西。", "梵谷|而你總想把眼前的東西改成自己的想像！");
-            });
+            }, "寫生回來　・　黃色小屋的畫室");
 
             Scene("yellow-understanding", Location.Studio, () =>
             {
                 Vincent(House + new Vector3(-1.06f, 0, .74f));
                 Gauguin(House + new Vector3(1.03f, 0, .74f));
-                var board = ImageProp("兩人視角對照板", House + new Vector3(0, 1.18f, .49f), null, 1.15f, .67f);
-                Arrive(InHouse, board.transform.position);
+                if (Recall(3, "yellow-space") == 0) DrawTool(0, House + new Vector3(1.57f, 0, .34f));
+                else Seat(House + new Vector3(-1.48f, 0, .78f));
+                var board = StudioWallPicture("兩人視角對照板", .37f, null, 1.15f, .67f);
+                Arrive(House + new Vector3(.47f, 0, -.49f), board.transform.position);
                 Speak(() => Layers(board, "整理兩位畫家的創作想法", _ =>
                 {
                     var contrast = MakeSketch("兩種畫法", (x, y) => x < .5f
@@ -176,7 +182,7 @@ namespace Puzzle.Story
                 }, Layer("塗出對照板左側的現場景物", Mask.Road, Green),
                     Layer("塗出對照板右側的想像色塊", Mask.Cloth, Gold)),
                     "高更|我批評的是方法，不是說你沒有價值。");
-            });
+            }, "稍後　・　轉到側牆前並看兩種畫法");
 
             Scene("yellow-house-retry", Location.Studio, () =>
             {
@@ -186,7 +192,8 @@ namespace Puzzle.Story
                 var table = Table(House + new Vector3(-.75f, 0, .65f));
                 var utensil = Prop("畫室工具", table.transform.position + new Vector3(.20f, .10f, -.18f),
                     new Vector3(.33f, .041f, .071f), new Color(.57f, .58f, .60f));
-                var paper = ImageProp("空白的求助畫片", House + new Vector3(-.95f, 1.13f, .66f), null, .57f, .44f);
+                RestOnTable(utensil, table, .31f, -.15f);
+                var paper = TableSketch("空白的求助畫片", table, .57f, .44f, -.26f);
                 Arrive(InHouse, table.transform.position);
                 Speak(() =>
                 {
@@ -215,40 +222,52 @@ namespace Puzzle.Story
                     }, true, new Ink("畫室工具", Mask.Board, Linen));
                 }, "夜深了。高更決定先離開黃色小屋。",
                     "梵谷|我以為這個家會讓我們都留下來。是不是我又把一切搞砸了？");
-            });
+            }, "深夜　・　高更離開後的黃色小屋");
 
             Scene("yellow-goodbye", Location.Studio, () =>
             {
-                Vincent(House + new Vector3(.84f, 0, .42f));
-                var art = ImageProp("留在畫室裡的畫布", House + new Vector3(-.51f, 1.20f, .69f), null);
-                Arrive(InHouse, art.transform.position);
+                var doorstep = terrain.Ground(village.Door + new Vector3(1.32f, 0, -.85f));
+                var vincent = Vincent(doorstep);
+                var art = StudioWallPicture("留在畫室裡的畫布", .48f, null);
+                Arrive(terrain.Ground(village.Door + Vector3.back * 2.0f), vincent.transform.position);
                 Speak(() =>
                 {
-                    Goal("替這段一起畫畫的日子留個位置");
+                    Goal("回畫室，替一起畫畫的日子留個位置");
                     BrushAt(art, "畫出要留在牆上的東西", choice =>
                     {
                         Save("yellow-goodbye", choice);
                         art.SetActive(false);
                         if (choice == 0)
                         {
-                            ImageProp("梵谷的速寫", House + new Vector3(-.67f, 1.45f, 1.82f), village.Study(PaintingStudy.All));
-                            ImageProp("高更的速寫", House + new Vector3(.57f, 1.45f, 1.82f), third.GauguinArt);
+                            StudioWallPicture("梵谷的速寫", -.11f, village.Study(PaintingStudy.All));
+                            StudioWallPicture("高更的速寫", 1.02f, third.GauguinArt);
                         }
-                        else ImageProp("一張新的空白畫布", House + new Vector3(0, 1.45f, 1.82f), null);
+                        else StudioWallPicture("一張新的空白畫布", .48f, null);
                         Speak(Next, choice == 0 ? "梵谷|我希望看著這些畫時，想起的不只有爭吵。"
                                 : "梵谷|我想留一點空間給接下來的日子。",
                             "梵谷|以前我想把每個人都留在自己的理想裡。現在我開始懂，有些人只能陪你走一段路。",
                             "1888 年，梵谷與高更在亞爾共同生活與創作。梵谷經歷精神危機後接受照護，此後仍持續作畫。");
                     }, false, new Ink("並排的兩幅畫框", Mask.Frame, Wood), new Ink("一張空白畫布", Mask.Panel, Linen));
                 }, "梵谷|我想念一起畫畫的日子，也知道我們可能不適合住在一起。");
-            });
+            }, "次日上午　・　高更離去後，小屋門前");
+        }
+
+        GameObject StudioWallPicture(string name, float z, Texture2D art, float width = .80f, float height = .62f)
+        {
+            var hit = third.StudioWall(House + new Vector3(0, 1.44f, z));
+            var picture = ImageProp(name, hit.point + hit.normal * .035f, art, width, height);
+            picture.transform.rotation = Quaternion.LookRotation(-hit.normal);
+            return picture;
         }
 
         void DrawTool(int tool, Vector3 point)
         {
             if (tool == 0) Period(terrain.Models.easel, point);
-            else if (tool == 1) Period(terrain.Models.palette, point + Vector3.up * .44f);
-            else ImageProp("乾淨的畫布", point + Vector3.up * .58f, null, .51f, .47f);
+            else if (tool == 1)
+            {
+                RestOnTable(Period(terrain.Models.palette, point), village.DeskTop, .30f, .12f);
+            }
+            else EaselPicture("乾淨的畫布", point, .51f, .47f);
         }
     }
 }

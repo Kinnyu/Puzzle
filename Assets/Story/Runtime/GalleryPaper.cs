@@ -47,7 +47,7 @@ namespace Puzzle.Story
             quad.transform.SetParent(transform, false);
             quad.transform.localScale = new Vector3(PaperWidth, PaperHeight, 1f);
             quad.GetComponent<Collider>().enabled = false;
-            quad.GetComponent<Renderer>().sharedMaterial = material;
+            StoryPropInk.SetSurface(quad, material);
             surface = quad.GetComponent<MeshFilter>();
         }
 
@@ -119,6 +119,7 @@ namespace Puzzle.Story
         internal void Crumple(Mesh mesh, PhysicsMaterial physicsMaterial)
         {
             surface.sharedMesh = mesh;
+            StoryPropInk.SetSurface(surface.gameObject, material);
             surface.transform.localScale = Vector3.one;
             UpdateHeldPose(true);
 

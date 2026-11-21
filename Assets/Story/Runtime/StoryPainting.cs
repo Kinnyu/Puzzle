@@ -7,5 +7,11 @@ namespace Puzzle.Story
     {
         [SerializeField] StoryDefinition story;
         public StoryDefinition Story => story;
+
+        void Awake()
+        {
+            if (TryGetComponent<MeshRenderer>(out var surface))
+                StoryPropInk.SetSurface(gameObject, surface.sharedMaterial);
+        }
     }
 }

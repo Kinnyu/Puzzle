@@ -21,13 +21,14 @@ namespace Puzzle.Story
             internal Action Use;
             internal bool Brush;
             internal float HoldSeconds;
+            internal float Range;
             internal Vector3 Offset;
             internal Vector3 Position => Object != null ? Object.position + Offset : Point;
         }
 
         enum Location { Square, Church, Mine, WorkersHome, Farm, Farmhouse, Studio, Cemetery, Clinic, Gallery }
 
-        readonly List<(string id, Location location, Action open)> scenes = new();
+        readonly List<(string id, Location location, Action open, string arrival)> scenes = new();
         readonly List<Interaction> targets = new();
         readonly List<Texture2D> illustrations = new();
         readonly Collider[] footingHits = new Collider[16];
@@ -128,11 +129,17 @@ namespace Puzzle.Story
                     break;
             }
             sceneIndex = Mathf.Max(0, scenes.FindIndex(item => item.id == checkpoint));
+            if (chapterId == "chapter-4" ||
+                (chapterId == "chapter-3" && sceneIndex > scenes.FindIndex(entry => entry.id == "alyscamps")))
+                village.HangStudy(progress.LoadCemeteryStudy());
+            if (chapterId == "chapter-4" && sceneIndex >= scenes.FindIndex(entry => entry.id == "exhibition-ready"))
+                ShowExhibition(true);
             enteringFromPainting = scene == null && chapterId == "chapter-1" && string.IsNullOrEmpty(checkpoint);
             OpenScene();
         }
 
-        void Scene(string id, Location location, Action open) => scenes.Add((id, location, open));
+        void Scene(string id, Location location, Action open, string arrival = null) =>
+            scenes.Add((id, location, open, arrival));
 
         void OpenScene()
         {
@@ -144,6 +151,7 @@ namespace Puzzle.Story
                 scene.SetActive(false);
                 Destroy(scene);
             }
+            Visible(exhibition.Setup, false);
             var entry = scenes[sceneIndex];
             scene = new GameObject(entry.id);
             scene.transform.SetParent(transform);
@@ -154,19 +162,21 @@ namespace Puzzle.Story
 
         void Next()
         {
+            if (progress.SceneTransitioning) return;
             ClearTargets();
             StopTimer();
             extendedRetry = false;
             int previous = sceneIndex++;
             if (sceneIndex < scenes.Count)
             {
-                bool distant = scenes[previous].location != scenes[sceneIndex].location;
+                var next = scenes[sceneIndex];
+                bool distant = scenes[previous].location != next.location || next.arrival != null;
                 progress.TransitionScene(() =>
                 {
                     keepNearbyPosition = !distant;
                     OpenScene();
                     keepNearbyPosition = false;
-                }, distant);
+                }, distant, caption: next.arrival);
             }
             else
             {
@@ -185,17 +195,26 @@ namespace Puzzle.Story
                 Vector3.Dot(Vector3.ProjectOnPlane(eyes.transform.forward, Vector3.up).normalized, direction.normalized) > .66f &&
                 CanStand(playerPosition, walk.Player.radius))
                 return;
+            float pitch = 0;
+            if (toward.HasValue && direction.sqrMagnitude > .0001f)
+            {
+                var focus = toward.Value;
+                // Location markers and actor pivots are at their feet. Frame the group at torso height.
+                if (Mathf.Abs(focus.y - FloorAt(focus).y) < .28f) focus.y += 1.05f;
+                pitch = Mathf.Clamp(Mathf.Atan2(destination.y + walk.EyeHeight - focus.y, direction.magnitude)
+                    * Mathf.Rad2Deg, -10f, 27f);
+            }
             walk.EnterWalkingAt(destination,
-                Quaternion.LookRotation(direction.sqrMagnitude > .0001f ? direction : Vector3.forward));
+                Quaternion.LookRotation(direction.sqrMagnitude > .0001f ? direction : Vector3.forward), pitch);
         }
 
-        void Travel(Vector3 spot, Vector3 toward, Action onArrival = null)
+        void Travel(Vector3 spot, Vector3 toward, Action onArrival = null, string caption = null)
         {
             progress.TransitionScene(() =>
             {
                 Arrive(spot, toward);
                 onArrival?.Invoke();
-            }, distant: true);
+            }, distant: true, caption: caption);
         }
 
         Vector3 FloorAndClearance(Vector3 spot) =>
@@ -253,12 +272,13 @@ namespace Puzzle.Story
             progress.SetObjective(text);
         }
 
-        void Offer(Vector3 point, string verb, Action use, Transform physical = null, bool brush = false, float hold = 0)
+        void Offer(Vector3 point, string verb, Action use, Transform physical = null, bool brush = false,
+            float hold = 0, float range = 3.15f)
         {
             targets.Add(new Interaction
             {
                 Point = point, Object = physical, Offset = physical != null ? point - physical.position : Vector3.zero,
-                Verb = verb, Use = use, Brush = brush, HoldSeconds = hold
+                Verb = verb, Use = use, Brush = brush, HoldSeconds = hold, Range = range
             });
         }
 
@@ -303,7 +323,7 @@ namespace Puzzle.Story
                     closest = target;
                     closestRange = distance;
                 }
-                if (distance > 3.15f) continue;
+                if (distance > target.Range) continue;
                 Vector3 screen = eyes.WorldToViewportPoint(position);
                 if (screen.z <= 0 || screen.x < .14f || screen.x > .86f || screen.y < .07f || screen.y > .93f) continue;
                 float aim = new Vector2(screen.x - .5f, screen.y - .5f).sqrMagnitude;
@@ -569,7 +589,7 @@ namespace Puzzle.Story
         void ColorProp(GameObject obj, Color color, Texture2D texture = null)
         {
             var renderer = obj.GetComponent<Renderer>();
-            renderer.sharedMaterial = propMaterial;
+            StoryPropInk.SetSurface(obj, propMaterial);
             var block = new MaterialPropertyBlock();
             block.SetColor("_BaseColor", color);
             if (texture != null) block.SetTexture("_BaseMap", texture);
@@ -591,11 +611,37 @@ namespace Puzzle.Story
 
         GameObject EaselPicture(string name, Vector3 center, float width = .80f, float height = .62f)
         {
-            var frame = ImageProp(name, center, null, width, height);
-            var foot = center + new Vector3(0, -height * .5f - .815f, .07f);
+            var foot = FloorAt(center + Vector3.forward * .07f);
             var stand = Period(terrain.Models.easel, foot);
+            PeriodModels.RestOnSurface(stand, foot.y);
+            var frame = CanvasAtLedge(name, stand, width, height);
             stand.transform.SetParent(frame.transform, true);
             return frame;
+        }
+
+        GameObject CanvasAtLedge(string name, GameObject stand, float width, float height, Texture2D art = null)
+        {
+            var center = stand.transform.TransformPoint(new Vector3(0, PeriodModels.EaselLedge + height * .5f, -.065f));
+            return ImageProp(name, center, art, width, height);
+        }
+
+        GameObject TableSketch(string name, GameObject table, float width, float height, float x = 0, float z = 0)
+        {
+            var card = ImageProp(name, table.transform.position, null, width, height);
+            card.transform.rotation = Quaternion.Euler(90, 0, 0);
+            RestOnTable(card, table, x, z);
+            return card;
+        }
+
+        GameObject PostedSign(string name, Vector3 center, float width = .80f, float height = .62f)
+        {
+            var face = ImageProp(name, center, null, width, height);
+            var foot = FloorAt(center + Vector3.forward * .06f);
+            float length = center.y - foot.y;
+            var post = Prop("木樁", foot + Vector3.up * (length * .5f),
+                new Vector3(.085f, length, .09f), Wood);
+            post.transform.SetParent(face.transform, true);
+            return face;
         }
 
         GameObject Seat(Vector3 foot, bool bench = false)
@@ -615,12 +661,13 @@ namespace Puzzle.Story
         GameObject Table(Vector3 foot)
         {
             var table = Prop("桌子", foot + Vector3.up * .70f, new Vector3(1.3f, .105f, .72f), Wood);
+            table.GetComponent<BoxCollider>().enabled = true;
             for (int i = -1; i <= 1; i += 2)
                 Prop("桌腳", foot + new Vector3(i * .53f, .35f, 0), new Vector3(.10f, .70f, .55f), Wood);
             return table;
         }
 
-        void Lamp(Vector3 point, Mesh model = null)
+        GameObject Lamp(Vector3 point, Mesh model = null)
         {
             var lamp = Period(model != null ? model : terrain.Models.oilLamp, point);
             var light = lamp.AddComponent<Light>();
@@ -628,6 +675,7 @@ namespace Puzzle.Story
             light.color = new Color(1f, .74f, .40f);
             light.range = 3.5f;
             light.intensity = 2.2f;
+            return lamp;
         }
 
         Texture2D MakeSketch(string title, Func<float, float, Color> draw)
@@ -664,6 +712,11 @@ namespace Puzzle.Story
             var burst = new GameObject("顏料筆觸");
             burst.transform.position = from;
             var particles = burst.AddComponent<ParticleSystem>();
+            var pigmentRenderer = burst.GetComponent<ParticleSystemRenderer>();
+            pigmentRenderer.sharedMaterial = propMaterial;
+            var pigmentColor = new MaterialPropertyBlock();
+            pigmentColor.SetColor("_BaseColor", color);
+            pigmentRenderer.SetPropertyBlock(pigmentColor);
             particles.Stop(true, ParticleSystemStopBehavior.StopEmittingAndClear);
             var main = particles.main;
             main.loop = false;

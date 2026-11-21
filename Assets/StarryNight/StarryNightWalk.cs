@@ -28,6 +28,7 @@ namespace Puzzle.StarryNight
         internal bool EscapeHandledExternally { get; set; }
         internal Func<Vector2, bool> PointerOverMenu { get; set; }
         internal CharacterController Player => player;
+        internal float EyeHeight => eyeHeight;
         internal bool WaitingAtPainting => view == View.Overlook && onApproachFinished != null;
 
         void Start()

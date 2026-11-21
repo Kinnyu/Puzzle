@@ -64,7 +64,7 @@ namespace Puzzle.Story
             var properties = new MaterialPropertyBlock();
             properties.SetColor(BaseColor, color);
             var renderer = prop.GetComponent<Renderer>();
-            renderer.sharedMaterial = propMaterial;
+            StoryPropInk.SetSurface(prop, propMaterial);
             renderer.SetPropertyBlock(properties);
             return prop.transform;
         }

@@ -399,7 +399,7 @@ namespace Puzzle.Story
             item.transform.SetParent(parent, false);
             item.transform.localPosition = position;
             item.transform.localScale = size;
-            item.GetComponent<Renderer>().sharedMaterial = material;
+            StoryPropInk.SetSurface(item, material);
             if (!solid) item.GetComponent<Collider>().enabled = false;
             return item;
         }

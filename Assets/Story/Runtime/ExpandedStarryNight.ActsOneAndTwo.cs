@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using UnityEngine;
 using Mask = Puzzle.Story.StoryBrush.Shape;
 using Ink = Puzzle.Story.StoryBrush.Option;
@@ -7,10 +8,11 @@ namespace Puzzle.Story
 {
     internal sealed partial class ExpandedStarryNight
     {
-        GameObject Mary(Vector3 spot) => Actor("瑪莉", fourth.VisitorSprite(0), spot);
-        GameObject Anna(Vector3 spot) => Actor("安娜", fourth.VisitorSprite(2), spot, Linen);
-        GameObject Ruth(Vector3 spot) => Actor("露絲", fourth.VisitorSprite(1), spot);
-        Vector3 Bench => Side + new Vector3(.42f, 0, 1.05f);
+        GameObject Mary(Vector3 spot) => Actor("瑪莉", fourth.VisitorSprite(2), spot);
+        GameObject Anna(Vector3 spot) => Actor("安娜", fourth.VisitorSprite(0), spot, Linen);
+        GameObject Ruth(Vector3 spot) => Actor("露絲", terrain.FarmerSprite, spot);
+        Vector3 Bench => terrain.ChapelPoint(1.73f, 0, -1.52f);
+        Vector3 BenchApproach => terrain.ChapelPoint(1.08f, 0, -2.75f);
         Vector3 Family => terrain.WorkersHome;
         Vector3 Meal => terrain.Farmhouse;
         Vector3 MineExit => terrain.Ground(Mine + new Vector3(1.65f, 0, .70f));
@@ -20,7 +22,7 @@ namespace Puzzle.Story
             Scene("church-meet", Location.Square, () =>
             {
                 var spot = terrain.Ground(Church + Vector3.back * .62f);
-                Vincent(spot + new Vector3(-1.2f, 0, .55f));
+                var vincent = Vincent(spot + new Vector3(-1.2f, 0, .55f));
                 Mary(spot + new Vector3(.95f, 0, .45f));
                 var cart = Prop("卡住的手推車", spot + Vector3.up * .51f, new Vector3(1.1f, .36f, .74f), Wood);
                 for (int side = -1; side <= 1; side += 2)
@@ -35,10 +37,12 @@ namespace Puzzle.Story
                     Prop("推車握柄", spot + new Vector3(side * .41f, .58f, -.66f),
                         new Vector3(.065f, .085f, .66f), Wood).transform.SetParent(cart.transform, true);
                 }
-                Period(terrain.Models.loaf, spot + new Vector3(-.28f, .74f, -.18f)).transform.SetParent(cart.transform, true);
-                Period(terrain.Models.book, spot + new Vector3(.28f, .71f, .14f)).transform.SetParent(cart.transform, true);
-                Period(terrain.Models.cloth, spot + Vector3.up * .75f, "車上的布料")
-                    .transform.SetParent(cart.transform, true);
+                for (int i = 0; i < 3; i++)
+                {
+                    var parcel = DeliveryParcel(i, spot);
+                    RestOnTable(parcel, cart, i == 0 ? .28f : -.24f, i == 2 ? -.19f : .13f);
+                    parcel.transform.SetParent(cart.transform, true);
+                }
                 var landing = spot + Vector3.back * 1.82f;
                 if (enteringFromPainting)
                 {
@@ -46,17 +50,17 @@ namespace Puzzle.Story
                     {
                         enteringFromPainting = false;
                         progress.SaveCheckpoint(scenes[sceneIndex].id);
-                        MeetAtCart(cart);
+                        MeetAtCart(cart, vincent);
                     });
                 }
                 else
                 {
                     Arrive(landing, spot);
-                    MeetAtCart(cart);
+                    MeetAtCart(cart, vincent);
                 }
             });
 
-            void MeetAtCart(GameObject cart)
+            void MeetAtCart(GameObject cart, GameObject vincent)
             {
                 Goal("看看廣場上卡住的推車");
                 Speak(() =>
@@ -77,7 +81,13 @@ namespace Puzzle.Story
                                     Speak(() => Ask("梵谷", "我是文森特。你是剛來村裡的嗎？", meet =>
                                     {
                                         Save("meet-by-help", meet);
-                                        Speak(Next, meet == 0 ? "梵谷|那我們算是一起迷路到同一件事裡了。"
+                                        Speak(() =>
+                                        {
+                                            Goal("跟著梵谷的推車走到教堂門前");
+                                            StartCoroutine(BringCartToDoor(cart.transform, vincent.transform, () =>
+                                                Offer(terrain.ChapelPoint(0, 1.05f, -3.85f), "陪梵谷把物資送進教堂",
+                                                    Next, range: 1.45f)));
+                                        }, meet == 0 ? "梵谷|那我們算是一起迷路到同一件事裡了。"
                                                 : "梵谷|這倒是很好的相遇方式。",
                                             "梵谷|如果不趕時間，願意陪我把東西送進教堂嗎？我一個人可能又會弄亂。");
                                     }, "我迷路了。", "我聽見有人需要幫忙。"),
@@ -92,10 +102,10 @@ namespace Puzzle.Story
 
             Scene("church-help", Location.Church, () =>
             {
-                var table = Table(Side + new Vector3(-.75f, 0, .15f));
+                var (table, linenTable) = DeliveryTables();
                 Vincent(Side + new Vector3(.92f, 0, .72f));
                 Mary(Side + new Vector3(-1.08f, 0, 1.04f));
-                var dropped = Side + new Vector3(.30f, .14f, 1.63f);
+                var dropped = Side + new Vector3(.30f, .05f, 1.63f);
                 var pile = Prop("側廊散落木板", dropped, new Vector3(.92f, .10f, .26f), Wood);
                 pile.transform.rotation = Quaternion.Euler(0, 28, 0);
                 for (int i = 0; i < 2; i++)
@@ -105,7 +115,7 @@ namespace Puzzle.Story
                     board.transform.rotation = Quaternion.Euler(0, -19 + 42 * i, 0);
                     board.transform.SetParent(pile.transform, true);
                 }
-                Arrive(Side + Vector3.back * 1.02f, table.transform.position);
+                Arrive(terrain.ChapelPoint(-.82f, 0, -2.14f), table.transform.position);
                 string[] names = { "書本", "布料", "麵包" };
                 string[] reactions = {
                     "梵谷|我在畫商那裡工作，常常見到很美的畫。但一本書被人翻得起毛邊，也有自己的故事。",
@@ -117,18 +127,18 @@ namespace Puzzle.Story
                 for (int i = 0; i < supplies.Length; i++)
                 {
                     int index = i;
-                    var parcel = Period(i == 0 ? terrain.Models.book : i == 1 ? terrain.Models.cloth : terrain.Models.loaf,
-                        table.transform.position + new Vector3((i - 1) * .42f, .11f, 0), names[i]);
+                    var parcel = DeliveryParcel(i, table.transform.position);
+                    RestOnTable(parcel, table, (i - 1) * .42f, -.13f);
                     supplies[i] = (parcel, $"拿起{names[i]}並放到指定位置", () =>
                     {
                         if (first < 0) first = index;
-                        parcel.transform.position += Vector3.forward * .21f;
+                        SortParcel(parcel, index, table, linenTable);
                     });
                 }
                 Speak(() =>
                 {
-                    var coat = Prop("攤開的外套", table.transform.position + new Vector3(-.89f, .12f, .22f),
-                        new Vector3(.52f, .09f, .28f), Blue);
+                    bool alreadyFolded = Recall(1, "folded-coat", 0) == 1;
+                    var coat = CoatOn(linenTable, alreadyFolded);
                     Collect("分好教堂的物資", supplies, () =>
                     {
                         ClearTargets();
@@ -153,62 +163,44 @@ namespace Puzzle.Story
                         }, reactions[first], "梵谷|約瑟還沒回來。別硬搬，會傷到人。",
                             "那一小部分，像是還沒乾透的顏料。");
                     });
-                    ObjectAction(coat, "摺好攤開的外套", () =>
+                    if (!alreadyFolded) ObjectAction(coat, "摺好攤開的外套", () =>
                     {
                         targets.RemoveAll(target => target.Object == coat.transform);
-                        coat.transform.localScale = new Vector3(.26f, .15f, .23f);
+                        FoldCoat(coat, linenTable);
                         Save("folded-coat", 1);
                         Speak(null, "梵谷|你連袖子都收得很整齊。晚上來的人應該用得上。");
                     });
                 }, "瑪莉|布料送到側廊，書放小桌，麵包留給晚間來訪的人。");
-            });
+            }, "教堂內　・　整理送來的物資");
 
             Scene("church-window", Location.Church, () =>
             {
-                var window = ImageProp("漏風的窗", Side + new Vector3(-.72f, 1.32f, 1.35f), null, .83f, .97f);
-                ColorProp(window.transform.GetChild(0).gameObject, Blue);
-                var vincent = Vincent(Side + new Vector3(.72f, 0, 1.0f));
-                Actor("約瑟", terrain.FarmerSprite, Side + new Vector3(-.99f, 0, .66f));
-                Arrive(Side + Vector3.back * .75f, window.transform.position);
+                var window = FurnishSideAisle();
+                var vincent = Vincent(terrain.ChapelPoint(-.30f, 0, 2.25f));
+                Actor("約瑟", fourth.VisitorSprite(1), terrain.ChapelPoint(-2.66f, 0, 2.29f));
+                Arrive(terrain.ChapelPoint(-1.53f, 0, 1.06f), window.transform.position);
                 Speak(() =>
                 {
                     Goal("選一種方式擋住側廊的風　〔B 畫筆〕");
                     BrushAt(window, "修補漏風的窗", option =>
                     {
                         Save("church-window", option);
-                        var center = window.transform.position + Vector3.back * .08f;
-                        if (option == 0)
-                        {
-                            for (int i = -1; i <= 1; i++)
-                                Prop("補好的窗板", center + Vector3.right * (i * .22f),
-                                    new Vector3(.21f, .86f, .04f), Color.Lerp(Wood, Gold, .55f + i * .10f));
-                        }
-                        else
-                        {
-                            for (int i = 0; i < 8; i++)
-                                Prop("厚窗簾的布褶", center + Vector3.right * ((i - 3.5f) * .10f),
-                                    new Vector3(.105f, .99f, .065f + (i % 2) * .04f),
-                                    Color.Lerp(Wood, Blue, .23f + (i % 2) * .27f));
-                        }
-                        var light = window.AddComponent<Light>();
-                        light.type = LightType.Point;
-                        light.range = 4;
-                        light.intensity = option == 0 ? 2.6f : .75f;
-                        light.color = option == 0 ? new Color(.81f, .88f, 1) : new Color(1, .74f, .45f);
+                        FitWindowCover(window, option);
                         Speak(() => Ask("梵谷", "我以前以為，事情只有一個正確答案。", _ =>
                             Answer(vincent, "和梵谷去看看安娜", Next), "有時候先試試看。", "也可以先問需要的人。"),
                             option == 0 ? "約瑟|尺寸剛剛好，這下省事了。" : "約瑟|能先擋一晚，明天我再修窗。");
                     }, false, new Ink("補上窗板", Mask.Panel, Gold), new Ink("畫出厚窗簾", Mask.Cloth, Linen));
                 }, "約瑟|今晚有人會在這裡休息，窗不能一直漏風。我去找合適的木框。", "梵谷|我可以幫忙，但我不知道怎麼修。");
-            });
+            }, "穿過清出的側廊　・　教堂後窗");
 
             Scene("church-anna", Location.Church, () =>
             {
+                FitWindowCover(FurnishSideAisle(), Recall(1, "church-window"));
                 Seat(Bench, true);
-                var anna = Anna(Bench + new Vector3(.51f, 0, .20f));
-                Vincent(Bench + new Vector3(-1.05f, 0, -.16f));
-                var drawing = ImageProp("長椅旁的教堂素描", Bench + new Vector3(-.43f, 1.25f, .68f), null);
-                Arrive(Side + Vector3.back * 1.05f, Bench);
+                var anna = Anna(Bench + Vector3.right * 1.03f);
+                Vincent(Bench + new Vector3(-1.18f, 0, .62f));
+                var drawing = BenchDrawing("長椅旁的教堂素描");
+                Arrive(BenchApproach, anna.transform.position);
                 Answer(anna, "問安娜在等誰", () =>
                 {
                     Speak(() =>
@@ -217,13 +209,14 @@ namespace Puzzle.Story
                         BrushAt(drawing, "在教堂素描上作畫", choice =>
                         {
                             Save("anna-object", choice);
-                            PutAnnaObject(choice);
+                            var furniture = PutAnnaObject(choice);
                             if (choice == 0)
                                 Answer(anna, "和安娜一起坐下", RememberAnna);
                             else
                             {
-                                var letter = Prop("安娜的信", anna.transform.position + new Vector3(-.31f, .83f, -.30f),
-                                    new Vector3(.24f, .17f, .03f), Linen);
+                                var letter = Prop("安娜的信", furniture.transform.position,
+                                    new Vector3(.24f, .012f, .17f), Linen);
+                                RestOnTable(letter, furniture, -.25f, -.16f);
                                 ObjectAction(letter, "聽安娜讀信", RememberAnna);
                                 Goal("安娜拿出了信");
                             }
@@ -245,17 +238,24 @@ namespace Puzzle.Story
                         "梵谷|我不知道怎麼回答您。");
                 }
 
-                void Reflect() => Speak(Next, "梵谷|我原本想說點漂亮的話，結果一句也說不出來。",
-                    "梵谷|我總是太急著證明自己有用。");
-            });
+                void Reflect() => Speak(() =>
+                {
+                    anna.SetActive(false);
+                    Goal("到椅旁的畫架，陪梵谷把今天畫下來");
+                    ObjectAction(drawing, "和梵谷攤開速寫紙", Next);
+                }, "梵谷|我原本想說點漂亮的話，結果一句也說不出來。",
+                    "安娜向你們道別。梵谷從口袋裡摸出兩張紙。",
+                    "梵谷|你看，畫架旁還有位置。我想趁著還記得，把今天留下來。");
+            }, "傍晚　・　安娜來到教堂門旁的長椅");
 
             Scene("church-sketch", Location.Church, () =>
             {
+                FitWindowCover(FurnishSideAisle(), Recall(1, "church-window"));
                 Seat(Bench, true);
                 PutAnnaObject(Recall(1, "anna-object"));
                 Vincent(Bench + Vector3.right * 1.0f);
-                var sketch = ImageProp("教堂速寫", Bench + new Vector3(-.28f, 1.02f, .14f), null);
-                Arrive(Side + Vector3.back * .93f, sketch.transform.position);
+                var sketch = BenchDrawing("教堂速寫");
+                Arrive(terrain.ChapelPoint(2.73f, 0, -1.91f), sketch.transform.position);
                 Speak(() => Layers(sketch, "和梵谷畫一張教堂速寫", choice =>
                 {
                     Save("church-sketch", choice);
@@ -272,10 +272,13 @@ namespace Puzzle.Story
 
             Scene("church-value", Location.Church, () =>
             {
+                FitWindowCover(FurnishSideAisle(), Recall(1, "church-window"));
+                var sketch = BenchDrawing("完成的教堂速寫");
+                ColorProp(sketch.transform.GetChild(0).gameObject, Color.white, ChurchArt(Recall(1, "church-sketch")));
                 var seat = Seat(Bench, true);
-                Vincent(Bench + Vector3.right * .55f);
+                Vincent(Bench + Vector3.right * 1.04f);
                 PutAnnaObject(Recall(1, "anna-object"));
-                Arrive(Side + Vector3.back * .55f, Bench);
+                Arrive(BenchApproach, seat.transform.position);
                 Goal("在長椅旁和梵谷聊聊今天");
                 ObjectAction(seat, "坐下來和梵谷交談", () =>
                 {
@@ -302,13 +305,137 @@ namespace Puzzle.Story
                         "梵谷|我在畫商那裡看見很多人追逐名聲，也有人一輩子只想做好手上的工作。",
                         "梵谷|今天幫忙推車時，我只想把車推出來。陪安娜坐著時，我卻開始想，她每天是不是都這樣一個人。");
                 });
-            });
+            }, "入夜　・　回到長椅");
         }
 
-        void PutAnnaObject(int choice)
+        IEnumerator BringCartToDoor(Transform cart, Transform vincent, Action arrived)
         {
-            if (choice == 0) Seat(Bench + new Vector3(-.94f, 0, -.05f));
-            else Lamp(Bench + new Vector3(-.92f, 1.15f, .35f));
+            Vector3 destination = terrain.ChapelPoint(0, 0, -4.32f);
+            while (cart != null && cart.gameObject.activeInHierarchy)
+            {
+                Vector3 flatTarget = new(destination.x, cart.position.y, destination.z);
+                cart.position = terrain.Ground(Vector3.MoveTowards(cart.position, flatTarget, 1.2f * Time.deltaTime))
+                    + Vector3.up * .51f;
+                var handles = terrain.Ground(cart.position + Vector3.back * .96f);
+                vincent.position = Vector3.MoveTowards(vincent.position, handles, 2.3f * Time.deltaTime);
+                if (Vector3.ProjectOnPlane(destination - cart.position, Vector3.up).sqrMagnitude < .001f
+                    && (vincent.position - handles).sqrMagnitude < .001f)
+                {
+                    arrived();
+                    yield break;
+                }
+                yield return null;
+            }
+        }
+
+        GameObject BenchDrawing(string name) =>
+            EaselPicture(name, Bench + new Vector3(.66f, 1.125f, 1.06f));
+
+        GameObject FurnishSideAisle()
+        {
+            var (table, linenTable) = DeliveryTables();
+            for (int i = 0; i < 3; i++)
+                SortParcel(DeliveryParcel(i, table.transform.position), i, table, linenTable);
+            CoatOn(linenTable, Recall(1, "folded-coat", 0) == 1);
+            var wall = terrain.ChapelWindowWall();
+            var frame = ImageProp("側廊待修窗框", wall.point + wall.normal * .034f, null, .83f, .97f);
+            ColorProp(frame.transform.GetChild(0).gameObject, Blue);
+            void WindowWood(string name, Vector3 offset, Vector3 size)
+            {
+                var wood = Prop(name, frame.transform.position + offset, size, Wood);
+                wood.transform.SetParent(frame.transform, true);
+            }
+            WindowWood("窗台", new Vector3(0, -.48f, -.07f), new Vector3(.93f, .07f, .20f));
+            WindowWood("豎窗櫺", Vector3.back * .051f, new Vector3(.038f, .89f, .018f));
+            WindowWood("橫窗櫺", new Vector3(0, .13f, -.05f), new Vector3(.77f, .038f, .018f));
+            frame.transform.rotation = Quaternion.LookRotation(-wall.normal, Vector3.up);
+            return frame;
+        }
+
+        (GameObject table, GameObject linenTable) DeliveryTables() =>
+            (Table(terrain.ChapelPoint(-2.38f, 0, -.88f)), Table(terrain.ChapelPoint(-2.38f, 0, .54f)));
+
+        GameObject DeliveryParcel(int index, Vector3 point) => index switch
+        {
+            0 => Period(terrain.Models.book, point, "書本"),
+            1 => Period(terrain.Models.cloth, point, "布料"),
+            _ => Period(terrain.Models.loaf, point, "麵包")
+        };
+
+        static void SortParcel(GameObject parcel, int index, GameObject table, GameObject linenTable) =>
+            RestOnTable(parcel, index == 1 ? linenTable : table, index == 1 ? .32f : (index - 1) * .40f, .14f);
+
+        GameObject CoatOn(GameObject table, bool folded)
+        {
+            var coat = Period(terrain.Models.cloth, table.transform.position, "攤開的外套");
+            coat.transform.localScale = new Vector3(.93f, .65f, 1.52f);
+            ColorProp(coat, Blue);
+            if (folded) FoldCoat(coat, table);
+            else
+            {
+                RestOnTable(coat, table, -.28f, 0);
+                for (int side = -1; side <= 1; side += 2)
+                {
+                    var sleeve = Period(terrain.Models.cloth, table.transform.position, "袖子");
+                    sleeve.transform.localScale = new Vector3(.26f, .54f, .92f);
+                    sleeve.transform.rotation = Quaternion.Euler(0, side * 16, 0);
+                    ColorProp(sleeve, Blue);
+                    RestOnTable(sleeve, table, -.28f + side * .205f, .028f);
+                    sleeve.transform.SetParent(coat.transform, true);
+                }
+            }
+            return coat;
+        }
+
+        static void FoldCoat(GameObject coat, GameObject table)
+        {
+            coat.name = "摺好的外套";
+            foreach (Transform sleeve in coat.transform) sleeve.gameObject.SetActive(false);
+            coat.transform.localScale = new Vector3(.68f, 1.4f, .90f);
+            RestOnTable(coat, table, -.28f, 0);
+        }
+
+        void FitWindowCover(GameObject frame, int option)
+        {
+            var mount = frame.transform;
+            bool boards = option == 0;
+            int count = boards ? 3 : 8;
+            float width = .77f / count;
+            for (int i = 0; i < count; i++)
+            {
+                var depth = boards ? .04f : .055f + i % 2 * .025f;
+                var center = mount.position - mount.forward * (.051f + depth * .5f)
+                    + mount.right * ((i - (count - 1) * .5f) * width);
+                var piece = Prop(boards ? "補好的窗板" : "厚窗簾的布褶", center,
+                    new Vector3(width, .89f, depth), boards ? Color.Lerp(Wood, Gold, .4f + i * .10f)
+                    : Color.Lerp(Wood, Blue, .23f + i % 2 * .27f));
+                piece.transform.rotation = mount.rotation;
+                piece.transform.SetParent(mount, true);
+            }
+            var light = frame.AddComponent<Light>();
+            light.type = LightType.Point;
+            light.range = 4;
+            light.intensity = boards ? 2.6f : .75f;
+            light.color = boards ? new Color(.81f, .88f, 1) : new Color(1, .74f, .45f);
+        }
+
+        static void RestOnTable(GameObject item, GameObject table, float x, float z)
+        {
+            var top = table.GetComponent<Renderer>().bounds;
+            var bounds = item.GetComponent<Renderer>().bounds;
+            var center = new Vector3(
+                Mathf.Clamp(top.center.x + x, top.min.x + bounds.extents.x, top.max.x - bounds.extents.x),
+                top.max.y + bounds.extents.y,
+                Mathf.Clamp(top.center.z + z, top.min.z + bounds.extents.z, top.max.z - bounds.extents.z));
+            item.transform.position += center - bounds.center;
+        }
+
+        GameObject PutAnnaObject(int choice)
+        {
+            if (choice == 0) return Seat(Bench + new Vector3(-1.22f, 0, -.08f));
+            var table = Table(Bench + new Vector3(-1.54f, 0, -.10f));
+            RestOnTable(Lamp(table.transform.position), table, .24f, .12f);
+            return table;
         }
 
         void MineStory()
@@ -318,7 +445,7 @@ namespace Puzzle.Story
                 Vincent(Mine + Vector3.left * .93f);
                 Peter(Mine + Vector3.right * .88f);
                 var sack = Sack(Mine, "待搬的煤袋");
-                Arrive(Mine + Vector3.back * 1.24f, Mine);
+                Arrive(Mine + Vector3.back * 1.67f, sack.transform.position);
                 Goal("過去幫兩人扶住煤袋");
                 Speak(() => ObjectAction(sack, "扶住煤袋", () =>
                 {
@@ -336,16 +463,16 @@ namespace Puzzle.Story
             {
                 Peter(Mine + new Vector3(1.15f, 0, .64f));
                 Vincent(Mine + new Vector3(-1.15f, 0, .6f));
-                var bag = Sack(Mine + Vector3.forward * 1.1f, "裝煤的布袋");
+                var bag = Sack(terrain.Ground(Mine + Vector3.forward * 1.1f), "裝煤的布袋");
                 var piles = new GameObject[3];
                 for (int i = 0; i < piles.Length; i++)
                 {
                     var point = terrain.Ground(Mine + new Vector3((i - 1) * .95f, 0, i == 1 ? .25f : -.34f)) +
-                        Vector3.up * .15f;
+                        Vector3.up * .095f;
                     piles[i] = Prop("散落煤塊", point, new Vector3(.55f, .19f, .39f),
                         new Color(.22f, .22f, .24f), PrimitiveType.Sphere);
                 }
-                Arrive(Mine + Vector3.back * 1.24f, Mine);
+                Arrive(terrain.Ground(Mine + new Vector3(-1.62f, 0, -1.05f)), bag.transform.position);
                 int coal = 0;
                 string[] accounts = { "彼得|天還沒亮，我們就來了。", "彼得|莉娜等我回家，也常等到睡著。",
                     "彼得|你們畫得走地上的煤，可畫不走明天的工作。" };
@@ -362,27 +489,32 @@ namespace Puzzle.Story
 
                 void MarkExit()
                 {
-                    var sign = ImageProp("失去照明的出口", MineExit + Vector3.up * .89f, null, .62f, .44f);
+                    var sign = PostedSign("失去照明的出口", MineExit + Vector3.up * .89f, .62f, .44f);
                     Goal("給礦口標出可辨識的出口　〔B 畫筆〕");
                     BrushAt(sign, "畫出礦口照明或標記", option =>
                     {
                         Save("mine-light", option);
-                        if (option == 0) Lamp(sign.transform.position + Vector3.up * .4f, terrain.Models.mineLamp);
+                        if (option == 0)
+                        {
+                            var shelf = Prop("礦燈木托", sign.transform.position + new Vector3(0, .24f, -.09f),
+                                new Vector3(.42f, .06f, .33f), Wood);
+                            RestOnTable(Lamp(shelf.transform.position, terrain.Models.mineLamp), shelf, 0, 0);
+                        }
                         else TurnSign(sign, Gold, "安全出口　→");
                         Speak(Next, "彼得|這樣好多了。進礦坑要聽熟手的，不要自己冒險。",
                             "梵谷|我原以為帶著熱情就夠了。原來還得學會聽。");
                     }, false, new Ink("提燈", Mask.Lantern, Gold), new Ink("反光標記", Mask.Arrow, Linen));
                 }
-            });
+            }, "礦口旁　・　和彼得收拾散煤");
 
             Scene("mine-family", Location.WorkersHome, () =>
             {
                 var table = Table(Family);
-                var spot = table.transform.position + new Vector3(.05f, .37f, .07f);
+                var spot = table.transform.position;
                 Ruth(Family + new Vector3(.91f, 0, .43f));
                 Actor("莉娜", fourth.VisitorSprite(3), Family + new Vector3(-.74f, 0, .59f)).transform.localScale = Vector3.one * .68f;
                 Vincent(Family + new Vector3(-1.22f, 0, -.03f));
-                var card = ImageProp("工人住所的畫片", spot, null, .53f, .39f);
+                var card = TableSketch("工人住所的畫片", table, .53f, .39f, .27f);
                 Arrive(Family + Vector3.back * 1.56f, Family);
                 Speak(() =>
                 {
@@ -391,7 +523,7 @@ namespace Puzzle.Story
                     {
                         Save("mine-supply", choice);
                         card.SetActive(false);
-                        PlaceSupport(spot - Vector3.up * .18f, choice);
+                        RestOnTable(PlaceSupport(spot, choice), table, -.32f, 0);
                         Speak(() => Listen(0, 0), "露絲|謝謝。不過明天我們還是要自己想辦法。你們願意聽聽我們怎麼過日子嗎？");
                     }, false, new Ink("麵包", Mask.Bread, Gold), new Ink("鍋子", Mask.Pot, Blue), new Ink("厚毯", Mask.Cloth, Linen));
                 }, "露絲|今天能分的就這些。文森特，你不用為我們難過。", "梵谷|可我看見了，就沒辦法當作沒看見。");
@@ -436,7 +568,7 @@ namespace Puzzle.Story
                         BrushAt(card, "為工人家庭補畫一件物資", extra =>
                         {
                             card.SetActive(false);
-                            PlaceSupport(spot + new Vector3(.39f, -.18f, .03f), other[extra]);
+                            RestOnTable(PlaceSupport(spot, other[extra]), table, .32f, 0);
                             Save("mine-extra-supply", other[extra]);
                             Speak(Next, "露絲|謝謝，我會留著慢慢用。你們先去田裡吧。");
                         }, false, kinds[other[0]], kinds[other[1]]);
@@ -445,7 +577,7 @@ namespace Puzzle.Story
                         Recall(1, "help") == 1 ? "梵谷|你在教堂說過的話，我現在才慢慢懂。"
                             : "露絲|我們也希望有人把我們當成能做決定的人。");
                 }
-            });
+            }, "收工後　・　工人住所");
 
             Scene("farm-harvest", Location.Farm, () =>
             {
@@ -460,7 +592,7 @@ namespace Puzzle.Story
                 }
                 for (int i = 0; i < 3; i++)
                     Crop(terrain.Ground(Farm + new Vector3((i - 1) * .84f, 0, 2.15f)), false);
-                Arrive(terrain.Ground(Farm + Vector3.back * 2.1f), Farm);
+                Arrive(terrain.Ground(Farm + Vector3.back * 2.1f), Farm + Vector3.up * .46f);
                 int harvest = 0;
                 Speak(SupplyTargets, "艾米爾|只收有標記的，別踩進還沒成熟的那塊田！");
                 void SupplyTargets()
@@ -502,35 +634,43 @@ namespace Puzzle.Story
                     if (supply == 0) Peter(visitor);
                     else if (supply == 1) Ruth(visitor);
                     else Actor("莉娜", fourth.VisitorSprite(3), visitor).transform.localScale = Vector3.one * .68f;
-                    PlaceSupport(visitor + new Vector3(-.22f, .52f, -.13f), supply);
+                    var supplies = Table(FloorAt(Farm + new Vector3(1.65f, 0, -1.30f)));
+                    var offering = supply == 2 ? Period(terrain.Models.coffeePot, supplies.transform.position, "莉娜送來的水壺")
+                        : PlaceSupport(supplies.transform.position, supply);
+                    RestOnTable(offering, supplies, 0, 0);
                     Speak(Next, new[] { "彼得|麵包還有一些。艾米爾，來分一塊吧。",
                         "露絲|鍋裡還有熱湯。我帶了一些來田裡。",
                         "莉娜|昨晚暖和多了。今天換我替你們送水。" }[supply],
                         "梵谷|先問哪一株可以收，比急著動手重要。");
                 }
-            });
+            }, "田裡　・　趁雨勢轉大前收成");
 
             Scene("farm-meal", Location.Farmhouse, () =>
             {
                 var table = Table(Meal);
-                var vincent = Vincent(Meal + new Vector3(.88f, 0, .42f));
+                var doorstep = terrain.Ground(Meal + new Vector3(.81f, 0, -2.61f));
+                var vincent = Vincent(doorstep);
                 FarmLamp();
                 Seat(Meal + new Vector3(-.92f, 0, .04f));
-                Arrive(Meal + Vector3.back * 1.44f, mealCenter());
+                Arrive(terrain.Ground(Meal + new Vector3(.15f, 0, -3.85f)), doorstep);
                 Answer(vincent, "請梵谷停下來休息", () =>
                     Ask("梵谷", "可我總覺得一停下來，就像放棄了他們。", _ =>
+                        Travel(Meal + Vector3.back * 1.44f, table.transform.position, JoinTable, "進到農舍　・　請梵谷一起坐下用餐"),
+                        "先坐下吃一點。", "你不能一個人扛下所有人的生活。"));
+                void JoinTable()
+                {
+                    vincent.transform.position = FindClearFooting(Meal + new Vector3(.88f, 0, .42f), .25f, 1.5f);
+                    var card = TableSketch("餐桌上的畫片", table, .52f, .35f);
+                    ClearTargets();
+                    BrushAt(card, "畫一件餐具給梵谷", option =>
                     {
-                        var card = ImageProp("餐桌上的畫片", mealCenter(), null, .52f, .35f);
-                        ClearTargets();
-                        BrushAt(card, "畫一件餐具給梵谷", option =>
-                        {
-                            card.SetActive(false);
-                            Dish(table.transform.position + new Vector3(.24f, .16f, -.05f), option);
-                            PauseTogether(4f, () => Speak(Next, "梵谷|謝謝你提醒我。我希望明天還能有力氣站在這裡。"));
-                        }, false, new Ink("餐盤", Mask.Circle, Linen), new Ink("水杯", Mask.Pot, Blue));
-                    }, "先坐下吃一點。", "你不能一個人扛下所有人的生活。"));
-                Vector3 mealCenter() => table.transform.position + Vector3.up * .32f;
-            });
+                        card.SetActive(false);
+                        Dish(table, .24f, -.05f, option);
+                        Save("farm-dish", option);
+                        PauseTogether(4f, () => Speak(Next, "梵谷|謝謝你提醒我。我希望明天還能有力氣站在這裡。"));
+                    }, false, new Ink("餐盤", Mask.Circle, Linen), new Ink("水杯", Mask.Pot, Blue));
+                }
+            }, "雨後　・　回農舍歇腳");
 
             Scene("potato-painting", Location.Farmhouse, () =>
             {
@@ -539,10 +679,11 @@ namespace Puzzle.Story
                 Ruth(Meal + new Vector3(-.82f, 0, .49f));
                 Actor("艾米爾", terrain.FarmerSprite, Meal + new Vector3(-1.07f, 0, -.06f));
                 FarmLamp();
-                Period(terrain.Models.coffeePot, table.transform.position + new Vector3(.41f, .184f, .12f));
-                Dish(table.transform.position + new Vector3(-.20f, .09f, -.16f), 0);
-                var easel = EaselPicture("農家晚餐畫布", Meal + new Vector3(.65f, 1.13f, .32f));
-                Arrive(Meal + Vector3.back * 1.44f, easel.transform.position);
+                RestOnTable(Period(terrain.Models.coffeePot, table.transform.position), table, .41f, .12f);
+                Dish(table, -.21f, .06f, 0);
+                if (Recall(2, "farm-dish") == 1) Dish(table, -.48f, -.22f, 1);
+                var easel = EaselPicture("農家晚餐畫布", Meal + new Vector3(1.53f, 0, -.49f));
+                Arrive(Meal + new Vector3(.12f, 0, -1.88f), Meal + new Vector3(.42f, .98f, .18f));
                 Speak(() => Layers(easel, "和梵谷描畫農家的晚餐", choice =>
                 {
                     Save("potato-focus", choice);
@@ -554,12 +695,12 @@ namespace Puzzle.Story
                     FreeLayer()),
                     "梵谷|我想記下這一幕。每個人都用自己的雙手換來這頓飯。",
                     "露絲|你要畫得像我們。別把我們畫成只會低頭的人。");
-            });
+            }, "晚餐時分　・　移到畫架旁，看向燈下的餐桌");
 
             Scene("miner-helped", Location.Mine, () =>
             {
                 var vincent = Vincent(Mine + new Vector3(.57f, 0, .19f));
-                var card = ImageProp("礦區的記憶畫片", Mine + new Vector3(-.42f, 1.11f, .11f), null);
+                var card = EaselPicture("礦區的記憶畫片", Mine + new Vector3(-.62f, 0, .11f));
                 Arrive(terrain.Ground(Mine + Vector3.back * 1.8f), Mine);
                 Answer(vincent, "和梵谷讀那封信", () =>
                 {
@@ -578,7 +719,7 @@ namespace Puzzle.Story
                     }, "別人的否定，不會抹掉你做過的事。", "也許你可以換一種方式留下他們的故事。"),
                         "一封關於傳教工作的信到了礦區。梵谷讀完，久久沒有說話。");
                 });
-            });
+            }, "入夜　・　礦口收到一封信");
         }
 
         GameObject Sack(Vector3 spot, string name)
@@ -594,7 +735,9 @@ namespace Puzzle.Story
 
         GameObject Basket(Vector3 spot)
         {
-            return Period(terrain.Models.basket, spot + Vector3.up * .14f, "收成籃");
+            var basket = Period(terrain.Models.basket, spot, "收成籃");
+            PeriodModels.RestOnSurface(basket, FloorAt(spot).y);
+            return basket;
         }
 
         GameObject Crop(Vector3 spot, bool ripe)
@@ -619,10 +762,11 @@ namespace Puzzle.Story
         // The chain terminates in the permanent crossbeam of the farmhouse.
         void FarmLamp() => Lamp(Meal + new Vector3(.03f, 1.94f, .04f), terrain.Models.pendant);
 
-        void PlaceSupport(Vector3 point, int choice) =>
+        GameObject PlaceSupport(Vector3 point, int choice) =>
             Period(choice == 0 ? terrain.Models.loaf : choice == 1 ? terrain.Models.stewPot : terrain.Models.cloth, point);
 
-        void Dish(Vector3 point, int choice) => Period(choice == 0 ? terrain.Models.platter : terrain.Models.coffeeCup, point);
+        void Dish(GameObject table, float x, float z, int choice) =>
+            RestOnTable(Period(choice == 0 ? terrain.Models.platter : terrain.Models.coffeeCup, table.transform.position), table, x, z);
 
         Texture2D ChurchArt(int choice) => MakeSketch("教堂速寫", (x, y) =>
         {

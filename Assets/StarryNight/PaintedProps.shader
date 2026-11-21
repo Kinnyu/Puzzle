@@ -50,7 +50,7 @@ Shader "Starry Night/Painted town props"
                 float2 edgePixels = min(i.uv, 1. - i.uv) / max(fwidth(i.uv), .00001);
                 float contour = (1. - smoothstep(.8, 1.9, min(edgePixels.x, edgePixels.y)))
                     * step(.999, max(axis.x, max(axis.y, axis.z)));
-                float3 ink = pigment * .32 + float3(.018, .013, .032);
+                float3 ink = pigment * .032 + float3(.005, .004, .008);
                 return half4(lerp(pigment, ink, max(rim, contour)), 1);
             }
             ENDHLSL

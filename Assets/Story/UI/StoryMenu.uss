@@ -101,12 +101,20 @@
 }
 
 .story-scene-fade {
+    align-items: center;
+    justify-content: center;
     position: absolute;
     left: 0;
     right: 0;
     top: 0;
     bottom: 0;
     background-color: #000000;
+}
+
+.story-transition-caption {
+    color: rgb(234, 223, 198);
+    font-size: 24px;
+    -unity-text-align: middle-center;
 }
 
 .story-card.chapter-three-review {
