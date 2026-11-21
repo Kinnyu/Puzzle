@@ -35,7 +35,7 @@ namespace Puzzle.Story
                             frame.transform.position = House + new Vector3(1.60f, 0, 1.775f);
                             frame.transform.rotation = Quaternion.Euler(9, 0, 0);
                             PeriodModels.RestOnSurface(frame, FloorAt(frame.transform.position).y);
-                            Goal("補色並清出畫室通道　〔B 畫筆〕");
+                            Goal("補色並清出畫室通道　〔右鍵畫板〕");
                             int finished = 0;
                             BrushAt(wall, "替黃色牆面補色", __ =>
                             {
@@ -135,7 +135,7 @@ namespace Puzzle.Story
                 Arrive(InHouse, plan.transform.position);
                 Speak(() =>
                 {
-                    Goal("給兩人留一點空間　〔B 畫筆〕");
+                    Goal("給兩人留一點空間　〔右鍵畫板〕");
                     BrushAt(plan, "調整畫室配置", choice =>
                     {
                         Save("yellow-space", choice);
@@ -198,7 +198,7 @@ namespace Puzzle.Story
                 Speak(() =>
                 {
                     TimeLimit(90, () => Retry("旁白", "夜色越來越深。回到剛才，找人一起幫忙。"));
-                    Goal("收好畫室工具，再找人幫忙　〔B 畫筆〕");
+                    Goal("收好畫室工具，再找人幫忙　〔右鍵畫板〕");
                     BrushAt(utensil, "擦除桌上的危險工具", _ =>
                     {
                         Vector3 safe = table.transform.position + Vector3.up * .12f + Vector3.forward * .31f;

@@ -19,7 +19,8 @@ namespace Puzzle.Story
             internal Transform Object;
             internal string Verb;
             internal Action Use;
-            internal bool Brush;
+            internal WorldBrushTarget Drawing;
+            internal bool Brush => Drawing != null;
             internal float HoldSeconds;
             internal float Range;
             internal Vector3 Offset;
@@ -55,6 +56,7 @@ namespace Puzzle.Story
         Interaction heldTarget;
         Transform preferredStop;
         float heldSince;
+        int brushClosedFrame = -1;
         bool spawnAtEntry;
         Vector3 walkPoint;
         Action onWalkArrival;
@@ -98,7 +100,7 @@ namespace Puzzle.Story
             Visible(exhibition.Supplies, false);
             Visible(exhibition.Setup, false);
             ShowExhibition(false);
-            canvas = new StoryBrush(progress, terrain.CanvasGrain);
+            canvas = new StoryBrush(progress, terrain.CanvasGrain, Obstructed);
         }
 
         internal void Begin(string chapterId, string checkpoint)
@@ -272,13 +274,13 @@ namespace Puzzle.Story
             progress.SetObjective(text);
         }
 
-        void Offer(Vector3 point, string verb, Action use, Transform physical = null, bool brush = false,
+        void Offer(Vector3 point, string verb, Action use, Transform physical = null, WorldBrushTarget drawing = null,
             float hold = 0, float range = 3.15f)
         {
             targets.Add(new Interaction
             {
                 Point = point, Object = physical, Offset = physical != null ? point - physical.position : Vector3.zero,
-                Verb = verb, Use = use, Brush = brush, HoldSeconds = hold, Range = range
+                Verb = verb, Use = use, Drawing = drawing, HoldSeconds = hold, Range = range
             });
         }
 
@@ -294,6 +296,7 @@ namespace Puzzle.Story
 
         void ClearTargets()
         {
+            canvas?.ClearTargets();
             targets.Clear();
             preferredStop = null;
             heldTarget = null;
@@ -302,6 +305,12 @@ namespace Puzzle.Story
         string Interact()
         {
             if (walk.InputSuppressed || CanvasOpen) return null;
+            if (walk.Walking && !progress.SceneTransitioning && !dialogue.BlocksGameplayInput &&
+                Mouse.current?.rightButton.wasPressedThisFrame == true && brushClosedFrame != Time.frameCount)
+            {
+                canvas.Open();
+                return null;
+            }
             if (walk.WaitingAtPainting) return "點擊畫面，進入村落";
             if (onWalkArrival != null)
             {
@@ -378,12 +387,12 @@ namespace Puzzle.Story
             }
 
             if (dialogue.TryConsumeGameplayInteraction()
-                || (best.Brush && Keyboard.current?.bKey.wasPressedThisFrame == true))
+                || (best.Brush && brushClosedFrame != Time.frameCount && Keyboard.current?.bKey.wasPressedThisFrame == true))
             {
                 best.Use();
                 return null;
             }
-            return $"按 {dialogue.InteractionKeyLabel} {best.Verb}";
+            return best.Brush ? $"點右鍵開啟畫板　{best.Verb}" : $"按 {dialogue.InteractionKeyLabel} {best.Verb}";
         }
 
         string DirectionHint(Vector3 point, float distance)
@@ -410,7 +419,16 @@ namespace Puzzle.Story
         void Update()
         {
             var keys = Keyboard.current;
-            if (CanvasOpen && keys?.bKey.wasPressedThisFrame == true) canvas.Hide();
+            if (CanvasOpen && keys?.bKey.wasPressedThisFrame == true)
+            {
+                brushClosedFrame = Time.frameCount;
+                canvas.Hide();
+            }
+            if (CanvasOpen)
+            {
+                canvas.Tick();
+                if (!CanvasOpen) brushClosedFrame = Time.frameCount;
+            }
             if (keys?.tabKey.wasPressedThisFrame == true && !walk.InputSuppressed &&
                 !dialogue.BlocksGameplayInput && !string.IsNullOrEmpty(goal))
                 progress.Notify(goal, 2f);
@@ -527,12 +545,14 @@ namespace Puzzle.Story
 
         void OfferBrush(GameObject prop, string verb, Action<int> finish, bool erase, Ink[] options, Color32[] priorLayers)
         {
-            Offer(prop.transform.position, verb, () => canvas.Open(verb, options, erase, answer =>
+            var drawing = canvas.Register(prop, verb, erase, options, answer =>
             {
                 targets.RemoveAll(target => target.Object == prop.transform);
                 Pigment(prop.transform.position, prop.transform.position + Vector3.up * .24f, options[answer].Color);
                 finish(answer);
-            }, priorLayers), prop.transform, brush: true);
+            }, priorLayers);
+            Offer(prop.transform.position, verb, () => canvas.Open(drawing), prop.transform,
+                drawing: drawing, range: StoryBrush.Reach);
         }
 
         void Layers(GameObject prop, string title, Action<int> finish, params Ink[][] layers)
@@ -541,7 +561,7 @@ namespace Puzzle.Story
             Color32[] previous = null;
             void Layer(int index)
             {
-                Goal($"{title}  {index + 1}/{layers.Length}　〔B 畫筆〕");
+                Goal($"{title}  {index + 1}/{layers.Length}　〔右鍵畫板〕");
                 var options = layers[index];
                 OfferBrush(prop, options.Length > 1 ? "選擇構圖並作畫" : options[0].Name, chosen =>
                 {

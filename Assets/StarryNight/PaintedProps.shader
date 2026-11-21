@@ -16,6 +16,7 @@ Shader "Starry Night/Painted town props"
             #pragma fragment Frag
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "OilPigment.hlsl"
+            #include "StoryBrush.hlsl"
             TEXTURE2D(_BaseMap); SAMPLER(sampler_BaseMap);
             CBUFFER_START(UnityPerMaterial)
                 float4 _BaseColor;
@@ -37,6 +38,7 @@ Shader "Starry Night/Painted town props"
 
             half4 Frag(Output i) : SV_Target
             {
+                StoryCut(i.pos);
                 float3 normal = normalize(i.normal);
                 float3 axis = abs(TransformWorldToObjectNormal(normal));
                 float2 metres = axis.y > max(axis.x,axis.z) ? i.localMetres.xz :

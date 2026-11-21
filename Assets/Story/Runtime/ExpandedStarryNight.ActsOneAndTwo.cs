@@ -115,6 +115,7 @@ namespace Puzzle.Story
                     board.transform.rotation = Quaternion.Euler(0, -19 + 42 * i, 0);
                     board.transform.SetParent(pile.transform, true);
                 }
+                foreach (var collider in pile.GetComponentsInChildren<BoxCollider>()) collider.enabled = true;
                 Arrive(terrain.ChapelPoint(-.82f, 0, -2.14f), table.transform.position);
                 string[] names = { "書本", "布料", "麵包" };
                 string[] reactions = {
@@ -144,18 +145,10 @@ namespace Puzzle.Story
                         ClearTargets();
                         Speak(() =>
                         {
-                            Goal("用畫筆整理側廊木板　〔B 畫筆〕");
+                            Goal("擦除側廊地上的木板　〔右鍵畫板〕");
                             BrushAt(pile, "擦除散落木板", _ =>
                             {
-                                var stacked = dropped + new Vector3(-.76f, 0, .36f);
-                                Pigment(pile.transform.position, stacked, Wood);
-                                pile.transform.SetPositionAndRotation(stacked, Quaternion.identity);
-                                for (int i = 0; i < pile.transform.childCount; i++)
-                                {
-                                    var board = pile.transform.GetChild(i);
-                                    board.rotation = Quaternion.identity;
-                                    board.position = stacked + Vector3.up * (.09f * (i + 1));
-                                }
+                                pile.SetActive(false);
                                 Ask("梵谷", "咦？剛才那裡還亂成一團……是我看錯了嗎？", _ =>
                                     Speak(Next, "梵谷|不管怎樣，路通了。謝謝你。"),
                                     "先把東西送進去吧。", "可能是我們一起整理好的。");
@@ -181,7 +174,7 @@ namespace Puzzle.Story
                 Arrive(terrain.ChapelPoint(-1.53f, 0, 1.06f), window.transform.position);
                 Speak(() =>
                 {
-                    Goal("選一種方式擋住側廊的風　〔B 畫筆〕");
+                    Goal("選一種方式擋住側廊的風　〔右鍵畫板〕");
                     BrushAt(window, "修補漏風的窗", option =>
                     {
                         Save("church-window", option);
@@ -205,7 +198,7 @@ namespace Puzzle.Story
                 {
                     Speak(() =>
                     {
-                        Goal("在素描裡留下陪伴的方式　〔B 畫筆〕");
+                        Goal("在素描裡留下陪伴的方式　〔右鍵畫板〕");
                         BrushAt(drawing, "在教堂素描上作畫", choice =>
                         {
                             Save("anna-object", choice);
@@ -477,7 +470,7 @@ namespace Puzzle.Story
                 int coal = 0;
                 string[] accounts = { "彼得|天還沒亮，我們就來了。", "彼得|莉娜等我回家，也常等到睡著。",
                     "彼得|你們畫得走地上的煤，可畫不走明天的工作。" };
-                Goal("把散落的煤收回袋中  0/3　〔B 畫筆〕");
+                Goal("把散落的煤收回袋中  0/3　〔右鍵畫板〕");
                 foreach (var pile in piles)
                     BrushAt(pile, "擦除散落的煤塊", _ =>
                     {
@@ -491,7 +484,7 @@ namespace Puzzle.Story
                 void MarkExit()
                 {
                     var sign = PostedSign("失去照明的出口", MineExit + Vector3.up * .89f, .62f, .44f);
-                    Goal("給礦口標出可辨識的出口　〔B 畫筆〕");
+                    Goal("給礦口標出可辨識的出口　〔右鍵畫板〕");
                     BrushAt(sign, "畫出礦口照明或標記", option =>
                     {
                         Save("mine-light", option);
@@ -519,7 +512,7 @@ namespace Puzzle.Story
                 Arrive(Family + Vector3.back * 1.56f, Family);
                 Speak(() =>
                 {
-                    Goal("做一件他們現在用得上的東西　〔B 畫筆〕");
+                    Goal("做一件他們現在用得上的東西　〔右鍵畫板〕");
                     BrushAt(card, "畫一件支援工人家庭的物資", choice =>
                     {
                         Save("mine-supply", choice);
@@ -599,7 +592,7 @@ namespace Puzzle.Story
                 void SupplyTargets()
                 {
                     ClearTargets();
-                    Goal($"採收有標記的成熟馬鈴薯  {harvest}/6　〔B 畫筆〕");
+                    Goal($"採收有標記的成熟馬鈴薯  {harvest}/6　〔右鍵畫板〕");
                     foreach (var plant in plants)
                     {
                         if (!plant.activeSelf) continue;
@@ -619,7 +612,7 @@ namespace Puzzle.Story
                     var road = Prop("泥濘田埂", mud, new Vector3(1.01f, .04f, 1.4f), new Color(.27f, .18f, .13f));
                     Speak(() =>
                     {
-                        Goal("鋪一條能搬收成的木板路　〔B 畫筆〕");
+                        Goal("鋪一條能搬收成的木板路　〔右鍵畫板〕");
                         BrushAt(road, "修補泥濘的田埂", _ =>
                         {
                             for (int i = 0; i < 5; i++)

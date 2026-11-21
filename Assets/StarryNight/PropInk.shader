@@ -17,11 +17,12 @@ Shader "Starry Night/Prop ink"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl"
 
+            #include "StoryBrush.hlsl"
             CBUFFER_START(UnityPerMaterial)
                 float4 _InkCenter;
             CBUFFER_END
             struct Input { float3 position : POSITION; float2 uv : TEXCOORD0; };
-            struct Output { float4 clip : SV_POSITION; float2 uv : TEXCOORD0; float width : TEXCOORD1; };
+            struct Output { float4 clip : SV_POSITION; float2 uv : TEXCOORD0; float width : TEXCOORD1; float3 world : TEXCOORD2; };
 
             Output Vert(Input input)
             {
@@ -43,12 +44,14 @@ Shader "Starry Night/Prop ink"
                     float4 behind = mul(UNITY_MATRIX_P, float4(view, 1.));
                     o.clip.z = behind.z / behind.w * o.clip.w;
                 }
+                o.world = TransformObjectToWorld(input.position);
                 o.uv = input.uv;
                 return o;
             }
 
             half4 Frag(Output i) : SV_Target
             {
+                StoryCut(i.world);
                 if (_InkCenter.w > .5)
                 {
                     float2 edge = min(i.uv, 1. - i.uv) / max(fwidth(i.uv), .00001);

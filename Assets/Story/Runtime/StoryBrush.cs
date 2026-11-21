@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using UnityEngine.InputSystem;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -26,119 +28,162 @@ namespace Puzzle.Story
             }
         }
 
-        const int Width = 160;
-        const int Height = 100;
-        const float RequiredCoverage = .90f;
         readonly StorySceneProgress progress;
         readonly StarryNight.StarryNightWalk walk;
-        readonly VisualElement overlay;
-        readonly Label title, hint, coverage, clock;
-        readonly VisualElement palette;
+        readonly Camera eyes;
+        readonly VisualElement overlay, card, tools, palette;
+        readonly Label hint, status, clock, title, caption;
+        readonly Button brushButton, eraserButton, assist;
         readonly Image surface;
-        readonly Button help;
-        readonly Texture2D texture;
-        readonly float[] pigmentRelief = new float[Width * Height];
-        readonly Color32[] pixels = new Color32[Width * Height];
-        readonly bool[] mask = new bool[Width * Height];
-        readonly bool[] visited = new bool[Width * Height];
-        Option[] choices;
-        Color32[] underpaint;
-        Action<int> complete;
-        Action close;
-        int selected;
-        int pointer = -1;
-        int total, filled, strokes;
-        bool moved;
+        readonly float[] grain = new float[WorldBrushTarget.Width * WorldBrushTarget.Height];
+        readonly List<WorldBrushTarget> targets = new();
+        readonly Dictionary<WorldBrushTarget, Label> labels = new();
+        readonly List<WorldBrushTarget> visible = new();
+        readonly Material guide;
+        readonly Func<Vector3, Transform, bool> obstructed;
+        readonly Texture2D lastImage;
+        Color32[] lastLayers;
+        WorldBrushTarget active, stroke;
+        bool eraser, review, suppressed, captured, rightDown, looking;
+        Vector2 dragDelta, lastScreen, lastPixel;
         float strokeLength;
-        Vector2 last;
-        bool erase;
-        bool hadSuppressedInput;
-        bool capturedCursor;
-        bool review;
+        int openedFrame;
+        Action closeReview;
         IVisualElementScheduledItem zoom;
-
         internal bool IsOpen { get; private set; }
         internal bool IsReview => IsOpen && review;
-        internal Texture2D LastImage => texture;
+        internal Texture2D LastImage => lastImage;
+        internal Color32[] CopyPaintedLayers() => lastLayers;
 
-        internal StoryBrush(StorySceneProgress progress, Texture2D canvasGrain)
+        internal StoryBrush(StorySceneProgress progress, Texture2D canvasGrain, Func<Vector3, Transform, bool> obstructed)
         {
-            // Cache one canvas of the town's pigment tile. Drawing and assists sample the same dry brush.
-            var grain = canvasGrain.GetPixels32();
-            for (int y = 0; y < Height; y++)
-            for (int x = 0; x < Width; x++)
-                pigmentRelief[y * Width + x] = grain[(y % canvasGrain.height) * canvasGrain.width + x % canvasGrain.width].r / 255f;
             this.progress = progress;
+            this.obstructed = obstructed;
             walk = progress.Walker;
+            eyes = walk.GetComponent<Camera>();
+            guide = new Material(Resources.Load<Shader>("StarryNight/WorldBrushGuide"));
+            var tile = canvasGrain.GetPixels32();
+            for (int i = 0; i < grain.Length; i++)
+                grain[i] = tile[(i / WorldBrushTarget.Width % canvasGrain.height) * canvasGrain.width +
+                    i % WorldBrushTarget.Width % canvasGrain.width].r / 255f;
+            lastImage = new Texture2D(WorldBrushTarget.Width, WorldBrushTarget.Height, TextureFormat.RGBA32, false);
             overlay = new VisualElement();
             overlay.AddToClassList("story-overlay");
             progress.AddChapterUI(overlay);
-            var card = StoryMenu.Panel(overlay, "story-card");
+
+            card = StoryMenu.Panel(overlay, "story-card");
             card.AddToClassList("brush-card");
             title = StoryMenu.Label(card, "", "story-card-title");
-            hint = StoryMenu.Label(card, "", "brush-hint");
-            clock = StoryMenu.Label(card, "", "brush-hint");
-            palette = StoryMenu.Panel(card, "brush-options");
-            surface = new Image { scaleMode = ScaleMode.StretchToFill };
+            caption = StoryMenu.Label(card, "", "brush-hint");
+            surface = new Image { scaleMode = ScaleMode.ScaleToFit };
             surface.AddToClassList("brush-surface");
             card.Add(surface);
-            coverage = StoryMenu.Label(card, "", "brush-hint");
-            var actions = StoryMenu.Panel(card, "brush-options");
-            help = StoryMenu.Button(actions, "使用輔助操作", Assist);
-            StoryMenu.Button(actions, "關閉畫布", () => Hide());
-            texture = new Texture2D(Width, Height, TextureFormat.RGBA32, false) { name = "星夜畫布", filterMode = FilterMode.Bilinear };
-            surface.RegisterCallback<PointerDownEvent>(OnDown);
-            surface.RegisterCallback<PointerMoveEvent>(OnMove);
-            surface.RegisterCallback<PointerUpEvent>(OnUp);
-            surface.RegisterCallback<PointerCaptureOutEvent>(evt =>
-            {
-                if (evt.pointerId == pointer) pointer = -1;
-            });
+            StoryMenu.Button(card, "繼續", () => Hide());
+
+            tools = StoryMenu.Panel(overlay, "world-brush-tools");
+            var row = StoryMenu.Panel(tools, "brush-options");
+            brushButton = StoryMenu.Button(row, "畫筆", () => SetTool(false));
+            eraserButton = StoryMenu.Button(row, "橡皮擦", () => SetTool(true));
+            hint = StoryMenu.Label(tools, "左鍵作畫　右鍵拖曳環顧　點右鍵收起", "brush-hint");
+            status = StoryMenu.Label(tools, "", "brush-hint");
+            palette = StoryMenu.Panel(tools, "brush-options");
+            assist = StoryMenu.Button(tools, "使用輔助操作", Assist);
+            clock = StoryMenu.Label(tools, "", "brush-hint");
+            SetTool(false);
             StoryMenu.Show(overlay, false);
         }
 
-        internal void Open(string heading, Option[] options, bool eraser, Action<int> finished, Color32[] previousLayers)
+        void SetTool(bool erase)
         {
-            title.text = heading;
-            bool same = ReferenceEquals(choices, options) && erase == eraser && selected >= 0;
-            choices = options;
-            underpaint = previousLayers;
-            erase = eraser;
-            complete = finished;
-            close = null;
-            review = false;
-            palette.Clear();
-            for (int i = 0; i < options.Length && options.Length > 1; i++)
-            {
-                int index = i;
-                StoryMenu.Button(palette, options[i].Name, () =>
-                {
-                    if (selected != index) Select(index);
-                });
-            }
-            surface.image = texture;
-            surface.uv = new Rect(0, 0, 1, 1);
-            if (!same) Select(0);
-            else
-            {
-                MarkChoice();
-                RefreshLabels();
-            }
-            Show();
+            eraser = erase;
+            brushButton.EnableInClassList("brush-choice-selected", !erase);
+            eraserButton.EnableInClassList("brush-choice-selected", erase);
+            CancelStroke();
         }
 
-        internal void Review(string heading, Texture2D art, string caption, Action finished, Rect? detail = null)
+        internal WorldBrushTarget Register(GameObject obj, string verb, bool erase, Option[] options,
+            Action<int> finished, Color32[] previous)
+        {
+            var target = new WorldBrushTarget(obj, verb, erase, options, finished, previous, grain);
+            targets.Add(target);
+            var label = StoryMenu.Label(overlay, erase ? "擦除" : "補畫", "world-brush-marker");
+            label.EnableInClassList("brush-marker-paint", !erase);
+            label.generateVisualContent += context => DrawToolIcon(context, erase);
+            overlay.Insert(0, label);
+            labels.Add(target, label);
+            StoryMenu.Show(label, false);
+            return target;
+        }
+
+        static void DrawToolIcon(MeshGenerationContext context, bool erase)
+        {
+            var pen = context.painter2D;
+            float y = context.visualElement.layout.height * .5f;
+            pen.strokeColor = erase ? new Color(1f, .80f, .53f) : new Color(.57f, .92f, 1f);
+            pen.lineWidth = 1.6f;
+            pen.BeginPath();
+            pen.MoveTo(new Vector2(6, y + 3));
+            pen.LineTo(new Vector2(14, y - 5));
+            pen.LineTo(new Vector2(erase ? 19 : 17, y - (erase ? 1 : 2)));
+            pen.LineTo(new Vector2(erase ? 12 : 9, y + 6));
+            pen.LineTo(new Vector2(6, y + (erase ? 3 : 7)));
+            pen.ClosePath();
+            pen.Stroke();
+            pen.BeginPath();
+            pen.MoveTo(new Vector2(erase ? 10 : 12, y - (erase ? 1 : 3)));
+            pen.LineTo(new Vector2(15, y + (erase ? 3 : 0)));
+            pen.Stroke();
+        }
+
+        internal void ClearTargets()
+        {
+            foreach (var target in targets)
+            {
+                labels[target].RemoveFromHierarchy();
+                target.Dispose();
+            }
+            targets.Clear();
+            visible.Clear();
+            labels.Clear();
+            Select(null);
+            CancelStroke();
+        }
+
+        internal void Open(WorldBrushTarget focused = null)
+        {
+            if (IsOpen) return;
+            review = false;
+            Show();
+            if (focused != null && CanSee(focused))
+            {
+                focused.Prepare(eyes);
+                Select(focused);
+                SetTool(focused.Erase);
+            }
+        }
+
+        void Show()
+        {
+            IsOpen = true;
+            openedFrame = Time.frameCount;
+            suppressed = walk.InputSuppressed;
+            captured = UnityEngine.Cursor.lockState == CursorLockMode.Locked;
+            walk.InputSuppressed = true;
+            StoryMenu.SetCursor(false);
+            overlay.EnableInClassList("world-brush-open", !review);
+            StoryMenu.Show(tools, !review);
+            StoryMenu.Show(card, review);
+            StoryMenu.Show(clock, false);
+            StoryMenu.Show(overlay, true);
+        }
+
+        internal void Review(string heading, Texture2D art, string text, Action finished, Rect? detail = null)
         {
             title.text = heading;
-            hint.text = caption;
-            coverage.text = "";
-            palette.Clear();
+            caption.text = text;
             surface.image = art;
             surface.uv = new Rect(0, 0, 1, 1);
-            surface.scaleMode = ScaleMode.ScaleToFit;
-            help.text = "繼續";
-            close = finished;
-            complete = null;
+            closeReview = finished;
             review = true;
             Show();
             if (!detail.HasValue) return;
@@ -148,25 +193,10 @@ namespace Puzzle.Story
             {
                 float elapsed = Mathf.Clamp01((Time.unscaledTime - start) / .70f);
                 float t = Mathf.SmoothStep(0, 1, elapsed);
-                surface.uv = new Rect(crop.x * t, crop.y * t,
-                    Mathf.Lerp(1, crop.width, t), Mathf.Lerp(1, crop.height, t));
+                surface.uv = new Rect(crop.x * t, crop.y * t, Mathf.Lerp(1, crop.width, t), Mathf.Lerp(1, crop.height, t));
                 if (elapsed >= 1f) zoom?.Pause();
             }).Every(16);
         }
-
-        void Show()
-        {
-            if (IsOpen) return;
-            StoryMenu.Show(clock, false);
-            IsOpen = true;
-            hadSuppressedInput = walk.InputSuppressed;
-            capturedCursor = CursorIsCaptured();
-            walk.InputSuppressed = true;
-            StoryMenu.SetCursor(false);
-            StoryMenu.Show(overlay, true);
-        }
-
-        static bool CursorIsCaptured() => UnityEngine.Cursor.lockState == CursorLockMode.Locked;
 
         internal void ShowTime(int seconds)
         {
@@ -176,215 +206,223 @@ namespace Puzzle.Story
 
         internal void Abort()
         {
-            close = null;
-            complete = null;
-            choices = null;
+            closeReview = null;
             Hide();
         }
 
         internal bool Hide()
         {
             if (!IsOpen) return false;
+            IsOpen = false;
             zoom?.Pause();
             zoom = null;
-            if (pointer >= 0 && surface.HasPointerCapture(pointer)) surface.ReleasePointer(pointer);
-            pointer = -1;
-            IsOpen = false;
+            CancelStroke();
+            rightDown = looking = false;
+            Select(null);
+            foreach (var label in labels.Values) StoryMenu.Show(label, false);
+            visible.Clear();
             StoryMenu.Show(overlay, false);
-            walk.InputSuppressed = hadSuppressedInput;
-            StoryMenu.SetCursor(capturedCursor);
-            var onClosed = close;
-            close = null;
-            onClosed?.Invoke();
+            walk.InputSuppressed = suppressed;
+            StoryMenu.SetCursor(captured);
+            var after = closeReview;
+            closeReview = null;
+            after?.Invoke();
             return true;
         }
 
-        void Select(int index)
+        bool CanSee(WorldBrushTarget target)
         {
-            selected = index;
-            filled = strokes = total = 0;
-            var option = choices[index];
-            Array.Clear(visited, 0, visited.Length);
-            for (int y = 0; y < Height; y++)
-            for (int x = 0; x < Width; x++)
+            if (!target.Object || !target.Object.activeInHierarchy) return false;
+            var v = eyes.WorldToViewportPoint(target.Center);
+            return v.z > eyes.nearClipPlane && v.x >= 0 && v.x <= 1 && v.y >= 0 && v.y <= 1 &&
+                !obstructed(target.Center, target.Object.transform);
+        }
+
+        bool InReach(WorldBrushTarget target) => Vector3.Distance(walk.Player.transform.position + Vector3.up * .9f,
+            target.Object.transform.position) <= Reach;
+        internal const float Reach = 3.15f;
+
+        void Select(WorldBrushTarget target)
+        {
+            if (active == target) return;
+            active = target;
+            palette.Clear();
+            if (target == null || target.Options.Length < 2) return;
+            for (int i = 0; i < target.Options.Length; i++)
             {
-                int i = y * Width + x;
-                float nx = (x + .5f) / Width, ny = (y + .5f) / Height;
-                mask[i] = InMask(option.Mask, nx, ny);
-                if (mask[i]) total++;
-                Color32 ground = PaperPixel(i);
-                pixels[i] = mask[i] && option.Mask != Shape.Free
-                    ? (erase ? InkPixel(i) : Color.Lerp(ground, new Color(.96f, .91f, .77f), .57f))
-                    : ground;
+                int choice = i;
+                StoryMenu.Button(palette, target.Options[i].Name, () =>
+                {
+                    if (active != target || choice == target.Choice) return;
+                    target.Select(choice);
+                    MarkChoice(target);
+                });
             }
-            surface.scaleMode = ScaleMode.StretchToFill;
-            MarkChoice();
-            PaintTexture();
-            RefreshLabels();
+            MarkChoice(target);
         }
 
-        Color32 InkPixel(int index)
-        {
-            Color color = choices[selected].Color;
-            float relief = pigmentRelief[index];
-            Color ink = Color.Lerp(color * (.70f + .40f * relief), new Color(.96f, .86f, .61f), relief * relief * .24f);
-            ink.a = color.a;
-            return ink;
-        }
-
-        void MarkChoice()
+        void MarkChoice(WorldBrushTarget target)
         {
             for (int i = 0; i < palette.childCount; i++)
-                palette[i].EnableInClassList("brush-choice-selected", i == selected);
+                palette[i].EnableInClassList("brush-choice-selected", i == target.Choice);
         }
 
-        Color32 PaperPixel(int index) => underpaint?[index] ?? (Color32)Color.Lerp(
-            new Color(.59f, .50f, .36f), new Color(.84f, .76f, .59f), pigmentRelief[index]);
-
-        internal Color32[] CopyPaintedLayers()
+        internal void Tick()
         {
-            var layers = new Color32[pixels.Length];
-            for (int i = 0; i < layers.Length; i++)
-                layers[i] = visited[i] ? pixels[i] : PaperPixel(i);
-            return layers;
-        }
-
-        void RefreshLabels()
-        {
-            string name = choices[selected].Name;
-            bool free = choices[selected].Mask == Shape.Free;
-            hint.text = free ? $"{name}　拖曳滑鼠，留下三筆"
-                : erase ? $"{name}　按住右鍵擦除有顏色的範圍"
-                : $"{name}　按住左鍵塗畫淡色範圍";
-            coverage.text = free ? $"{strokes} / 3 筆" : $"{Percent()}% / 90%";
-            help.text = "使用輔助操作";
-        }
-
-        int Percent() => total == 0 ? 0 : Mathf.FloorToInt(100f * filled / total);
-
-        void OnDown(PointerDownEvent evt)
-        {
-            if (!IsOpen || review || pointer >= 0 || evt.button != (erase ? 1 : 0)) return;
-            pointer = evt.pointerId;
-            surface.CapturePointer(pointer);
-            last = Coordinate(evt.localPosition);
-            strokeLength = 0f;
-            moved = false;
-            progress.Sound?.PlayBrush();
-            Deposit(last);
-            PaintTexture();
-            RefreshLabels();
-            CheckCoverage();
-            evt.StopPropagation();
-        }
-
-        void OnMove(PointerMoveEvent evt)
-        {
-            if (evt.pointerId != pointer) return;
-            Vector2 position = Coordinate(evt.localPosition);
-            float distance = Vector2.Distance(position, last);
-            int samples = Mathf.Max(1, Mathf.CeilToInt(distance / 2f));
-            for (int i = 1; i <= samples; i++)
-                moved |= Deposit(Vector2.Lerp(last, position, i / (float)samples));
-            strokeLength += distance;
-            last = position;
-            PaintTexture();
-            RefreshLabels();
-            CheckCoverage();
-            evt.StopPropagation();
-        }
-
-        void OnUp(PointerUpEvent evt)
-        {
-            if (evt.pointerId != pointer) return;
-            surface.ReleasePointer(pointer);
-            pointer = -1;
-            if (choices[selected].Mask == Shape.Free && moved && strokeLength >= 5f)
+            if (!IsOpen || review || overlay.panel == null) return;
+            var mouse = Mouse.current;
+            if (mouse == null) return;
+            if (Time.frameCount != openedFrame && mouse.rightButton.wasPressedThisFrame)
             {
-                strokes++;
-                RefreshLabels();
-                if (strokes == 3) Finish();
+                rightDown = true;
+                dragDelta = Vector2.zero;
+                CancelStroke();
             }
-            evt.StopPropagation();
-        }
-
-        Vector2 Coordinate(Vector2 local) => new(
-            Mathf.Clamp(local.x / Mathf.Max(1, surface.contentRect.width) * Width, -10, Width + 10),
-            Mathf.Clamp((1 - local.y / Mathf.Max(1, surface.contentRect.height)) * Height, -10, Height + 10));
-
-        bool Deposit(Vector2 position)
-        {
-            int radius = choices[selected].Mask == Shape.Free ? 3 : 8;
-            int cx = Mathf.RoundToInt(position.x), cy = Mathf.RoundToInt(position.y);
-            bool painted = false;
-            for (int y = Mathf.Max(0, cy - radius); y <= Mathf.Min(Height - 1, cy + radius); y++)
-            for (int x = Mathf.Max(0, cx - radius); x <= Mathf.Min(Width - 1, cx + radius); x++)
+            if (rightDown)
             {
-                int dx = x - cx, dy = y - cy, i = y * Width + x;
-                if (!mask[i] || dx * dx + dy * dy > radius * radius) continue;
-                if (!visited[i]) filled++;
-                visited[i] = true;
-                pixels[i] = erase ? PaperPixel(i) : InkPixel(i);
-                painted = true;
+                var delta = mouse.delta.ReadValue();
+                dragDelta += delta;
+                if (!looking && dragDelta.sqrMagnitude >= 25)
+                {
+                    looking = true;
+                    StoryMenu.SetCursor(true);
+                    walk.LookFromCanvas(dragDelta);
+                }
+                else if (looking) walk.LookFromCanvas(delta);
+                if (!mouse.rightButton.isPressed)
+                {
+                    rightDown = false;
+                    if (!looking) { Hide(); return; }
+                    looking = false;
+                    StoryMenu.SetCursor(false);
+                }
             }
-            return painted;
-        }
 
-        void CheckCoverage()
-        {
-            if (choices[selected].Mask != Shape.Free && total > 0 && filled >= Mathf.CeilToInt(total * RequiredCoverage))
-                Finish();
-        }
-
-        void PaintTexture()
-        {
-            texture.SetPixels32(pixels);
-            texture.Apply(false);
-        }
-
-        void Finish()
-        {
-            if (review)
+            Vector2 screen = mouse.position.ReadValue();
+            bool overTools = tools.worldBound.Contains(PanelPoint(screen));
+            visible.Clear();
+            foreach (var target in targets)
             {
-                Hide();
-                return;
+                bool shown = CanSee(target);
+                if (shown)
+                {
+                    target.Prepare(eyes);
+                    shown = CanSee(target);
+                }
+                var label = labels[target];
+                StoryMenu.Show(label, shown);
+                if (!shown) continue;
+                visible.Add(target);
+                var location = overlay.WorldToLocal(PanelPoint(eyes.WorldToScreenPoint(target.Center)));
+                label.style.left = location.x;
+                label.style.top = location.y;
+                label.text = (target.Erase ? "擦除" : "補畫") + (InReach(target) ? "" : " · 靠近");
             }
-            var finished = complete;
-            int answer = selected;
-            choices = null;
-            close = null;
-            complete = null;
-            Hide();
-            finished?.Invoke(answer);
+            Vector2 pixel = default;
+            var hover = rightDown || overTools ? null : Pick(screen, out pixel);
+            if (stroke == null && hover != null) Select(hover);
+            if (active != null && !visible.Contains(active)) Select(null);
+            if (active == null && visible.Count == 1) Select(visible[0]);
+            foreach (var target in visible)
+            {
+                target.Draw(eyes, guide, target == hover);
+                labels[target].EnableInClassList("brush-marker-hover", target == hover);
+            }
+            bool usable = active != null && InReach(active) && eraser == active.Erase;
+            status.text = active == null ? "環顧尋找畫筆或橡皮擦標記" :
+                !InReach(active) ? $"{active.Verb}　收起畫板並靠近" :
+                !usable ? $"{active.Verb}　選擇{(active.Erase ? "橡皮擦" : "畫筆")}" : $"{active.Verb}　{active.Progress}";
+            StoryMenu.Show(assist, usable);
+            if (overTools || rightDown || !usable) { CancelStroke(); return; }
+            if (mouse.leftButton.wasPressedThisFrame && hover == active && active.Deposit(pixel))
+            {
+                stroke = active;
+                strokeLength = 0;
+                lastScreen = screen;
+                lastPixel = pixel;
+                progress.Sound?.PlayBrush();
+                active.Upload();
+            }
+            if (stroke == null) return;
+            int steps = Mathf.CeilToInt(Vector2.Distance(screen, lastScreen) / 3f);
+            bool changed = false;
+            for (int i = 1; i <= steps; i++)
+            {
+                var point = Vector2.Lerp(lastScreen, screen, i / (float)steps);
+                if (Pick(point, out var ink) != stroke || !stroke.Deposit(ink))
+                {
+                    lastPixel = new Vector2(float.NaN, 0);
+                    continue;
+                }
+                if (!float.IsNaN(lastPixel.x)) strokeLength += Vector2.Distance(lastPixel, ink);
+                lastPixel = ink;
+                changed = true;
+            }
+            if (changed) stroke.Upload();
+            lastScreen = screen;
+            if (!mouse.leftButton.isPressed) stroke.EndStroke(strokeLength);
+            if (stroke.Finished) Finish(stroke);
+            else if (!mouse.leftButton.isPressed) CancelStroke();
         }
+
+        Vector2 PanelPoint(Vector2 screen) => RuntimePanelUtils.ScreenToPanel(overlay.panel,
+            new Vector2(screen.x, Screen.height - screen.y));
+
+        WorldBrushTarget Pick(Vector2 screen, out Vector2 pixel)
+        {
+            pixel = default;
+            var ray = eyes.ScreenPointToRay(screen);
+            float nearest = float.PositiveInfinity;
+            WorldBrushTarget best = null;
+            foreach (var target in visible)
+            {
+                if (!target.Hit(ray, out float distance, out var uv) || distance >= nearest ||
+                    obstructed(ray.GetPoint(distance), target.Object.transform)) continue;
+                nearest = distance;
+                best = target;
+                pixel = uv;
+            }
+            return best;
+        }
+
+        void CancelStroke() { stroke = null; strokeLength = 0; }
 
         void Assist()
         {
-            if (review)
-            {
-                Finish();
-                return;
-            }
-            if (choices[selected].Mask == Shape.Free)
-            {
-                for (int band = 0; band < 3; band++)
-                for (int x = 28; x < 131; x++)
-                    Deposit(new Vector2(x, 28 + band * 19 + Mathf.Sin(x * .051f + band * .36f) * 9));
-            }
-            else
-            {
-                for (int i = 0; i < mask.Length; i++)
-                {
-                    if (!mask[i]) continue;
-                    visited[i] = true;
-                    pixels[i] = erase ? PaperPixel(i) : InkPixel(i);
-                }
-            }
-            PaintTexture();
-            Finish();
+            if (review) { Hide(); return; }
+            if (active == null || active.Erase != eraser || !CanSee(active) || !InReach(active)) return;
+            active.Assist();
+            Finish(active);
         }
 
-        static bool InMask(Shape shape, float x, float y)
+        void Finish(WorldBrushTarget target)
+        {
+            if (!target.Finished || !targets.Contains(target) || !CanSee(target) || !InReach(target)) return;
+            int answer = target.Choice;
+            lastLayers = target.Layers();
+            var art = (Color32[])lastLayers.Clone();
+            for (int i = 0; i < art.Length; i++)
+                if (art[i].a == 0) art[i] = Color.Lerp(new Color(.59f, .50f, .36f), new Color(.84f, .76f, .59f), grain[i]);
+            lastImage.SetPixels32(art);
+            lastImage.Apply();
+            targets.Remove(target);
+            labels[target].RemoveFromHierarchy();
+            labels.Remove(target);
+            Hide();
+            target.Dispose();
+            target.Complete(answer);
+        }
+
+        public void Dispose()
+        {
+            Abort();
+            ClearTargets();
+            overlay.RemoveFromHierarchy();
+            UnityEngine.Object.Destroy(guide);
+            UnityEngine.Object.Destroy(lastImage);
+        }
+
+        internal static bool InMask(Shape shape, float x, float y)
         {
             float dx = x - .5f, dy = y - .5f;
             bool inside(float l, float r, float b, float t) => x >= l && x <= r && y >= b && y <= t;
@@ -432,10 +470,5 @@ namespace Puzzle.Story
             return false;
         }
 
-        public void Dispose()
-        {
-            UnityEngine.Object.Destroy(texture);
-            overlay.RemoveFromHierarchy();
-        }
     }
 }

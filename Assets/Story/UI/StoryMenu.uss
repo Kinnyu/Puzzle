@@ -439,3 +439,39 @@
     color: #ebd9b1;
     white-space: normal;
 }
+
+.story-overlay.world-brush-open {
+    padding: 0;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+.world-brush-tools {
+    position: absolute;
+    right: 18px;
+    bottom: 20px;
+    max-width: 46%;
+    align-items: stretch;
+    padding: 8px 14px;
+    background-color: rgba(23, 33, 47, 0.94);
+    border-top-width: 2px;
+    border-top-color: #cda567;
+}
+
+.world-brush-marker {
+    position: absolute;
+    translate: -50% -125%;
+    font-size: 15px;
+    color: #fff2ce;
+    background-color: rgba(29, 36, 48, 0.88);
+    border-radius: 5px;
+    padding: 2px 7px 2px 24px;
+}
+
+.world-brush-marker.brush-marker-paint {
+    color: #a7edff;
+}
+
+.world-brush-marker.brush-marker-hover {
+    background-color: #745a30;
+    color: white;
+}

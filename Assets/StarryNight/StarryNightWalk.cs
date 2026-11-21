@@ -29,6 +29,7 @@ namespace Puzzle.StarryNight
         internal Func<Vector2, bool> PointerOverMenu { get; set; }
         internal CharacterController Player => player;
         internal float EyeHeight => eyeHeight;
+        internal bool Walking => view == View.Walking;
         internal bool WaitingAtPainting => view == View.Overlook && onApproachFinished != null;
 
         void Start()
@@ -71,9 +72,7 @@ namespace Puzzle.StarryNight
             if (clicked) Cursor.lockState = CursorLockMode.Locked;
             if (mouse != null && Cursor.lockState == CursorLockMode.Locked)
             {
-                Vector2 delta = mouse.delta.ReadValue();
-                yaw += delta.x * .11f;
-                pitch = Mathf.Clamp(pitch - delta.y * .11f, -89f, 88f);
+                Turn(mouse.delta.ReadValue());
             }
             float dt = Time.deltaTime;
             Vector2 input = Vector2.zero;
@@ -91,6 +90,19 @@ namespace Puzzle.StarryNight
             if (player.isGrounded && verticalSpeed < 0) verticalSpeed = -2f;
             verticalSpeed += Physics.gravity.y * dt;
             player.Move((velocity + Vector3.up * verticalSpeed) * dt);
+            UpdateWalkingView();
+        }
+
+        void Turn(Vector2 delta)
+        {
+            yaw += delta.x * .11f;
+            pitch = Mathf.Clamp(pitch - delta.y * .11f, -89f, 88f);
+        }
+
+        internal void LookFromCanvas(Vector2 delta)
+        {
+            if (!InputSuppressed || !Walking) return;
+            Turn(delta);
             UpdateWalkingView();
         }
 
