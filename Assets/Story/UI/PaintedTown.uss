@@ -1,19 +1,11 @@
 /* The translucent tile uses the bristle relief from the village material. */
 .story-title-card, .story-card, .story-controls, .story-toast, .story-objective,
-.drawing-tools, .chapter-three-timer, .chapter-three-subtitle, .chapter-objective-card,
-.dialogue-card, .story-button, .dialogue-control, .dialogue-action, .chapter-title {
+.drawing-tools, .chapter-three-timer, .chapter-objective-card,
+.story-button, .dialogue-control, .chapter-title {
     background-image: url("project://database/Assets/Story/UI/Canvas%20grain.png");
     background-repeat: repeat;
     background-size: 160px 128px;
     -unity-background-image-tint-color: rgba(255, 255, 255, 0.16);
-}
-
-.dialogue-card {
-    background-color: rgba(24, 37, 62, 0.93);
-    border-left-width: 3px;
-    border-left-color: #dfb66a;
-    padding-left: 18px;
-    padding-right: 18px;
 }
 
 .chapter-title {

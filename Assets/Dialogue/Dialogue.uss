@@ -176,13 +176,19 @@
 }
 
 .dialogue-control, .dialogue-action {
-    background-color: #2d405d;
+    background-color: #24334c;
     color: #f6edd7;
     border-width: 1px;
-    border-color: #7f8ba1;
-    border-radius: 2px;
+    border-color: #526483;
+    border-radius: 6px;
     padding: 6px 12px;
     font-size: 16px;
+}
+
+.dialogue-control {
+    background-color: #2d405d;
+    border-color: #7f8ba1;
+    border-radius: 2px;
 }
 
 .dialogue-action {
